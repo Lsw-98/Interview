@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    /* 
+      使用标准盒子模型
+      整个li的宽度为310 = border * 2 + padding * 2 + width
+    */
+
+    .uls1 li {
+      box-sizing: content-box;
+      margin: 5px;
+      padding: 50px;
+      width: 200px;
+      height: 200px;
+      border: 5px solid #ccc;
+      float: left;
+    }
+
+    /*
+      使用IE盒子模型
+      整个li的宽度为200 = border * 2 + padding * 2 > width ? border + padding : width
+    */
+
+    .uls2 li {
+      box-sizing: border-box;
+      margin: 5px;
+      padding: 50px;
+      width: 100px;
+      height: 200px;
+      border: 5px solid #ccc;
+      float: left;
+    }
+  </style>
+</head>
+
+<body>
+  <ul class="uls1">
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+  </ul>
+
+  <hr />
+
+  <ul class="uls2">
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+  </ul>
+</body>
+
+</html>
