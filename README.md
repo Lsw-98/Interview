@@ -90,3 +90,82 @@
 
 ### *CSS属性哪些不可以继承
     border、margin、padding
+
+## CSS优先级算法问题
+    !important > 内联样式 > id > class > 标签 > 通配 
+
+### *CSS权重计算
+首先我给每个CSS选择器赋一个权重：
+ - !important权重为10000
+ - 内联样式权重为：1000
+ - id为：100
+ - class：10
+ - 标签：1
+ - 通配：0
+
+然后计算每个样式的权重值，权重大的优先
+
+## 用CSS画一个三角形    
+    可以使用border(边框)画，设置边框三边为透明，另一边不透明
+
+## 一个盒子不给宽高如何水平居中
+
+方法一：使用弹性布局
+
+```
+ <style>
+   .container {
+     width: 200px;
+     height: 200px;
+     border: 5px solid gray;
+     /* 第一种方式：弹性布局 */
+     display: flex;
+     /* justify-content属性定义了项目在主轴上的对齐方式 */
+     justify-content: center;
+     /* align-items属性定义项目在交叉轴上如何对齐。 */
+     align-items: center;
+   }
+
+   .content {
+     background-color: brown;
+   }
+ </style>
+
+ <div class="container">
+   <div class="content">123</div>
+ </div>    
+```
+
+方法二：使用绝对定位
+```
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      width: 200px;
+      height: 200px;
+      border: 5px solid gray;
+
+      /* 第一种方式：弹性布局 */
+      /* display: flex; */
+      /* justify-content属性定义了项目在主轴上的对齐方式 */
+      /* justify-content: center; */
+      /* align-items属性定义项目在交叉轴上如何对齐。 */
+      /* align-items: center; */
+
+      /* 第二种方式：使用绝对定位 */
+      position: relative;
+    }
+
+    .content {
+      background: brown;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+```

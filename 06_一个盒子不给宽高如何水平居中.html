@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      width: 200px;
+      height: 200px;
+      border: 5px solid gray;
+
+      /* 第一种方式：弹性布局 */
+      /* display: flex; */
+      /* justify-content属性定义了项目在主轴上的对齐方式 */
+      /* justify-content: center; */
+      /* align-items属性定义项目在交叉轴上如何对齐。 */
+      /* align-items: center; */
+
+      /* 第二种方式：使用绝对定位 */
+      /* 
+        为什么position：absolute；的父元素要设置position：relative；
+        因为绝对定位的元素相对最近的父元素进行定位，该父元素应满足position的值必须是：relative、absolute、fixed，
+        若没有这养的父元素，就相对于body定位
+      */
+      position: relative;
+    }
+
+    .content {
+      background: brown;
+      position: absolute;
+      /* 
+        当使用：top: 50%;left: 50%;， 是以左上角为原点，故不处于中心位置
+        translate(-50%,-50%) 作用是，往上（x轴）,左（y轴）移动自身长宽的 50%，以使其居于中心位置。
+      */
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="content">123</div>
+  </div>
+</body>
+
+</html>

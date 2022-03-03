@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<style>
+  /* 标签选择器 */
+  div {
+    background-color: gray !important;
+  }
+
+  #box {
+    background-color: orange;
+  }
+
+  .cbox {
+    background-color: green;
+  }
+
+  * {
+    background-color: black;
+  }
+
+  /* 优先级算法如何计算 */
+
+
+  /* 标签选择器，权重和为1 */
+  .demoheader h2 {
+    background-color: red;
+  }
+
+  /* 两个标签，权重和为2 */
+  div h2 {
+    background-color: blue;
+  }
+
+  .demo h2 {
+    background-color: aqua;
+  }
+
+  /* 一个类选择器，一个标签选择器，权重和为11 */
+  .demo h2 {
+    background-color: green;
+  }
+
+  /* 一个id选择器，一个标签选择器，权重和为101 */
+  #demo h2 {
+    background-color: gray;
+  }
+
+  /* 一个id选择器，两个标签选择器，权重和为102 */
+  div #demo h2 {
+    background-color: white;
+  }
+
+  /* 110 */
+  .demo #demo h2 {
+    background-color: aqua;
+  }
+
+  .demoheader #demo h2 {
+    background-color: blueviolet;
+  }
+</style>
+
+<body>
+  <!-- 内联样式 -->
+  <!-- <div style="background-color: red;" id="box" class="cbox">
+    123456789
+  </div> -->
+
+  <!-- 优先级算法如何计算 -->
+  <div class="demoheader">
+    <div class="demo" id="demo">
+      <h2 href="#">123</h2>
+    </div>
+  </div>
+</body>
+
+</html>
