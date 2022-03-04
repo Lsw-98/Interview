@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    /* 
+      如果这么设置，会发生高度塌陷的问题
+      * {
+        margin: 0px;
+        padding: 0px;
+      }
+
+      ul {
+        height: 50px;
+        border: 5px solid gray;
+      }
+
+      ul li {
+        width: 200px;
+        height: 200px;
+        float: left;
+        margin: 10px;
+        background: orange;
+      } 
+    */
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    ul {
+      width: 300px;
+      border: 5px solid gray;
+      /* 加上以下语句的其中一句都可以让ul变为BFC元素 */
+      overflow: hidden;
+      /* float: left; */
+      /* display: inline-block; */
+      /* display: table-cell; */
+      /* position: absolute; */
+      /* position: fixed; */
+    }
+
+    ul li {
+      width: 200px;
+      height: 200px;
+      float: left;
+      margin: 10px;
+      background: orange;
+
+    }
+  </style>
+</head>
+
+<body>
+  <ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+  </ul>
+  <h2>BFC</h2>
+
+</body>
+
+</html>

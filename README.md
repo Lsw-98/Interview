@@ -169,3 +169,26 @@
     }
   </style>
 ```
+
+
+## display有哪些属性，作用是什么？
+  display: none   - 表示该元素不会显示，但盒子还在DOM中  
+  display: block  - 把某元素转化为块元素  
+  display: inline - 把某元素转化为行内元素  
+  display: inline-block - 把某元素转化为行内块元素
+
+## BFC规范
+BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面的子元素不会影响到外面的元素
+
+### *BFC布局规则
+ - 内部盒子在垂直方向，一个接一个的放置
+ - Box垂直方向的距离由margin决定，属于同一个BFC的两个相邻Box的margin会发生重叠
+ - 计算BFC的高度时，浮动元素也参与计算
+ - 每个Box的margin box的左边，与包含块border box的左边相接触（对于从左往右的格式化 ，否则相反）。即使存在浮动也是如此
+ - BFC的区域不会与float box重叠
+
+### * 如何创建BFC
+ - float的值不为none
+ - position的值不为static或者relative
+ - overflow的值不为visible
+ - display的值为inline-block、table-cell、flex、table-caption、inline-flex

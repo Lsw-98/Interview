@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    p {
+      width: 200px;
+      height: 200px;
+      margin: 100px;
+      background: orange;
+    }
+
+    div {
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 这里不加div，会出现margin重叠的问题 -->
+  <p>p1</p>
+  <div>
+    <p>p2</p>
+  </div>
+</body>
+
+</html>
