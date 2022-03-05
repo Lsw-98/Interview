@@ -7,13 +7,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    div {
+    /* 
+    使用边框画
+      div {
+        width: 0;
+        height: 0;
+        border: 100px solid transparent;
+        border-right: 100px solid #ccc;
+      } 
+    */
+
+    /* 使用:after */
+    div:after {
+      content: '';
+      display: inline-block;
       width: 0;
       height: 0;
-      border-left: 100px solid transparent;
-      border-top: 100px solid transparent;
-      border-right: 100px solid #ccc;
-      border-bottom: 100px solid transparent;
+      border: 10px solid transparent;
+      border-left: 10px solid coral;
     }
   </style>
 </head>

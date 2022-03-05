@@ -106,13 +106,41 @@
 然后计算每个样式的权重值，权重大的优先
 
 ## 用CSS画一个三角形    
-    可以使用border(边框)画，设置边框三边为透明，另一边不透明
+1.可以使用border(边框)画，设置边框三边为透明，另一边不透明
+```html
+<style>
+  div {
+    width: 0;
+    height: 0;
+    border: 100px solid transparent;
+    border-right: 100px solid #ccc;
+  } 
+</style>
+
+<div></div>
+```
+
+2.使用:after画
+```html
+<style>
+  div:after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left: 10px solid coral;
+  }
+</style>
+
+<div></div>
+```
 
 ## 一个盒子不给宽高如何水平居中
 
 方法一：使用弹性布局
 
-```
+```html
  <style>
    .container {
      width: 200px;
@@ -137,7 +165,7 @@
 ```
 
 方法二：使用绝对定位
-```
+```html
   <style>
     * {
       padding: 0;
@@ -192,3 +220,51 @@ BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面
  - position的值不为static或者relative
  - overflow的值不为visible
  - display的值为inline-block、table-cell、flex、table-caption、inline-flex
+
+
+ ## 如何清除浮动
+ 1. 使用BFC
+ 2. 使用:after
+
+ ### *:before 和 :after
+ :before 和 :after 的主要作用是在元素内容前后加上指定内容
+
+ 可以使用:after来清除浮动，例如：
+ ```html
+   <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    ul {
+      border: 5px solid black;
+    }
+
+    ul:after {
+      content: '';
+      display: block;
+      /* 清除左右两边浮动 */
+      clear: both;   
+    }
+
+    ul li {
+      width: 200px;
+      height: 200px;
+      background-color: orange;
+      float: left;
+    }
+  </style>
+
+  <ul>
+   <li>1</li>
+   <li>2</li>
+   <li>3</li>
+  </ul>
+ ```
+
+## position有哪些值，分别根据什么定位
+
+1. position: fixed;   - 固定定位，相对于窗口定位，不管浏览器怎么滚动
+2. position: relative;   - 相对于自身的位置进行定位，不脱离文档流
+3. position: absolute;   - 相对第一个有relative的父元素进行定位，脱离文档流

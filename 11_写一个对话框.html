@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .left,
+    .right {
+      min-height: 40px;
+      position: relative;
+      display: table;
+      text-align: center;
+      border-radius: 7px;
+      background-color: #9EEA6A;
+      border: 1px solid black;
+    }
+
+    /* 定位左右对话框 */
+    .right {
+      top: 40px;
+      left: 60px;
+    }
+
+    /* 使内容居中 */
+    .left>p,
+    .right>p {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 0 10px;
+    }
+
+    /* 画小三角形 */
+    .left::before,
+    .left::after,
+    .right::before,
+    .right::after {
+      content: '';
+      display: block;
+      width: 0px;
+      height: 0px;
+      border: 8px solid transparent;
+      position: absolute;
+      top: 11px;
+    }
+
+    /* 分别给两个对话框的小三角形定位 */
+    .left::before {
+      border-right: 8px solid #9EEA6A;
+      left: -16px;
+    }
+
+    .left::after {
+      border-right: 8px solid #9EEA6A;
+      left: -17px;
+      z-index: -1;
+    }
+
+    .right::before {
+      border-left: 8px solid #9EEA6A;
+      right: -17px;
+      z-index: -1;
+    }
+
+    .right::after {
+      border-left: 8px solid #9EEA6A;
+      right: -16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="left">
+    <p>吃了吗？</p>
+  </div>
+  <div class="right">
+    <p>吃了啊！</p>
+  </div>
+</body>
+
+</html>

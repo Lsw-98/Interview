@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 
+      清除浮动的第一种方式：使用BFC
+      ul {
+        border: 5px solid black;
+        overflow: hidden;
+      }
+
+      ul li {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        float: left;
+      } 
+    */
+
+    ul {
+      border: 5px solid black;
+    }
+
+    ul:after {
+      content: '';
+      display: block;
+      /* 清除左右两边浮动 */
+      clear: both;
+    }
+
+    ul li {
+      width: 200px;
+      height: 200px;
+      background-color: orange;
+      float: left;
+    }
+  </style>
 </head>
+
 <body>
-  
+  <ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+  </ul>
 </body>
+
 </html>
