@@ -268,3 +268,67 @@ BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面
 1. position: fixed;   - 固定定位，相对于窗口定位，不管浏览器怎么滚动
 2. position: relative;   - 相对于自身的位置进行定位，不脱离文档流
 3. position: absolute;   - 相对第一个有relative的父元素进行定位，脱离文档流
+
+
+## reset.css
+reset是一个css文件，可以重置css样式
+
+## Normalize.css
+Normalize.css：可以增强跨浏览器渲染的一致性
+
+## sprite的优缺点
+### *什么是sprite
+把多个小图标合并为一个大图片
+
+### *优点
+减少了http请求的次数，提升了性能
+
+### *缺点
+可维护性差（例如图片位置进行修改或内容宽高修改）
+
+## display:none和visibility:hidden的区别
+1. display:none是彻底消失，不在文档流中占位，浏览器也不会解析该元素；
+visibility:hidden是视觉上消息了，可以理解为透明度为0的效果，在文档流中占位，浏览器会解析该元素
+2. 使用visibility:hidden比display:none性能更好，当display进行切换属性时，页面会发生回流，而visibility切换时不会引起回流。
+
+```html
+<style>
+  div {
+    width: 200px;
+    height: 200px;
+    background-color: pink;
+    /* display: none; */
+    visibility: hidden;
+    
+  }
+</style>
+
+<div>
+  123
+</div>
+<ul>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+</ul>
+```
+
+## opacity和rgba的区别
+opacity和rgba都可以给元素设置透明度，但不同之处在于：
+1. **opacity作用于元素以及元素内的所有内容的透明度**，而**rgba()只作用于元素的颜色和其背景色**
+2. **opacity可以被继承，rgba()不会被继承**
+```html
+<style>
+  div {
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 0, 0, 0.5);
+    /* opacity: 0.5; */
+  }
+</style>
+
+<div>
+  你好，css
+</div>
+```
+
