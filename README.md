@@ -1,8 +1,10 @@
-# 深入学习CSS记录
+# 面试八股文记录
 
 注:  
     &emsp;&emsp;整个库的文档都是自己整理，自己手码的，有错误的地方，请指出，谢谢!!!。如果你喜欢的话，麻烦点一个star吧，谢谢!!!  
     &emsp;&emsp;下面进行正题。  
+
+# CSS篇
 
 ## 盒子模型
 盒子模型分为标准盒子模型和IE盒子模型，
@@ -288,7 +290,7 @@ Normalize.css：可以增强跨浏览器渲染的一致性
 
 ## display:none和visibility:hidden的区别
 1. display:none是彻底消失，不在文档流中占位，浏览器也不会解析该元素；
-visibility:hidden是视觉上消息了，可以理解为透明度为0的效果，在文档流中占位，浏览器会解析该元素
+visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，在文档流中占位，浏览器会解析该元素
 2. 使用visibility:hidden比display:none性能更好，当display进行切换属性时，页面会发生回流，而visibility切换时不会引起回流。
 
 ```html
@@ -332,3 +334,175 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
 </div>
 ```
 
+# React篇
+## React事件机制
+React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
+可以使用**event.preventDefault**阻止事件冒泡。
+
+![avatar](/react_interview/img/事件机制.jpg)
+
+### *实现合成事件的目的
+ - 合成事件是一个跨浏览器的原生时间包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。
+ - 对于原生浏览器事件来说，浏览器会给监听器创建一个事件对象，如果你有很多的事件监听，那么就需要分配很多的事件对象，造成高额的内存分配问题，但对于合成事件来说，有一个事件池专门来管理它们的创建和销毁，当事件需要被使用时，就会从池子中复用对象，事件回调结束后，就会销毁事件对象上的属性，从而便于下次复用事件对象。
+
+## React的事件和普通的HTML事件有什么不同？
+1. 事件的命名方式不同，原生事件为全小写，react事件为小驼峰
+2. 事件函数处理语法不同，原生事件为字符串，react事件为函数
+3. react事件不能采用return false的方式来阻止浏览器的默认行为，而必须明确调用preventDefault()来阻止默认行为
+
+## 合成事件
+合成事件是react模拟DOM原生事件的一个事件对象，其优点如下：
+1. 兼容所有浏览器，兼容性好
+2. 将事件统一放到一个数组，避免频繁的新增删除
+3. 方便react统一管理和事务机制
+
+## react时间执行顺序
+事件的执行顺序为<font color="#FF6347">原生事件先执行，合成事件再执行</font>。合成事件会冒泡到document上，所以**尽量避免原生事件和合成事件混用**。如果原生事件阻止冒泡，那么就会导致合成事件不执行。
+
+## React.Component 和 React.PureComponent 的区别
+PureComponent表示一个纯组件，可以<font color="#FF6347">减少render渲染次数，从而提高组件的性能</font>。  
+在React中，可以通过shouldComponentUpdate()函数执行reture false来阻止页面的更新，减少不必要的render。  
+而PureComponent会自定执行shouldComonentUpdate。PureComponent只会进行浅比较，比较数据地址，不会比较数据内容是否一致。**如果数据具有深层次结构，利用对象等形式，不推荐使用PureComponent**。
+
+## 哪些方法会触发 React 重新渲染
+### *setState()方法被调用
+当执行setState()方法时，组件会调用render使页面重新渲染。<font color="#FF6347">当传入null时，并不会重新渲染页面</font>。 
+### *父组件的重新渲染
+只要父组件重新渲染了，即使传入子组件的props未发生变化，子组件也会重新渲染。
+
+## React如何判断什么时候重新渲染组件
+通过shouldComponentUpdate()生命周期钩子函数的返回值true/false来判断是否需要重新渲染组件。
+
+## React声明组件的方式
+React声明组件主要有三种方式：
+- 函数式组件（无状态组件）
+- ES5原生方式：React.createClass定义的组件
+- ES6：extends React.Component定义组件
+
+### *无状态函数式组件
+函数式组件只负责传入props来展示，不涉及到state状态的操作，组件不会被实例化，整体渲染性能得到提升，不能访问this对象，不能访问生命周期函数。   
+可以通过useState()给函数式组件添加状态。
+
+### *React.createClass与React.Component区别：
+1. 创建语法不同：
+```js
+// React.createClass
+import React from 'react';
+
+const Contacts = React.createClass({  
+  render() {
+    return (
+      <div></div>
+    );
+  }
+});
+
+export default Contacts;  
+```
+
+```js
+// React.Component
+import React from 'react';
+
+class Contacts extends React.Component {  
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div></div>
+    );
+  }
+}
+
+export default Contacts;  
+```
+
+2. 设置propType 和 getDefaultProps不同
+
+React.createClass：通过proTypes对象和getDefaultProps()方法来设置和获取props.
+```js
+// React.createClass
+import React from 'react';
+
+const Contacts = React.createClass({  
+  propTypes: {
+    name: React.PropTypes.string
+  },
+  getDefaultProps() {
+    return {
+
+    };
+  },
+  render() {
+    return (
+      <div></div>
+    );
+  }
+});
+
+export default Contacts;  
+```
+
+React.Component：通过设置两个属性propTypes和defaultProps
+```js
+// React.Component
+import React form 'react';
+class TodoItem extends React.Component{
+    static propTypes = { // as static property
+        name: React.PropTypes.string
+    };
+    static defaultProps = { // as static property
+        name: ''
+    };
+    constructor(props){
+        super(props)
+    }
+    render(){
+        return <div></div>
+    }
+}
+```
+
+3. 状态定义不同
+React.createClass：通过getInitialState()方法返回一个包含初始值的对象
+```js
+// React.createClass
+import React from 'react';
+let TodoItem = React.createClass({
+    // return an object
+    getInitialState(){ 
+        return {
+            isEditing: false
+        }
+    }
+    render(){
+        return <div></div>
+    }
+})
+```
+
+React.Component：通过state设置初始状态
+```js
+// React.Component
+import React from 'react';
+class TodoItem extends React.Component{
+    state = { 
+        isEditing: false
+    }
+    render(){
+        return <div></div>
+    }
+}
+```
+
+4. this的指向不同
+     - React.createClass：会正确绑定this
+     - React.Component：由于使用了 ES6，属性并不会自动绑定到 React 类的实例上。
+
+## 有状态组件与无状态组件
+| |  有状态组件   | 无状态组件  |
+| ---- |  ----  | ----  |
+| 特点 | 是类组件、可以使用this、可以使用生命周期函数、根据外部传入的props和自身的state进行渲染、若频繁触发生命周期函数会影响性能 | 不依赖自身state、可以避免使用this、性能更高、只根据props进行渲染 |
+| 使用场景 | 需要使用状态或需要使用状态操作组件时时 | 组件不需要管理state，纯展示 |
+| 总结 | 类组件可以维护自身的状态变量，让开发者在组件的不同阶段对组件进行更多的控制  | 视图与数据解耦分离、专注于render |
