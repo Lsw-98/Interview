@@ -35,7 +35,7 @@
  - 类选择器（.）
  - 标签选择器
  - 相邻选择器（+）
- - 后代选择器
+ - 后代选择器(ul li)
  - 子元素选择器（>）
  - 属性选择器（a[href]）
 
@@ -101,11 +101,14 @@
  - !important权重为10000
  - 内联样式权重为：1000
  - id为：100
- - class：10
- - 标签：1
- - 通配：0
+ - class、属性选择器、伪类选择器：10
+ - 标签、伪元素选择器：1
+ - 通配、后代、子选择器、兄弟选择器：0
 
 然后计算每个样式的权重值，权重大的优先
+
+### *注意事项
+1. 继承得到的样式的优先级最低
 
 ## 用CSS画一个三角形    
 1.可以使用border(边框)画，设置边框三边为透明，另一边不透明
@@ -200,12 +203,24 @@
   </style>
 ```
 
-
 ## display有哪些属性，作用是什么？
-  display: none   - 表示该元素不会显示，但盒子还在DOM中  
-  display: block  - 把某元素转化为块元素  
-  display: inline - 把某元素转化为行内元素  
-  display: inline-block - 把某元素转化为行内块元素
+  display: none   - 表示该元素不会显示，但盒子还在DOM中    
+  display: block  - 把某元素转化为块元素，会占一行，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>  
+  display: inline - 把某元素转化为行内元素，<font color="	#FF6347">默认宽度为内容宽度，不可以设置宽高，同行显示 </font>  
+  display: inline-block - 把某元素转化为行内块元素  
+  display: list-item - 像块级元素一样显示，但会加上一个标记，例如：  
+  ![list-item](https://user-images.githubusercontent.com/70066311/157609326-04ade374-811f-429f-a68a-0ce65da62d21.png)  
+  display：table - 将元素当作表格使用，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>    
+  display: inherit - 继承父元素的display属性
+
+## 行内元素和块级元素
+|  |  行内元素   | 块级元素  |
+| ---- |  ----  | ----  |
+| 可否设置宽高 | 设置宽高无效，宽高为内容宽高  | 可以设置宽高 |
+| 可否设置padding和margin | 可以设置水平方向的、不可设置垂直方向的  | 可以设置任意方向的padding和margin |
+| 可否自动换行 | 不会自动换行  | 自动换行 |
+| 排列方式 |   | 一块占一行，从上到下排列 |
+
 
 ## BFC规范
 BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面的子元素不会影响到外面的元素
@@ -288,10 +303,12 @@ Normalize.css：可以增强跨浏览器渲染的一致性
 ### *缺点
 可维护性差（例如图片位置进行修改或内容宽高修改）
 
-## display:none和visibility:hidden的区别
-1. display:none是彻底消失，不在文档流中占位，浏览器也不会解析该元素；
-visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，在文档流中占位，浏览器会解析该元素
-2. 使用visibility:hidden比display:none性能更好，当display进行切换属性时，页面会发生回流，而visibility切换时不会引起回流。
+## 隐藏元素的方式
+1. display:none是彻底消失，<font color="	#FF6347">不在文档流中占位，浏览器也不会解析该元素，不会响应绑定事件，子节点不会继承</font>。  
+2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
+3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="	#FF6347">会响应绑定的事件</font>。  
+4. z-index:负值是其他元素覆盖该元素，实现隐藏  
+ - 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生回流，造成文档重排；而visibility切换时不会引起回流，只会引起本元素重绘</font>。
 
 ```html
 <style>
@@ -334,12 +351,40 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
 </div>
 ```
 
+## link和@import的区别
+两者都是外部引用CSS的方式，区别如下：
+1. link时XHTML标签，除了可以引用CSS还可以引用其他文件；@import只能引用CSS文件
+2. link兼容性比@import更好
+3. link在引入CSS时，在页面载入的同时进行加载；@import要等页面完全加载完后再加载CSS
+4. link可以使用JS控制DOM改变样式；@import不可以。
+
+## transiton和animation的区别
+ - transition是过度属性，在某些时候触发的事件例如输入框得到焦点、失去焦点等。
+ - animation是动画属性，它的实现不需要触发事件，设定好时间会自己执行。
+
+## 伪元素和伪类的区别和作用
+ - 伪元素：<font color="	#FF6347">在元素的前后插入额外的元素或样式</font>，但这些元素实际上并不在文档中产生，只在外部显示可见，例如：
+ ```css
+  p::before {content:"第一章：";}
+  p::after {content:"Hot!";}
+  p::first-line {background:red;}
+  p::first-letter {font-size:30px;}
+ ```
+
+ - 伪类：将特殊的效果添加到特定选择器上，在已有元素上添加样式，<font color="	#FF6347">不会产生新元素</font>。例如：
+ ```css
+  a:hover {color: #FF00FF}
+  p:first-child {color: red}
+ ```
+
+ - 区别：伪类是通过元素选择器加上伪类改变该元素状态；伪元素是增加额外的元素或样式。
+
 # React篇
 ## React事件机制
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
 可以使用**event.preventDefault**阻止事件冒泡。
 
-![avatar](/react_interview/img/事件机制.jpg)
+![事件机制](https://user-images.githubusercontent.com/70066311/157618463-b5fc6510-f7f9-498f-9722-cf7458d6972c.jpg)
 
 ### *实现合成事件的目的
  - 合成事件是一个跨浏览器的原生时间包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。

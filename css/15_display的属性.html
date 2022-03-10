@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .div1 {
+      width: 200px;
+      height: 200px;
+      background: wheat;
+      font-size: 200px;
+      /* 
+        设置水平方向的margin和padding
+      */
+      margin-left: 100px;
+      padding-right: 200px;
+      /* 
+        当display为block时，每个元素会沾满一行，默认宽度为父元素宽度，可以设置宽高
+      */
+      /* display: block; */
+      /* 
+        display为inline时，每个元素的宽度为内容宽度，不可以设置宽高，同行显示
+      */
+      display: inline;
+      /* 
+        display为inline-block时，每个元素的宽度为内容宽度，不可以设置宽高，同行显示
+      */
+      /* display: inline-block; */
+      /* display: list-item; */
+      /* display: table; */
+    }
+
+    .div2 {
+      width: 200px;
+      height: 200px;
+      background: wheat;
+      /* display: block; */
+      /* display: inline; */
+      /* display: inline-block; */
+      /* display: list-item; */
+      display: table;
+    }
+
+    .div3 {
+      width: 200px;
+      height: 200px;
+      background: wheat;
+      /* display: block; */
+      /* display: inline; */
+      /* display: inline-block; */
+      /* display: list-item; */
+      display: table;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="div1">1</div>
+  <div class="div2">2</div>
+  <div class="div3">3</div>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    input {
+      transition: all 2s;
+      border-radius: 5px;
+    }
+
+    input:hover {
+      box-shadow: 10px 10px 10px 10px blue;
+    }
+
+    div {
+      width: 300px;
+      height: 100px;
+      background-color: pink;
+      /* 动画名称(默认值为none) */
+      animation-name: test;
+      /* animation-duration: 持续时间(默认值为0) */
+      animation-duration: 3s;
+      /* animation-timing-function: 时间函数(默认值为ease) */
+      animation-timing-function: ease;
+      /* animation-delay: 延迟时间(默认值为0) */
+      animation-delay: 0.4s;
+      /* animation-iteration-count: 循环次数(默认值为1) */
+      animation-iteration-count: infinite;
+      /* animation-direction: 动画方向(默认值为normal) */
+      animation-direction: normal;
+      /* animation-play-state: 播放状态(默认值为running) */
+      animation-play-state: running;
+      /* animation-fill-mode: 填充模式(默认值为none) */
+      animation-fill-mode: none;
+    }
+
+    @keyframes test {
+      0% {
+        background-color: lightblue;
+      }
+
+      30% {
+        background-color: lightgreen;
+      }
+
+      60% {
+        background-color: lightgray;
+      }
+
+      100% {
+        background-color: black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <input type="text">
+  <div>
+    123
+  </div>
+</body>
+
+</html>
