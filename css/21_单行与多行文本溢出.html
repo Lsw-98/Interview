@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .simple {
+      width: 200px;
+      overflow: hidden;
+      /* 超出部分使用省略号代替 */
+      text-overflow: ellipsis;
+      /* 不换行 */
+      white-space: nowrap;
+    }
+
+    .mul {
+      width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* 作为弹性伸缩盒子模型显示 */
+      display: -webkit-box;
+      /* 设置伸缩盒子的子元素排列方式：从上到下垂直排列 */
+      -webkit-box-orient: vertical;
+      /* 最多显示三行 */
+      -webkit-line-clamp: 3;
+    }
+  </style>
+</head>
+
+<body>
+  <p class="simple">
+    单行文本溢出处理：remote: https://github.com/Lsw-98/Interview.gitTo https://github.com/Lsw-98/Learn-CSS.git1a15846..f134515
+    main ->
+    main
+  </p>
+  <p class="mul">
+    多行文本溢出处理：remote: https://github.com/Lsw-98/Interview.gitTo https://github.com/Lsw-98/Learn-CSS.git1a15846..f134515
+    main ->
+    main
+    remote: https://github.com/Lsw-98/Interview.gitTo https://github.com/Lsw-98/Learn-CSS.git1a15846..f134515
+    main ->
+    main
+    remote: https://github.com/Lsw-98/Interview.gitTo https://github.com/Lsw-98/Learn-CSS.git1a15846..f134515
+    main ->
+    main
+    remote: https://github.com/Lsw-98/Interview.gitTo https://github.com/Lsw-98/Learn-CSS.git1a15846..f134515
+    main ->
+    main
+  </p>
+</body>
+
+</html>
