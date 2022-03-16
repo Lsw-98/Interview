@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="container">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+    <img src="loading.gif" data-src="../img/list-item.png">
+  </div>
+  <script>
+    var imgs = document.querySelectorAll('img');
+    function lozyLoad() {
+      var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+      var winHeight = window.innerHeight;
+      for (var i = 0; i < imgs.length; i++) {
+        if (imgs[i].offsetTop < scrollTop + winHeight) {
+          imgs[i].src = imgs[i].getAttribute('data-src');
+        }
+      }
+    }
+    window.onscroll = lozyLoad();
+  </script>
+</body>
+
+</html>
