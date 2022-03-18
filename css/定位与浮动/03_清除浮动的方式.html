@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .father {
+      width: 500px;
+      border: 2px solid black;
+      background-color: gray;
+      /* 第二种方法 */
+      /* overflow: hidden; */
+    }
+
+    /* 第三种方法 */
+    .father::after {
+      content: "";
+      /* 
+        clear属性只有对块级元素才有效，而::after等伪元素默认对内联元素起作用，
+        所以这里要加上display:block使其成为块级元素。
+       */
+      display: block;
+      clear: both;
+    }
+
+    .child1 {
+      float: left;
+      width: 100px;
+      height: 100px;
+      background: orange;
+    }
+
+    .child2 {
+      float: left;
+      width: 100px;
+      height: 100px;
+      background: green;
+    }
+
+    p {
+      background: yellow;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="child1"></div>
+    <div class="child2"></div>
+    <!-- 第一种方式 -->
+    <!-- <div style="clear: both;"></div> -->
+    <p>123</p>
+  </div>
+  <p>456</p>
+</body>
+
+</html>

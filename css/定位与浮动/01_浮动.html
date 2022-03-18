@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .divs {
+      width: 100px;
+      height: 100px;
+      background: blueviolet;
+    }
+
+    .divchild {
+      float: left;
+      background: wheat;
+    }
+
+    .child2 {
+      float: left;
+      background: green;
+    }
+
+    /* .child1 {
+      float: left;
+      background: red;
+    } */
+  </style>
+</head>
+
+<body>
+  <div class="divs">
+    father
+  </div>
+  <div class="divs divchild">
+    child
+  </div>
+  <div class="divs child1">
+    child1
+  </div>
+  <!-- 这里的child2会向上浮动，覆盖住child1，直到碰到另一个浮动元素divchild的边框，才会停留 -->
+  <div class="divs child2">
+    child2
+  </div>
+</body>
+
+</html>

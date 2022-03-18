@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div {
+      width: 100px;
+      height: 100px;
+      position: relative;
+    }
+
+    p {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+    }
+
+    .d1 {
+      background-color: antiquewhite;
+    }
+
+    .d2 {
+      background-color: gray;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+    }
+
+    .d3 {
+      background-color: green;
+      top: 30px;
+      left: 30px;
+      z-index: 101;
+    }
+
+    .d4 {
+      background-color: orange;
+      top: 50px;
+      left: 50px;
+      z-index: 102;
+    }
+
+    .d5 {
+      background-color: red;
+      top: 70px;
+      left: 70px;
+      z-index: 103;
+    }
+
+    .d6 {
+      background-color: skyblue;
+      top: 90px;
+      left: 90px;
+      z-index: 104;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <p class="d1">d1</p>
+    <p class="d2">d2</p>
+    <p class="d3">d3</p>
+    <p class="d4">d4</p>
+    <p class="d5">d5</p>
+    <p class="d6">d6</p>
+  </div>
+</body>
+
+</html>
