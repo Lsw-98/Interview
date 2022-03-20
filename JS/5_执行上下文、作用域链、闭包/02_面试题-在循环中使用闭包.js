@@ -20,15 +20,24 @@
 
 /**
  * 解决方法2：使用闭包
- * 
+ *
  */
 
+// for (var i = 1; i <= 5; i++) {
+//   (function (j) {
+//     console.log("111");
+//     setTimeout(function timer() {
+//       console.log(j);
+//     }, j * 100);
+//   })(i)
+//   console.log("222");
+// }
+
+/**
+ * 使用setTimeout的第三个参数，这个参数会被当成timer的参数传入
+ */
 for (var i = 1; i <= 5; i++) {
-  (function (j) {
-    console.log("111");
-    setTimeout(function timer() {
-      console.log(j);
-    }, j * 100);
-  })(i)
-  console.log("222");
+  setTimeout(function timer(j) {
+    console.log(j);
+  }, 500, i)
 }
