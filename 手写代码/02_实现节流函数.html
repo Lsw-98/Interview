@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div {
+      width: 1000px;
+      height: 1000px;
+      background: orange;
+    }
+  </style>
+</head>
+
+<body>
+  <div></div>
+  <script>
+    // 定时器版
+    function throttleTime(fn, delay) {
+      let timer = null   // 表示当前函数是否在执行
+      return function () {
+        if (!timer) {
+          timer = setTimeout(() => {
+            fn()
+            timer = null
+          }, delay)
+        }
+      }
+    }
+
+    // 时间戳版
+    function throttleTimeStamp(fn, delay) {
+      let preTime = Date.now()
+      return function () {
+        let nowTime = Date.now()
+        if (nowTime - preTime >= delay) {
+          preTime = Date.now()
+          return fn()
+        }
+      }
+    }
+
+    function showTop() {
+      var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+      console.log('滚动条位置：' + scrollTop);
+    }
+    window.onscroll = throttleTime(showTop, 2000)
+  </script>
+</body>
+
+</html>

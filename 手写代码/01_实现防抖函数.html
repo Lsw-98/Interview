@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div {
+      width: 1000px;
+      height: 1000px;
+      background: orange;
+    }
+  </style>
+</head>
+
+<body>
+  <div></div>
+  <script>
+    function debounce(fn, delay) {
+      let timer = null   // 借助闭包
+      return function () {
+        if (timer) {
+          clearTimeout(timer)   // 取消由 setTimeout() 方法设置的定时操作。
+        }
+        timer = setTimeout(fn, delay)
+      }
+    }
+
+    function showTop() {
+      var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+      console.log('滚动条位置：' + scrollTop);
+    }
+    window.onscroll = debounce(showTop, 1000)
+  </script>
+</body>
+
+</html>
