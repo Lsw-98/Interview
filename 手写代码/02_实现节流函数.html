@@ -37,6 +37,7 @@
       return function () {
         let nowTime = Date.now()
         if (nowTime - preTime >= delay) {
+          // 保存函数的执行时间
           preTime = Date.now()
           return fn()
         }

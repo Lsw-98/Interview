@@ -510,6 +510,81 @@ JS中有Undefined、Null、Object、Number、String、Boolean、Symbol、BigInt�
 - Symbol代表创建后独一无二且不可变的数据类型，它主要是为了解决可能出现的全局变量冲突问题。
 - BigInt是一种数字类型的数据，他可以表示任意精度格式的整数，使用BitInt可以安全的存储和操作大整数，即使这个数已经超出了Number能够表示的安全整数范围。
 
+## call()、apply()、bind()
+例子1:
+```js
+const name = "小王"
+const age = 17
+
+const obj = {
+  name: "校长",
+  objAge: this.age,
+  func: function () {
+    console.log(this.name + "年龄" + this.age)
+  }
+}
+```
+调用obj.func()输出”校长年龄undefined“。
+
+例子2：
+```js
+const name = "盲僧"
+function shows(){
+  console.log(this.name)
+}
+```
+调用shows()输出“盲僧”
+比较上边两个例子this的差别，第一个this指向obj，第二个this指向window。
+
+**1. call、apply、bind都是用来重定义this这个对象的**  
+例如：
+```js
+const name = "小王", age = 12
+const obj = {
+  name: "小张",
+  objAge: this.age,
+  func: function () {
+    console.log(this.name + "年龄" + this.age);
+  }
+}
+
+const db = {
+  name: "约德尔人",
+  age: 99,
+}
+
+obj.func.call(db)
+obj.func.apply(db)
+obj.func.bind(db)()
+```
+bind返回的是一个函数，必须调用它才会执行。  
+
+**2. 对比call、apply、bind传参情况**
+```js
+const name = "小王", age = 12
+const obj = {
+  name: "小张",
+  objAge: this.age,
+  func: function (fm, t) {
+    console.log(this.name + "年龄" + this.age, "来自" + fm + "去往" + t);
+  }
+}
+
+const db = {
+  name: "约德尔人",
+  age: 99,
+}
+
+obj.func.call(db,'成都','上海')；　　　　 // 德玛 年龄 99  来自 成都去往上海
+obj.func.apply(db,['成都','上海']);      // 德玛 年龄 99  来自 成都去往上海  
+obj.func.bind(db,'成都','上海')();       // 德玛 年龄 99  来自 成都去往上海
+obj.func.bind(db,['成都','上海'])();　　 // 德玛 年龄 99  来自 成都, 上海去往 undefined
+```
+call、bind、apply这三个函数的第一个参数都是this的指向对象，第二个参数差别就来了：
+<font color="#FF6347">call可以传入多个参数，每个参数用逗号相隔</font>。
+<font color="#FF6347">apply的所有参数都要放在一个数组中</font>。
+<font color="#FF6347">bind除了返回的是函数外，其余都和call是一样的</font>。
+
 ## 原型与原型链
  
 ## 执行上下文/作用域链/闭包
@@ -547,12 +622,15 @@ js使用执行上下文栈来管理执行上下文。
 1. 回调函数  
 使用多个回调函数嵌套会造成<font color="#FF6347">回调地狱</font>，上下两层的代码耦合度高。
 2. Promise  
-使用Promise可以解决回调地狱问题。
+Promise是ES6引入的异步编程的解决方案，Promise可以封装异步操作，获取成功和失败的结果。Promise的优点是：支持链式调用，可以解决回调地狱问题。
 3. generator  
 4. async  
 当函数内部执行到一个await语句时，如果语句返回一个promise对象，那么函数会等待promise变为resolve状态在继续向下执行。
 ### 对Promise的理解
 Promise是一种异步编程的解决方案，可以解决回调地狱问题。Promise有三种状态：pending（进行中）、resolved（已完成）、rejected（已拒绝）。Promise只能由pending转化到resolved状态或pending转化到rejected状态。一旦从进行中状态转化为其他状态就不可再改变了。  
+### Promise使用流程
+首先创建Promise实例，然后Promise对象会执行异步操作，若异步操作成功，则调用resolve()方法并将Promise对象的状态改为resolved，失败则调用reject()方法并将Promise对象的状态改为rejected。在后续调用then方法时，若Promise对象的的状态为resolved，则调用第一个回调函数，否则调用第二个回调函数。then()方法的返回对象也是一个Promise对象，因此可以进行链式调用。
+
 **Promise的缺点：**
 1. 无法取消，一旦新建就会立即执行。
 2. 如果不设置回调函数，Promise内部抛出错误，不会反应到外部。
@@ -561,13 +639,15 @@ Promise是一种异步编程的解决方案，可以解决回调地狱问题。P
 1. 创建Promise对象。
 Promise构造函数接受一个函数作为参数，该函数的两个参数分别是resolve、reject。
 ```js
-const promise1 = new Promise((resolve, reject) => {
+const promise1 = new Promise((resolve, reject) => { 
   ...
   resolve('promise1')
   ...
 
-}).then(res => {
+}).then(res => {   // then方法接受两个回调函数作为参数，第一个回调函数在请求成功时调用，第二个在失败时调用。
   ...
+},()=>{
+
 }).catch(err=>{
   console.log(err)
 })
@@ -773,11 +853,191 @@ FIN：释放一个连接
 2. 提升用户体验：当页面图片较多时，用户可能会等待很长时间，这就影响了用户体检
 3. 防止加载过多的图片资源影响其它文件资源的加载
 
+### *懒加载实现原理
+懒加载的实现原理是：<font color="	#FF6347">将图片的src属性赋为空值，将图片路径存储到data-src属性中，当滚动到需要图片加载时，再将data-src属性的值赋给src，以此来实现图片的延迟加载</font>。
+1. window.innerHeight是浏览器可视区的高度
+2. document.body.scrollTop || document.documentElement.scrollTop是浏览器滚动过的距离
+3. imgs.offsetTop是元素（图片）顶部距离文档顶部的高度（包括以滚动的区域）。
+4. <font color="	#FF6347">图片加载的条件</font>：img.offsetTop < document.body.scrollTop || document.documentElement.scrollTop + window.innerHeight
+
+![image](https://user-images.githubusercontent.com/70066311/159425662-7559348b-a69a-446b-8ff2-84ccecdc01fa.png)
+
+### *原生js实现懒加载
+```html
+<div>
+  <img src="loading.gif" data-src="../img/list-item.png">
+  <img src="loading.gif" data-src="../img/list-item.png">
+  <img src="loading.gif" data-src="../img/list-item.png">
+  <img src="loading.gif" data-src="../img/list-item.png">
+  <img src="loading.gif" data-src="../img/list-item.png">
+  <img src="loading.gif" data-src="../img/list-item.png">
+</div>
+
+<script>
+  // 获取到全部的img元素
+  const imgs = document.querySelectorAll('img')
+  function lazyLoad(){
+    let scrollTop = document.body.scrollTop || document.documentElement.scrollTop
+    let winHeight = window.innerHeight
+    for(let i = 0;i < imgs.length;i++){
+      if(imgs[i].offsetTop < scrollTop + winHeight){
+        imgs[i].src = imgs[i].getAttribute('data-src')
+      }
+    }
+  }
+
+  window.onscroll = lazyLoad()
+
+</script>
+```
+
+### 懒加载与预加载
+懒加载是指<font color="	#FF6347">延迟加载，当图片进入到页面的可视区域内在加载，起到延迟加载，缓解服务器压力的作用</font>。而预加载会增加服务器压力，他会<font color="	#FF6347">提前将资源加载并保存到本地，需要用到资源时直接从本地读取，这样可以减少用户等待时间，提升用户体验，但会给服务器增加压力</font>。
+
+## 回流（重排）和重绘
+### *回流
+当部分或全部元素的尺寸、属性或结构发生变化时，浏览器会重新渲染部分或全部文档的过程称为回流。
+
+### *会导致回流的操作
+- 页面首次渲染
+- 浏览器的窗口大小发生变化
+- 元素的内容发生变化
+- 元素的大小或位置发生变化
+- 元素的字体发生变化
+- 添加或删除可见的DOM元素
+- 激活CSS伪类
+- 查询某些属性或者调用某些方法
+
+在触发回流时，会导致DOM元素重新排列，有两种情况：
+1. 全局范围：从根节点开始，对整个渲染树进行重新布局
+2. 局部范围：对渲染树的某部分进行重新布局
+
+### *重绘
+当页面中某些元素的样式发生变化，但不会影响其在文档流中的位置时，浏览器就会对这些元素进行重绘。
+
+### *会导致重绘的操作
+- color、background-color、 background-image
+- outline-color、outline-width、outline-decoration
+- border-radius、visibility、box-shadow
+
+<font color="	#FF6347">当触发回流时，一定会触发重绘；但触发了重绘，不一定会重排</font>。
+
+### *如何避免重排和重绘
+1. 在操作DOM时，尽量在底层的DOM节点进行操作
+2. 不要使用table布局
+3. 不要频繁操作元素样式
+4. 避免频繁操作DOM
+5. 使用absolute和fixed，使元素脱离文档流，这样他们的变化会不会影响其他元素
+
+**渲染队列**：浏览器会将多次的重排、重绘操作放入一个渲染队列中，等队列到一定长度后，会对队列进行批处理，这样就会让多次重排和重绘变为一次重排和重绘。
+
+### *如何优化动画
+可以把动画的position设置为absolute或fixed，使动画脱离文档流，这样动画元素的回流就不会影响页面了。
+
+### *DocumentFragment
+DocumentFragment是一个文档片段，是一个没有父对象的最小文档对象。DocumentFragment不是真实DOM树的一部分，所以它的变化不会重新渲染DOM树。当我们把DocumentFragment插入到DOM树中时，插入的不是DocumentFragment本身，而是DocumentFragment所有的子孙节点，且不会触发页面的重绘，这样做就可以大大增加页面的性能。
+
+
 ## 防抖和节流
 ### *防抖
 防抖是指<font color="	#FF6347">事件被触发n秒后再执行回调，如果在这n秒内事件又被触发，则重新计时</font>。这可以使用在一些点击请求上，避免因为用户的多次点击向后端发送多次请求。
 ### *节流
 节流是指<font color="	#FF6347">在规定的一个时间单位内，只能触发一次该事件的回调函数，如果在同一个单位时间内某事件被触发多次，只能有一次生效</font>。节流可以使用在scroll函数的事件监听上。通过事件节流来降低事件调用的频率。
+
+# ES6
+## 箭头函数
+### *箭头函数和普通函数的区别
+1. 外形不同
+箭头函数使用 <font color="	#FF6347">=></font> 定义。
+```js
+// 普通函数
+function demo(){
+  ...
+}
+
+// 箭头函数
+let demo = () => {
+  ...
+}
+```
+2. 箭头函数都是匿名函数
+普通函数可以有匿名函数，也可以有具名函数；箭头函数只有匿名函数。
+```js
+// 具名函数
+function demo(){
+  ...
+}
+
+// 匿名函数
+let func = function(){
+  ...
+}
+
+// 箭头函数
+let demo = () => {
+  ...
+}
+```
+3. 箭头函数不可以用于构造函数，不能使用new
+4. 箭头函数中的this指向不同  
+①. 箭头函数本身不创建this
+在普通函数中，this总是指向调用它的对象，如果用作构造函数，this指向创建的对象实例。  
+而<font color="	#FF6347">箭头函数本身没有this，但它在声明时可以捕获其所在上下文的this供自己使用</font>。
+```js
+let success = "捕获成功"
+let func = () => {
+  console.log(this.success)
+}
+
+func()
+// 打印：捕获成功
+```
+箭头函数在全局作用域声明，所以它捕获全局作用域中的this，this指向window对象
+
+```js
+var name = "message1";
+function wrap(){
+  this.name="message2";
+  let func=() => {
+    console.log(this.name);
+  }
+  func();
+}
+let en=new wrap();
+// 打印：message2
+```
+②. 结合call()、apply()方法使用
+箭头函数结合call()、apply()方法调用一个函数时，只传入一个参数对this没有影响。
+```js
+let obj2 = {
+    a: 10,
+    b: function(n) {
+        let f = (n) => n + this.a;
+        return f(n);
+    },
+    c: function(n) {
+        let f = (n) => n + this.a;
+        let m = {
+            a: 20
+        };
+        return f.call(m,n);
+    }
+    
+};
+console.log(obj2.b(1));    // 11
+console.log(obj2.c(1));    // 11
+```
+<font color="	#FF6347">箭头函数的 this 永远指向其上下文的 this ，任何方法都改变不了其指向，如 call() , bind() , apply()</font>。
+
+## let、const、var的区别
+1. 块级作用域：块级作用域用{}包括，let和const具有块级作用域，var不具有。块级作用域解决了ES5的存在的两个问题：
+    - 内层变量可能会覆盖外层变量
+    - 用来计数的循环变量泄露为全局变量
+2. 变量提升：变量提升就是把变量的声明提升到作用域的最上面去，而不会把赋值也提升上来。
+3. var声明的变量为全局变量，并会将该变量添加为全局对象的属性。let和const不会
+4. 初始值设置：const必须设置初始值
+5. let创建的变量可以修改指针指向（可重新赋值）
+
 
 # React篇
 ## React事件机制
