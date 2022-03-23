@@ -12,4 +12,4 @@ async function main() {
 }
 
 
-main()
+main()   // 返回一个promise对象
