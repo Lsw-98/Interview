@@ -631,9 +631,27 @@ Promise是一种异步编程的解决方案，可以解决回调地狱问题。P
 ### Promise使用流程
 首先创建Promise实例，然后Promise对象会执行异步操作，若异步操作成功，则调用resolve()方法并将Promise对象的状态改为resolved，失败则调用reject()方法并将Promise对象的状态改为rejected。在后续调用then方法时，若Promise对象的的状态为resolved，则调用第一个回调函数，否则调用第二个回调函数。then()方法的返回对象也是一个Promise对象，因此可以进行链式调用。
 
+### Promise转换状态的三种方式
+1. resolve函数
+2. reject函数
+3. 抛出错误：使用throw抛出错误
+
 **Promise的缺点：**
 1. 无法取消，一旦新建就会立即执行。
 2. 如果不设置回调函数，Promise内部抛出错误，不会反应到外部。
+
+### Promise是改变状态先执行还是指定回调先执行
+当执行器中的代码为同步时，会先改变状态后执行回调。  
+当执行器中的代码为异步时，会先执行回调再改变状态。
+
+### Primise.then()返回新的promise的结果状态由什么决定？
+由then()返回的回调函数执行的结果决定。
+- 如果抛出异常，则新的promise的状态为rejected
+- 如果返回的是非promise的值，则新的promise状态为fulfilled
+- 如果返回的是promise，则promise的执行结果为新的promise的结果
+
+### 如何中断promise链
+<font color="#FF6347">返回一个状态为pendding的promise对象</font>。
 
 ### Promise的基本用法
 1. 创建Promise对象。
@@ -667,8 +685,11 @@ Promise.race(promise1, timeOutPromise(5000)).then(res=>{})
 **finally()**
 finally()方法用于指定不管Promise对象最后状态如何，都会执行的操作。
 
+### async
+async的返回值为promise对象。这个promise的状态是由async的返回值决定的。
+
 ### await
-await一般都在async()函数内部，await表达式的运算结果取决于它等的是什么：
+await必须写在async()函数内部，await表达式的运算结果取决于它等的是什么：
  - 如果它等到是普通表达式，那么表达式的运算结果就是await返回的结果。
  - 如果等到的是promise对象，那么await会等promise对象的状态变为resolve后，得到resolve的值，作为await表达式的运算结果。
 

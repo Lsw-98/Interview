@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    let p = new Promise((resolve, reject) => {
+      resolve("ok")
+    })
+
+    let result = p.then((value) => {
+      // 1. 抛出异常，状态变为rejected
+      // throw "出错了"
+      // 2.返回非promise的值，状态变为fulfilled
+      // return 123
+      // 3.返回一个promise，then()方法返回的promise的状态由这个新的promise的状态决定
+      return new Promise((resolve, reject) => {
+        resolve("success")
+        // reject("error")
+      })
+    })
+
+    console.log(result);
+  </script>
+</body>
+
+</html>

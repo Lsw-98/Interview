@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="./promise.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // let p = new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     // throw 123
+    //     resolve("成功了")
+    //     // reject("失败了")
+    //   }, 500);
+    // })
+
+    // const result = p.then(
+    // res => {
+    // 1. 返回非promise的值
+    // return "hello"
+
+    // 2. 返回promise对象
+    // return new Promise((resolve, reject) => {
+    // resolve("666")
+    // reject("777")
+    // })
+
+    // 3. 抛出异常
+    // throw "出错了！！！"
+    // }
+    // ).then(res => {
+    //   console.log("111");
+    // }).then(res => {
+    //   console.log("222");
+    // }).catch(err => {
+    //   console.log(err);
+    // })
+
+
+    let q1 = new Promise((resolve, reject) => {
+      resolve("成功")
+      console.log(111);
+      // setTimeout(() => {
+      //   resolve("1成功！！！")
+      // }, 1000);
+    })
+    q1.then(res => {
+      console.log(222);
+    })
+    console.log(333);
+
+  </script>
+</body>
+
+</html>
