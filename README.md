@@ -1213,7 +1213,233 @@ console.log(obj2.c(1));    // 11
 5. let创建的变量可以修改指针指向（可重新赋值）
 
 
-# React篇
+# React
+## 数据管理
+### React setState调用的原理
+![image](https://user-images.githubusercontent.com/70066311/160269643-e287ab67-d888-4a67-b8c4-2f11de24bd28.png)
+
+### setState调用之后发生了什么？是同步还是异步的？
+<font color="	#FF6347">在代码中调用setState后React会将传入的对象与当前组件的状态合并，然后触发调和过程。经过调和过程，React会根据新的状态构建React元素树，然后计算新老元素树节点的差异，根据差异对页面进行渲染。</font>。
+
+根据场景来决定是同步还是异步。
+- 同步：在React无法控制的地方，比如原生事件，例如：addEventListener、setTimeout、setInterval等事件中，就只能同步更新。
+- 异步：在React生命周期和合成事件中，<font color="	#FF6347">React可以把多次setState合并到一起进行更新，提高效率</font>。    
+
+<font color="	#FF6347">setState设计为异步，可以提升性能。如果每次setState都要进行一次更新，那么意味着render函数会被频繁调用，这样效率很低。React采用延迟更新策略，可以把多次setState合并到一起进行更新，提高效率</font>。
+
+**对于相同状态的进行同时调用setState，只有最后一个setState会生效，而不是单纯的累加**。
+```js 
+// 每次点击按钮value的值+2，而不是+3
+<button 
+  onClick={() => (
+    setValue(value + 1), 
+    setValue(value + 2)
+  }
+>
+  value + 1
+</button>
+```
+
+### getDefaultProps和defaultProps
+getDefaultProps和defaultProps用于指定属性的默认值。
+```js
+// ES5
+getDefaultProps: function(){
+    return {
+        autoPlay: false,
+        maxLoops: 10
+    }
+},
+
+// ES6
+// 静态函数:使某个函数只在一个源文件中有效，不能被其他源文件所用
+static defaultProps = {
+  name: "lsw"
+}
+```
+
+### setState的第二个参数是什么？
+setState的第二个参数是一个回调函数，在组件重新渲染完后执行，等价于在componentDidUpdate中执行。在这个回调函数中可以拿到更新的后state的值。
+
+### setState和replaceState的区别是什么？
+setState用来设置状态，它接收两个参数，第一个参数是新的状态值，第二个参数是一个可选的回调函数，在状态改变后执行，可以获取到状态改变后的值。
+React会将多次的setState合并为一次执行，提高性能，减少页面渲染次数。<font color="	#FF6347">setState只是覆盖原来的状态，不会减少原来的状态</font>。
+
+<font color="	#FF6347">replaceState只会保留nextState中的值，原来的state将被删除，相当于赋值</font>。
+
+### state和props的区别
+
+
+
+## 组件通信
+React组件常见的通信的方式有以下几种：
+- 父向子通信：使用props。
+- 子向父通信：使用props和回调函数。
+- 跨级组件通信：使用context。
+- 非嵌套关系的组件通信：redux。
+
+### 父向子通信
+父组件通过 props 向子组件传递需要的信息。在子组件中加入属性，这些属性就是要传给子组件的数据。子组件使用props接收这些数据。
+```js
+// 子组件: Child
+const Child = props =>{
+  return <p>{props.name}</p>
+}
+
+// 父组件 Parent
+const Parent = ()=>{
+    return <Child name="react"></Child>
+}
+```
+
+### 子向父通信
+子组件通过调用父组件传递到子组件的方法向父组件传递消息的。
+```js
+// 父组件
+import React from 'react'
+import Child from './components/Child';
+
+function App() {
+  const handleMessgae = (message) => {
+    console.log(message);
+  }
+
+  return (
+    <div className="App">
+      <Child message={handleMessgae} />
+    </div>
+  );
+}
+
+export default App;
+
+// 子组件
+import React from 'react'
+
+export default function Child(props) {
+  const { message } = props
+  const getMessage = () => {
+    message("刘帅武")
+  }
+
+  return (
+    <button onClick={getMessage}>点我返回消息</button>
+  )
+}
+```
+
+### 跨级组件的通信方式
+父组件与子组件的子组件通信的方式：
+- 使用props，层层传递。
+- 使用context。context相当于一个大容器，不论嵌套多深，都可以在context中得到，对于跨越多层的全局数据可以使用context实现。
+```js
+import React, { useState, useContext } from "react";
+
+// 1.使用React.createContext()创建一个context对象
+const TestContext = React.createContext();
+
+const Child1 = () => {
+  // 3.子组件通过useContext(TestContext)获取值
+  const value = useContext(TestContext);
+  return (
+    <div>
+      {(() => console.log('Child1-render'))()}
+      <h3>Child1-value: {value}</h3>
+    </div>
+  );
+}
+
+// 避免child2渲染，提升性能
+const Child2 = React.memo(() => {
+  return (
+    <div>
+      {(() => console.log('Child2-render'))()}
+      <h3>Child2</h3>
+    </div>
+  )
+})
+
+// 这里已经实现了组件之间数据共享，但是只要testContext中的共享数据发生变化后，子组件都会重新渲染，
+// 而child2并没有绑定数据，所以可以使用react.memo()来提升性能
+
+function App() {
+  const [value, setValue] = useState(0);
+
+  return (
+    <div className="App">
+      {(() => console.log("Parent-render"))()}
+      <button onClick={() => setValue(value + 1)}>value + 1</button>
+      {/* 
+        2.TestContext.Provider包裹子组件
+          数据放在value属性中
+      */}
+      <TestContext.Provider value={value}>
+        <Child1 />
+        <Child2 />
+      </TestContext.Provider>
+    </div >
+  );
+}
+
+export default App;
+```
+使用Context时，只要Context中的数据发生变化时，就会重新渲染使用Context的组件，可以使用useMemo绑定某些值，减少某些组件的渲染，提升页面加载效率。
+
+### 非嵌套关系组件的通信方式
+- 发布消息订阅
+- 使用redux
+- 如果是兄弟组件，找到它们共同的父组件进行通信。
+
+## 路由
+### React-Router的实现原理
+React-Router是建立在history之上的，<font color="	#FF6347">history会监听浏览器地址栏的变化，并解析url转化为location对象，然后router匹配到对应的路由，最后渲染对应的组件</font>。
+
+Router负责<font color="	#FF6347">根据当前的url来渲染相应的组件</font>。
+Route<font color="	#FF6347">根据当前的url与自身的path属性进行匹配，匹配成功就渲染对应的组件</font>。
+
+React-Router中的history有三种：分别是browserHistory、hashHistory和menoryHistory。<font color="	#FF6347">browserHistory利用的是H5中的history接口</font>。<font color="	#FF6347">hashHistory利用的是history中的location属性的hash</font>。
+
+**browserHistory**采用push和replace方法来实现url的改变，这两个方法分别封装了history的**pushState**和**replaceState**方法。这两个方法都会改变当前的url，但不会刷新页面。还有例如go()、back()、forward()等方法。这些方法都会触发popState事件，所以在browseHistory采用<font color="	#FF6347">手动触发popState的方式来实现对url改变的监听</font>。 
+
+**hashHistory**通过区分history对象中的location属性中包含的hash字段来渲染不同的组件。
+
+### 何如配置React-Router实现路由切换
+- 使用\<Route>组件  
+<font color="	#FF6347">路由匹配是通过比较<Route>的path属性与当前的pathname来实现的</font>。可以给\<Route>组件加上 **exact** 属性来实现路由精准匹配。
+
+```js
+<Route path="/home" component={Home} />
+```
+
+- \<Switch>和\<Route>  
+在\<Route>外层包裹\<Switch>表示只会匹配到第一个匹配的\<Route>。
+```js
+<Swicth>
+  <Route path="/home" component={Home} />
+  <Route path="/about" component={About} />
+</Switch>
+```
+
+- \<Link>、\<NavLink>和\<Redirect>  
+\<Link>组件将被渲染为一个\<a>标签。
+```js
+<Link to="/home">Home</Link>
+// 在页面中被渲染为：<a href="/home">Home</a>
+```
+ \<Link>的跳转行为只会触发相匹配的组件的内容更新，而不会重新渲染整个页面。
+
+
+\<NavLink>是一种特殊的\<Link>，当它的to属性与当前地址匹配时，可以将其定义为active状态。
+
+\<Redirect>组件用于重定向路由。
+```js
+<Redirect from="/users/:id" to="/user/profile/:id">
+```
+从/users/:id 转到 /user/profile/:id。
+
+### React-Router如何获取URL的参数和历史对象
+
+
 ## React事件机制
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
 可以使用**event.preventDefault**阻止事件冒泡。
