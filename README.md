@@ -1445,7 +1445,93 @@ React-Router中的history有三种：分别是browserHistory、hashHistory和men
 ```
 从/users/:id 转到 /user/profile/:id。
 
-### React-Router如何获取URL的参数和历史对象
+## Hooks
+类组件：类组件是采用ES6 class的写法进行组件编写，类组件内部封装了很多东西，比如state，生命周期函数等，我们我们可以在组件挂载、渲染、卸载阶段分别写不同的逻辑。但使用类组件难以拆分内部逻辑，不方便复用，因此有了函数式组件。     
+函数组件真正的将数据和页面渲染绑定到了一起，实现了输入一组数据，输出一个UI。更加方便复用与拆分。但函数式组件是一种无状态组件，它不可以定义state，没有生命周期函数。而Hooks使得函数式组件有了这些能力。    
+
+### 为什么useState使用数组还不是对象
+如果使用数组，那么调用者在解构useState中的值时可以自由对这些值命名；而使用对象就必须用对象中的命名。
+
+### Hooks的使用限制
+- <font color="	#FF6347">不在循环、条件或嵌套函数中使用Hooks</font>
+- <font color="	#FF6347">只能在函数时组件中调用Hooks</font>
+React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中使用Hooks，可能会造成取值错位等错误发生。
+
+### 常用的Hooks
+- useState：状态钩子，为函数式组件提供内部状态
+- useContext：共享钩子，用于组件间共享状态，可以解决通过逐层传递props共享状态的麻烦。  
+使用方法：   
+1. <font color="	#FF6347">使用React.createContext()创建一个context对象</font>；
+```js
+  const TestContext = React.createContext();
+```
+2. <font color="	#FF6347">使用TestContext.Provider包裹需要共享数据的子组件</font>；
+```js
+// TestContext.Provider包裹子组件数据放在value属性中
+<TestContext.Provider value={value}>
+  <Child1 />
+  <Child2 />
+</TestContext.Provider>
+</div >
+```
+3. <font color="	#FF6347">在子组件中使用useContext()获取值</font>
+```js
+// 子组件通过useContext(TestContext)获取值
+const value = useContext(TestContext);
+```
+
+- useEffect：副作用钩子，数据获取、消息订阅、操作DOM等都属于副作用。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="	#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
+
+- useRef：获得组件的实例，多用于\<input>、\<form>等带有输入的DOM标签。
+
+- useMemo：与useEffect类似，区别在于<font color="	#FF6347">传入useMemo的函数会在页面渲染的时候执行，而useEffect是在页面渲染后才执行</font>。只有在数组中存储的变量发生变化时，useMemo()才会执行回调函数，可以减少局部页面渲染，提升性能。
+
+### useMemo和useCallback的区别
+useCallback和useMemo都是优化性能的手段，类似于类组件中的<font color="	#FF6347">shouldComponentUpdate</font>，useCallback和useMemo都会判断props和state是否变化，从而避免每次父组件render时都去渲染子组件。     
+区别在于<font color="	#FF6347">useCallback返回一个函数，当这个函数被当作组件使用时，可以避免每次更新都重新渲染该组件；useMemo返回一个值，避免每次渲染都要对值进行不必要的计算</font>。
+
+### useEffect和useLayoutEffect的区别
+<font color="	#FF6347">useEffect是异步执行的，useLayoutEffect是同步执行的；useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前，和componentDidMount等价</font>。若在useEffect的回调函数中需要对DOM进行样式修改，可以使用useLayoutEffect，避免页面闪烁。<font color="	#FF6347">useLayoutEffect总是比useEffect先执行</font>。
+
+### React.PureComponent、useMemo和React.memo的区别
+React.PureComponent会浅比较prop和state，若比较前后prop和state没有变化，则可以减少渲染次数，提升效率。但<font color="	#FF6347">React.PureComponent只会作浅层比较，对于有复杂结构的prop和state可能会比较出错。所以React.PureComponent只适用于prop和state比较简单的情况</font>。
+
+React.memo和React.PureComponent类似，React.PureComponent在类组件中使用，React.memo在函数式组件中使用。
+
+useMemo根据数组中的prop和state的变化情况执行回调函数。
+
+### useEffect和useMemo的区别
+<font color="	#FF6347">useEffect会在DOM更新完后执行副作用函数；而useMemo会在页面渲染期间执行回调函数，useMemo可以在DOM改变时控制某些函数不被触发</font>。
+
+### 使用Hooks要注意的坑
+1. 不要在循环，条件或嵌套函数中调用hooks，必须在React函数的顶层使用Hooks。     
+React需要利用调用顺序来正确更新相应的状态，若在循环，条件或嵌套函数中调用hooks很容易导致调用顺序不一致，产生难以预计的后果。
+
+2. 使用useState时，不能使用push、pop、splice等直接更改数组对象。   
+直接使用push、pop、splice等方法无法直接获取到num值，要采用析构方式。
+```js
+import React, { useState } from 'react'
+
+export default function App() {
+  const [num, setNum] = useState([0, 1, 2, 3, 4])
+  const test = () => {
+    // num.push(5)
+    // num.pop()
+    num.splice(2)
+    setNum([...num])
+  }
+  return (
+    <div>
+      <button onClick={test}>点我</button>
+      {num}
+    </div>
+  )
+}
+```
+
+3. 使用useState设置状态时，只有第一次会生效，后面需要更新状态，需要在useEffect中执行。
+
+4. 善用useMemo、useCallback，不要滥用useContext。     
 
 
 ## React事件机制
