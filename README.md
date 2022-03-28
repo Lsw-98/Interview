@@ -1214,6 +1214,12 @@ console.log(obj2.c(1));    // 11
 
 
 # React
+## 生命周期
+### React的生命周期有哪些
+React生命周期分为三个阶段：
+- 
+
+
 ## 数据管理
 ### React setState调用的原理
 ![image](https://user-images.githubusercontent.com/70066311/160269643-e287ab67-d888-4a67-b8c4-2f11de24bd28.png)
@@ -1268,8 +1274,10 @@ React会将多次的setState合并为一次执行，提高性能，减少页面�
 <font color="	#FF6347">replaceState只会保留nextState中的值，原来的state将被删除，相当于赋值</font>。
 
 ### state和props的区别
+props是从组件外部传入的，主要用于父组件向子组件传递数据，具有只读性，只能通过外部组件主动传递数据来渲染子组件。state的作用是组件自己用来创建、修改、管理自身状态，他是组件的私有属性，不可通过外部修改，只能在组件内部通过this.setState修改，修改state会导致页面重新渲染。
 
-
+### 校验propTypes
+propTypes用来对传入的props数据进行验证，若props与propTypes定义的数据类型不符，控制台会报警告。可以避免随着程序越来越复杂出现的问题，还可以让程序变得更加易读。
 
 ## 组件通信
 React组件常见的通信的方式有以下几种：
