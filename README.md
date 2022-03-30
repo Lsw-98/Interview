@@ -1217,7 +1217,105 @@ console.log(obj2.c(1));    // 11
 ## 生命周期
 ### React的生命周期有哪些
 React生命周期分为三个阶段：
-- 
+- 装载阶段：组件第一次在页面渲染
+- 更新阶段：组件状态发生变化引起页面重新渲染
+- 卸载阶段：组件从DOM树中被移除的阶段
+
+<font color="	#FF6347">react生命周期(旧)</font>
+![02_react生命周期(旧)](https://user-images.githubusercontent.com/70066311/160606822-92bbfe94-7d60-4e33-a77d-f312484822e0.png)
+
+<font color="	#FF6347">react生命周期(新)</font>
+![03_react生命周期(新)](https://user-images.githubusercontent.com/70066311/160606846-f1fcb249-e933-4a3f-b1ac-b834596a8d91.png)
+
+### 组件挂载阶段
+组件被创建就在挂载阶段，组件被创建后组件实例被插入到DOM中，完成组件的第一次渲染。在该阶段会一次调用如下方法：
+- constructor
+- getDerivedStateFromProps
+- render
+- componentDidMount  
+
+(1) constructor()     
+组件中的构造器，若显式定义了constructor，必须执行super()，否咋无法在构造函数中拿到this。
+构造器中通常做两件事：定义state和给事件绑定this。
+```js
+constructor(props){
+  super(props)
+  this.state={
+    count: 0,
+    name: "lsw"
+  },
+  this.handleClick = this.handleClick.bind(this)
+}
+```   
+(2) getDrivedStateFromProps()：将传入的props映射到state上面
+```js
+static getDrivedStateFromProps(props, state)
+```
+getDrivedStateFromProps()方法是一个静态方法，不可以在该函数内部使用this。getDrivedStateFromProps()接受两个参数，props代表接收到的新的参数，state代表当前组件的state对象，会返回一个对象用来更新当前的state对象，如果不更新会返回null。
+
+该方法会在<font color="	#FF6347">组件装载、接受到新的props、setState和forceUpdate时被调用</font>。
+
+(3) render
+render()是React最核心的方法，它只做一件事，就是根据state和props渲染新的页面。
+
+(4) componentDidMount()
+componentDidMount()会在组件挂载后立即调用用，主要做以下几件事情：
+<font color="	#FF6347">
+- 执行依赖于DOM的操作
+- 发送网络请求
+- 添加订阅消息（会在componentWillUnmount取消订阅）
+</font>
+
+### 组件更新阶段
+当组件的state、props改变了，或调用了forceUpdate，会触发组件的更新，这个过程可能会发生多次。这个阶段会依次调用如下方法：
+- getDrivedStateFromProps()
+- shouldComponentUpdate()
+- render()
+- getSnapshotBeforeUpdate()
+- componentDidUpdate()
+
+(1) shouldComponentUpdate(nextProps, nextState)   
+在讲这个生命周期函数之前，先要了解下面两个问题：
+1. setState()在任何情况下都会导致组件重新渲染吗？
+2. 如果没有调用setState、props的值也没有变化，组件就不会重新渲染吗？
+第一个问题是<font color="	#FF6347">会</font>，第二个问题是<font color="	#FF6347">如果父组件重新渲染时，不管子组件的props有没有发生变化，都会引起子组件的重新渲染</font>，这样会导致性能下降，这时就要用到shouldComponentUpdate()。
+
+shouldComponentUpdate()是在组件重新渲染开始之前触发的，返回值为一个布尔值，默认返回true，<font color="	#FF6347">通过比较this.state和nextState、this/props和nextProps的值是否变化，来返回true或false</font>。当返回false时，组件的更新过程停止，后续的render()和componentDidUpdate()也不会被调用。<font color="	#FF6347">不要使用深比较进行检查</font>。
+
+(2) getSnapshotBeforeUpdate(prevProps, prevState)
+prevProps, prevState表示更新之前的props和state，这个函数必须要和componentDidUpdate()一起使用，并且要有一个返回值，默认返回null，这个返回值作为参数传给componentDidUpdate()。
+
+适用场景：<font color="	#FF6347">更新时需要用到更新之前的state和props的情况</font>，例如在带有滚动条的信息栏插入一条信息。
+
+(3) componentDidUpdate(prevProps, prevState, snapshot)
+componentDidUpdate()会在更新后被立即调用，首次渲染不会执行此方法，该阶段通常进行如下操作：
+- 对DOM进行操作
+- 进行网络请求
+
+### 组件卸载阶段
+该阶段只有一个生命周期函数：componentWillUnmount()，会在组件卸载及销毁之前调用，在此方法中必须要执行的操作是：
+- 清除网络请求
+- 取消在componentDidMount()中发布的消息订阅
+
+### React废弃了三个生命周期函数是为什么？
+被废弃的三个函数分别是：<font color="	#FF6347">componentWillMount()、componentWillUpdate()、componentWillReceiveProps()</font>。
+
+componentWillMount()的功能完全可以被constructor()和componentDidMount()代替，比如异步请求、消息订阅的操作。
+
+componentWillReceiveProps()中主要做的事是<font color="	#FF6347">比较更新前后的两个props是否一致，如果不一致，再将props更新到state</font>。这么做有两个问题：
+1. <font color="	#FF6347">破坏了state单一数据源，导致组件的状态变得不可预测</font>
+2. <font color="	#FF6347">会增加重绘的次数</font>
+
+componentWillUpdate()不管更没更新，都会执行回调函数，而我们有时只想在更新成功后执行回调函数，这可以将componentWillUpdate()的回调迁移到componentDidUpdate()中进行。
+
+### props改变后会在哪个生命周期函数中处理
+<font color="	#FF6347">在getDrivedStateFromProps()函数中进行处理的</font>。getDrivedStateFromProps()是一个静态函数，不能通过this访问class的属性，而是通过参数提供的nextProps和prevProps进行比较，根据新传入的props来映射state。
+
+### React性能优化在哪个生命周期函数
+<font color="	#FF6347">shouldComponentUpdate()</font>。如果父组件重新渲染，子组件会跟着重新渲染，大多数情况下，子组件的这种重新渲染是没有必要的，所以可以在shouldComponentUpdate()方法中取消子组件的更新，提升性能。
+
+### 网络请求在哪个生命周期函数中处理
+<font color="	#FF6347">componentDidMount()</font>。在该生命周期函数中组件已被完全挂载到网页上了，可以保证数据的加载。
 
 
 ## 数据管理
@@ -1531,8 +1629,20 @@ export default function App() {
 
 3. 使用useState设置状态时，只有第一次会生效，后面需要更新状态，需要在useEffect中执行。
 
-4. 善用useMemo、useCallback，不要滥用useContext。     
+4. 善用useMemo、useCallback，不要滥用useContext。   
 
+## Redux
+### 对Redux的理解
+<font color="	#FF6347">Redux是一个用来管理数据状态的工具</font>。因为React传递数据是单向的，父组件可以向子组件通过props传递数据，而子组件无法直接向父组件传递数据，这样的单向数据流成就了React的数据可控性。随着项目越来越大，state也越来越难以管理，而使用Redux可以轻松管理这些state。
+
+### Redux的工作原理
+当组件想要更新状态时，Redux会创建一个action对象，action对象包含两个数据，一个是必备的type，表示action类型，第二个state，在action不会修改state的值，而是等待store调用dispatch()方法将store传递给reducer，reducer才是真正更新state值的对象。reducer接收两个参数，一个是preState，一个是action，通过匹配不同
+action.type来执行不同的逻辑，然后返回一个新的state。store在组件挂载到页面后(componentDidmount)通过subscribe()方法一直监听reducer，通过getState()方法得到新的经过reducer处理后的state。
+
+![redux原理图](https://user-images.githubusercontent.com/70066311/160605698-6166cd12-93e9-491e-8474-65a0163114d8.png)
+
+### Redux主要解决的问题
+Redux主要解决的问题是将Redux的状态与React的UI绑定到一起，当使用dispatch(action)改变state时可以自动更新页面。
 
 ## React事件机制
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
