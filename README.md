@@ -649,7 +649,7 @@ console.log(person.name) // Kevin
 
 ![image](https://user-images.githubusercontent.com/70066311/161053741-1713e101-c2c6-432e-8477-874c4839edd3.png)
 
-### 构造函数、原型和实力的关系
+### 构造函数、原型和实例的关系
 <font color="#FF6347">每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个指向原型对象的内部指针</font>。
 
 ### 原型链
@@ -801,13 +801,78 @@ await必须写在async()函数内部，await表达式的运算结果取决于它
  4. 重复2.3步骤直到所有代码执行完毕
 
 
-
  ### 并行和并发的区别
 |     | 并发  | 并行  |
 |  ----  | ----  | ---- |
 | 概念  | 在某个时刻通过CPU切换对多个任务进行处理  | 同一时刻发生多个事件  |
 | CPU资源  | 需要对CPU资源进行抢占 | 不会对CPU资源进行抢占 |
 | 线程切换  | 会进行线程切换  | 线程之间不会进行切换 |
+
+# 前端工程化
+## Git
+### **git和svn的区别**
+- git是分布式的，svn是集中式的。因此如果服务器出现问题，我们无法使用svn来提交代码。
+- svn的分支是复制整个版本库的一份完整目录，而git的分支是指针只想某次提交。因此<font color="#FF6347">git分支创建开销更小而且在分支上变化不会影响到其他人；svn的分支变化会影响到其他人。
+</font>
+
+### **git pull和git fetch的区别**
+- git fetch只能将远程仓库的变化下载下来，并没有和本地分支合并
+- git pull会将远程仓库的变化下载下来，并和当前分支进行合并
+
+### **git rebase和git merge的区别**
+- git merge会新建一个commit对象，将两个分支以前的commit记录都指向这个新commit记录。这种方法会保留之前每个分支的commit历史。
+- git rebase会先找到两个分支的第一个共同的commit祖先记录，然后将提取当前分支之后的所有commit记录，然后将这个 commit 记录添加到目标分支的最新提交后面。经过这个合并后，两个分支合并后的 commit 记录就变为了线性的记录了。
+
+
+## Webpack
+### **Webpack和grunt、gulp的区别**
+Grunt和Gulp是<font color="#FF6347">基于任务运行的工具
+</font>：他们会自动执行指定的任务，就像流水线，把资源放上去然后通过不同的插件进行加工。
+
+Webpack是<font color="#FF6347">基于模块化打包的工具</font>：自动化处理模块，webpack把一切都当作模块，当webpack处理应用程序时，他会递归地构建一个依赖关系图，其中包含应用程序需要的每个模块，然后将这些模块打包成一个或多个bundle。
+
+### **loader**
+webpack只能理解JS和JSON文件，其他类型的文件都需要经过loader处理。<font color="#FF6347">loader可以做语言翻译（将TS转化为JS）、格式转换（将内联图像转换为data URL）、样式编译（允许直接在JS模块中import
+CSS文件）</font>。
+
+### **有哪些常见的loader**
+- file-loader：把文件输出到每一个文件夹中，在代码中通过相对URL去引用输出的文件
+- url-loader：把文件内容以base64的方式注入到代码中
+- source-map-loader：加载额外的Source Map文件，以方便断点调试
+- image-loader：加载并压缩图片文件
+- babel-loader：把ES6代码转化为ES5代码
+- css-loader：加载CSS，支持模块化、压缩、文件导入等特性
+- style-loader：把CSS代码注入到JS中，通过DOM操作去加载CSS
+- eslint-loader：通过ESlint检查JS代码
+
+### **常见的plugin**
+- define-plugin：定义环境变量
+- html-webpack-plugin：简化html文件创建
+- uglifyjs-webpack-plugin：通过UglifyES压缩ES6代码
+- webpack-parallel-uglify-plugin：多核压缩，提高压缩效率
+- webpack-bundlde-analyzer：可视化webpack输出文件和体积
+- mini-css-extract-plugin：CSS提取到单独的文件中，支持按需加载
+
+### **bundle、chunk、module是什么？**
+- bundle：<font color="#FF6347">由webpack打包出来的文件</font>
+- chunk：代码块，一个chunk由多个模块组合而成，<font color="#FF6347">用于代码的合并和分割</font>
+- module：是开发中的单个模块，在webpack的世界中一切皆模块，<font color="#FF6347">一个模块对应一个文件，webpack会从配置的entry中递归开始找出所有依赖的模块</font>。
+
+### **loader和plugin的区别**
+不同的作用：
+- Loader：webpack将以切换文件都看作模块，但webpack只能加载和解析js文件和JSON文件，如果想要将其他文件打包的话，就必须要使用loader。所以<font color="#FF6347">loader的作用是让webpack有了加载和解析非JS文件的能力</font>。
+- Plugin：plugin可以扩展webpack的功能，让webpack具有更多的灵活性。在webpack运行的生命周期中会广播许多事件，plugin可以监听这些事件、在合适的时机通过webpack提供的API改变输出结果。
+
+### **webpack热更新的实现原理**  
+热更新又称为热替换（HMR），可以做到不刷新浏览器就将更新的内容替换就内容。
+
+![1649059032(1)](https://user-images.githubusercontent.com/70066311/161499544-083ee38f-28c3-4d01-9264-921ea2ee2c9c.jpg)
+
+### **如何利用webpack优化前端性能**
+- 压缩代码：删除多余的代码、注释，简化代码写法。利用webpack的 UglifyJsPlugin 和 ParallelUglifyPlugin 来压缩JS⽂件
+- Tree Shanking：将代码永远不会走到的片段删除
+- Code Splitting：将代码按组件分块、做到按需加载，同时充分利用浏览器缓存
+- 提取公共第三方库：将公共模块抽取，利用浏览器缓存可以长期缓存这些无需变动的代码
 
 # 计算机网络
 ##  <font color="#FF6347">HTTP和HTTPS的区别</font>
@@ -1395,7 +1460,7 @@ DocumentFragment是一个文档片段，是一个没有父对象的最小文档�
 
 # ES6
 ## 箭头函数
-### *箭头函数和普通函数的区别
+### **箭头函数和普通函数的区别**
 1. 外形不同
 箭头函数使用 <font color="	#FF6347">=></font> 定义。
 ```js
@@ -1476,7 +1541,8 @@ let obj2 = {
 console.log(obj2.b(1));    // 11
 console.log(obj2.c(1));    // 11
 ```
-<font color="	#FF6347">箭头函数的 this 永远指向其上下文的 this ，任何方法都改变不了其指向，如 call() , bind() , apply()</font>。
+
+<font color="	#FF6347">5. 箭头函数的 this 永远指向其上下文的 this ，任何方法都改变不了其指向，如 call() , bind() , apply()</font>。
 
 ## let、const、var的区别
 1. 块级作用域：块级作用域用{}包括，let和const具有块级作用域，var不具有。块级作用域解决了ES5的存在的两个问题：
@@ -1484,8 +1550,83 @@ console.log(obj2.c(1));    // 11
     - 用来计数的循环变量泄露为全局变量
 2. 变量提升：变量提升就是把变量的声明提升到作用域的最上面去，而不会把赋值也提升上来。
 3. var声明的变量为全局变量，并会将该变量添加为全局对象的属性。let和const不会
-4. 初始值设置：const必须设置初始值
+4. 初始值设置：var和let可以不设置初始值，const必须设置初始值
 5. let创建的变量可以修改指针指向（可重新赋值）
+
+## const对象可以修改吗？
+const保证的并不是值不变，而是const变量指向的内存地址不变，<font color="	#FF6347">对于基本数据类型</font>，其值就永远保存在变量指向的那个内存地址，因此等同于常量。但<font color="	#FF6347">对于引用类型的数据（对象和数组）</font>，变量指向数据的内存地址，const只能保证这个指针是固定不变的，至于它指向的数据结构是不是可变的，就完全不能控制了。
+
+## 为什么箭头函数不能作为构造函数
+<font color="	#FF6347">构造函数需要this这个对象，用于接收参来的参数，以及在构造函数的最后将这个this返回</font>。而箭头函数没有this，所以不能作为构造函数。
+
+## 如果new一个箭头函数会怎么样
+因为箭头函数相对于普通函数并没有自己的this指向，而构造函数需要由this，所以箭头函数不能new。
+<font color="	#FF6347">new操作符实现的步骤如下</font>：
+
+1. 创建一个对象
+2. 将构造函数的作用域赋值给新对象（也就是将新对象的__proto__属性指向构造函数的prototype属性）
+3. 构造函数中的this指向新对象（也就是为这个新对象添加属性和方法）
+4. 返回新的对象 
+
+## 扩展运算符（...）
+<font color="	#FF6347">扩展运算符对对象实例的拷贝属于浅拷贝</font>
+
+## 数组运算符可以将数组用逗号分割为一个参数序列，且每次只能打开一层数组。
+```js
+console.log(...[1, 2, 3]);  // 1 2 3
+console.log(...[1, [2, 3, 4], 5]);   // 1 [ 2, 3, 4 ] 5
+console.log(...[1, ...[2, 3, 4], 5]);   // 1 2 3 4 5
+
+function add(x, y) {
+  return x + y;
+}
+const numbers = [1, 2];
+add(...numbers) // 3
+
+// 复制数组
+const arr1 = [1, 2, 3];
+const arr2 = [...arr1];
+```
+
+## 对对象与数组的结构的理解
+### **数组的结构**
+在解构数组时，以元素的位置为匹配条件来提取想要的数据：
+```js
+const [a, b, c] = [1, 2, 3]
+```
+
+还可以使用空占位的方式，实现对数组中某几个元素的精准提取：
+```js
+const [a, , c] = [1, 2, 3]
+// a: 1, c: 3
+```
+
+### **对象的解构**
+```js
+const stu = {
+  name: 'Bob',
+  age: 24
+}
+
+const { name, age } = stu
+```
+
+### **提取高度嵌套的对象里的指定属性**
+```js
+const school = {
+   classes: {
+      stu: {
+         name: 'Bob',
+         age: 24,
+      }
+   }
+}
+```
+<font color="	#FF6347">可以在解构出来的变量名右侧，通过冒号+{目标属性名}这种形式，进一步解构它，一直解构到拿到目标数据为止</font>。
+```js
+const { classes: { stu: { name } } } = school
+console.log(name);   // Bob
+```
 
 
 # React
@@ -1918,6 +2059,10 @@ action.type来执行不同的逻辑，然后返回一个新的state。store在�
 
 ### Redux主要解决的问题
 Redux主要解决的问题是将Redux的状态与React的UI绑定到一起，当使用dispatch(action)改变state时可以自动更新页面。
+
+### Redux异步<font color="	#FF6347">中间件</font>
+(1) redux-thunk
+
 
 ## React事件机制
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
