@@ -481,6 +481,123 @@ z-index属性在下列情况会失效：
 - 子元素变为行内盒子：display：inline-block
 - 子元素加入浮动或定位
 
+## CSS布局
+### **table布局**
+table的特性决定了它非常适合用来做布局，表格中的内容可以自动居中。但table局部有很多缺点：
+1. <font color="#FF6347">比其他HTML标签占更多的字节，造成下载时间延迟，占用服务器更多资源</font>
+2. <font color="#FF6347">阻挡浏览器渲染引擎的渲染顺序，延迟页面的加载速度</font>
+
+### **flex布局**
+**1. 盒模型**    
+- 标准盒子模型：width = 2 * border + 2 * padding + content
+- IE盒子模型：width = 2 * border + 2 * padding > content ? border * 2 + padding * 2 : content
+
+**2. display/position**
+display：
+- block：    
+      - <font color="#FF6347">元素表现为块级元素，可以设置宽高，独占一行，若没有设置宽度，则默认填满父级元素的宽度</font>。     
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>。
+- inline：   
+      - <font color="#FF6347">元素表现为行内元素</font>；   
+      - <font color="#FF6347">不能设置宽高，大小完全由内容撑开</font>；   
+      - <font color="#FF6347">padding上下左右都有效，但margin只有左右会产生效果，上下不生效</font>。
+- inline-block：     
+      - <font color="#FF6347">对外表现为行内元素，对内表现为块级元素</font>     
+      - <font color="#FF6347">可以设置宽高</font>    
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>
+
+**inline-block与浮动**
+不同点：<font color="#FF6347">inline-block不会脱离文档流；浮动会脱离文档流</font>。
+相同点：<font color="#FF6347">可以达到一样的效果</font>。
+
+
+position：
+- static：<font color="#FF6347">没有定位，存在于正常的文档流中</font>
+- relative：<font color="#FF6347">相对元素本来的位置进行偏移，不会改变布局的计算</font>
+- absolute：<font color="#FF6347">脱离文档流，相对于第一个不是static的父元素进行定位</font>
+- fixed：<font color="#FF6347">固定定位，相对于浏览器窗口进行定位</font>
+
+static不可以设置z-index。    
+
+**3. flex布局（弹性盒子布局）**     
+任何容器都可以指定为flex布局。采用flex布局的元素，称为flex容器，它的所有子元素自动成为容器成员。
+
+![image](https://user-images.githubusercontent.com/70066311/161722952-f8e30262-53e0-4ee5-8911-64a3ab607dee.png)
+
+容器默认存在两根轴，<font color="#FF6347">水平的主轴和垂直的交叉轴</font>。
+
+**flex容器**有6个属性：
+- flex-direction：<font color="#FF6347">决定主轴方向的排列</font>
+
+![image](https://user-images.githubusercontent.com/70066311/161723235-b8eda26f-1225-492f-b3b4-bc8db7625f17.png)
+
+- flex-wrap：默认情况下，项都排列在一条直线上。<font color="#FF6347">而该属性定义如果排列不下，该如何换行</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/161723699-b60322b1-d78f-41fd-a907-6c8f9c028c82.png)
+nowrap：不换行     
+wrap：换行，第一行在上方：
+
+![image](https://user-images.githubusercontent.com/70066311/161723822-ccfd4fd7-40ca-47bb-bb31-0b829d3be4c6.png) 
+wrap-reverse：换行，第一行在下方：
+
+![image](https://user-images.githubusercontent.com/70066311/161724323-64fa817c-2ca8-4c71-9a17-4a1134f9d56f.png)
+
+- flex-flow：是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap
+
+- justify-content：定义了项目在主轴上对齐的方式
+
+![image](https://user-images.githubusercontent.com/70066311/161724697-1c9f09cc-b935-49eb-9f22-042c4c387d63.png)
+
+space-between：两端对齐，项目之间的间隔都相等。
+
+space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+
+- align-item：定义项目在交叉轴上如何对齐
+
+![image](https://user-images.githubusercontent.com/70066311/161724975-4a4ff18b-f619-48f9-8eb3-d9dca5409b5b.png)
+
+stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
+
+- align-content：定义了多根轴线的对齐方式，如果只有一根轴线，则该属性不起作用
+
+![image](https://user-images.githubusercontent.com/70066311/161726025-401fa82b-4290-4662-95ef-b53c6be84260.png)
+
+**子项**的6个属性：
+- order：数值越小，排列越靠前
+
+![image](https://user-images.githubusercontent.com/70066311/161726640-59d02e21-b97e-4236-9546-a59d92b53251.png)
+
+- flex-grow：定义项目放大的比例，默认为0。<font color="#FF6347">如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍</font>。
+
+- flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小。</font>。负值对该属性无效。
+
+- flex-basis：在计算剩余空间之前设置子项的基础宽度。
+
+-flex：<font color="#FF6347">flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选</font>。该属性有两个快捷值：<font color="#FF6347">auto (1 1 auto) 和 none (0 0 auto)</font>。
+
+- align-self：align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
+
+### **float**
+<font color="#FF6347">浮动元素是脱离文档流的，但不脱离文字流</font>。
+
+**浮动元素的特点：**
+- 对于自身：
+    1. 浮动元素可以形成块；可以让行内元素拥有宽和高
+    2. 浮动元素尽量靠上
+    3. 尽量靠左（float：left）或右（float：right）。如果那一行不能满足浮动元素的宽度要求，则元素会往下掉。
+
+- 对于兄弟元素：
+    1. 不会影响其它块级元素的位置
+    2. 会影响其它块级元素的文本
+    3. <font color="#FF6347">上面紧贴非浮动元素、旁边紧贴浮动元素</font>
+
+- 对父元素影响：
+    1. <font color="#FF6347">从布局上“消失”</font>
+    2. <font color="#FF6347">高度塌陷</font>
+
+### **响应式布局**
+使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
+
 ## 常见的CSS布局单位
 1. px  
 px是屏幕能显示的最小区域。
