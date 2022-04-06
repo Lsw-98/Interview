@@ -1004,6 +1004,26 @@ call、bind、apply这三个函数的第一个参数都是this的指向对象，
 <font color="#FF6347">apply的所有参数都要放在一个数组中</font>。
 <font color="#FF6347">bind除了返回的是函数外，其余都和call是一样的</font>。
 
+## 深拷贝与浅拷贝
+如何区分深拷贝与浅拷贝，简单点来说，就是假设B复制了A，当修改A时，看B是否会发生变化，如果B也跟着变了，说明这是浅拷贝；如果B没变，那就是深拷贝。
+
+对于<font color="#FF6347">引用数据类型</font>，key存在栈内存，value存在堆内存中，但栈内存会提供一个引用的地址指向堆内存的值。
+
+**浅拷贝**
+
+![image](https://user-images.githubusercontent.com/70066311/161970282-947ca2a5-05e5-4ecc-a27a-0533d02dd0f7.png)
+
+<font color="#FF6347">当b = a进行拷贝时，其实复制的是a的引用地址，而不是堆中的值</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/161970418-657e9e89-b53a-44ac-a700-d1de3fe11cdf.png)
+
+而当我们a[0]=1时进行数组修改时，由于a与b指向的是同一个地址，所以自然b也受了影响，这就是所谓的<font color="#FF6347">浅拷贝</font>了。
+
+![image](https://user-images.githubusercontent.com/70066311/161970572-29125196-72bf-4a8a-ae5d-f7b7304f08f7.png)
+
+**深拷贝**
+要是<font color="#FF6347">在堆内存中也开辟一个新的内存专门为b存放值</font>，就像基本类型那样，岂不就达到深拷贝的效果了。
+
 ## 原型与原型链
 ### prototype（原型）
 在JS中，每个函数都有一个prototype属性，这个属性指向函数的原型对象。
@@ -2111,8 +2131,9 @@ React生命周期分为三个阶段：
 - componentDidMount  
 
 (1) constructor()     
-组件中的构造器，若显式定义了constructor，必须执行super()，否咋无法在构造函数中拿到this。
-构造器中通常做两件事：定义state和给事件绑定this。
+组件中的构造器，<font color="#FF6347">若显式定义了constructor，必须执行super(props)，否咋无法在构造函数中拿到this</font>。
+
+构造器中通常做两件事：<font color="	#FF6347">定义state和给事件绑定this</font>。
 ```js
 constructor(props){
   super(props)
@@ -2127,7 +2148,7 @@ constructor(props){
 ```js
 static getDrivedStateFromProps(props, state)
 ```
-getDrivedStateFromProps()方法是一个静态方法，不可以在该函数内部使用this。getDrivedStateFromProps()接受两个参数，props代表接收到的新的参数，state代表当前组件的state对象，会返回一个对象用来更新当前的state对象，如果不更新会返回null。
+getDrivedStateFromProps()方法是一个静态方法，不可以在该函数内部使用this。getDrivedStateFromProps()接受两个参数，<font color="	#FF6347">props代表接收到的新的参数，state代表当前组件的state对象</font>，会返回一个对象用来更新当前的state对象，如果不更新会返回null。
 
 该方法会在<font color="	#FF6347">组件装载、接受到新的props、setState和forceUpdate时被调用</font>。
 
@@ -2137,9 +2158,10 @@ render()是React最核心的方法，它只做一件事，就是根据state和pr
 (4) componentDidMount()
 componentDidMount()会在组件挂载后立即调用用，主要做以下几件事情：
 <font color="	#FF6347">
-- 执行依赖于DOM的操作
-- 发送网络请求
+- 执行依赖于DOM的操作    
+- 发送网络请求             
 - 添加订阅消息（会在componentWillUnmount取消订阅）
+
 </font>
 
 ### 组件更新阶段
@@ -2198,7 +2220,64 @@ componentWillUpdate()不管更没更新，都会执行回调函数，而我们�
 ### React setState调用的原理
 ![image](https://user-images.githubusercontent.com/70066311/160269643-e287ab67-d888-4a67-b8c4-2f11de24bd28.png)
 
-### setState调用之后发生了什么？是同步还是异步的？
+setState具体的执行过程如下：
+1. 首先调用setState()函数：
+```js
+ReactComponent.prototype.setState = function(partialState, callback){
+  // updater：一个带有形参的函数，返回被更新的状态对象。它可以接收到props和state
+  this.updater.enqueueSetState(this, partialState)
+  if(callback){
+    this.updater.enqueueCallback(this, callback, 'setState')
+  }
+}
+```
+enqueueSetState<font color="	#FF6347">将新的state放进组件的状态队列里，并调用enqueueUpdate来处理将要更新的实例对象</font>。
+
+```js
+enqueueSetState: function (publicInstance, partialState) {
+  // 根据 this 拿到对应的组件实例
+  var internalInstance = getInternalInstanceReadyForUpdate(publicInstance, 'setState');
+  // 这个 queue 对应的就是一个组件实例的 state 数组
+  var queue = internalInstance._pendingStateQueue || (internalInstance._pendingStateQueue = []);
+  queue.push(partialState);
+  //  enqueueUpdate 用来处理当前的组件实例
+  enqueueUpdate(internalInstance);
+}
+```
+
+setState()最终通过<font color="	#FF6347">enqueueUpdate更新state</font>。
+
+```js
+function enqueueUpdate(component) {
+  ensureInjected();
+  // 注意这一句是问题的关键，isBatchingUpdates标识着当前是否处于批量创建/更新组件的阶段
+  if (!batchingStrategy.isBatchingUpdates) {
+    // 若当前没有处于批量创建/更新组件的阶段，则立即更新组件
+    batchingStrategy.batchedUpdates(enqueueUpdate, component);
+    return;
+  }
+  // 否则，先把组件塞入 dirtyComponents 队列里，让它“再等等”
+  dirtyComponents.push(component);
+  if (component._updateBatchNumber == null) {
+    component._updateBatchNumber = updateBatchNumber + 1;
+  }
+}
+```
+
+在enqueueUpdate中通过<font color="	#FF6347">batchingStrategy的isBatchingUpdates属性来判断当前是否处于批量创建/更新组件的阶段</font>。
+
+batchingStrategy对象可以理解为“锁管理器”。这里的“锁”是指isBatchingUpdates变量。<font color="	#FF6347">isBatchingUpdates初始值为false，表示并未进行任何批量更新操作。每当React调用batchedUpdate去执行更新动作时，会先把这个锁给锁上（置isBatchingUpdates为true），表明“现在正处于批量更新过程中”</font>。当上锁后，更新需要更新的组件都要在队列中等待下一次批量更新。
+
+setState()将对组件state的更新排入队列，并通知React需要使用更新后的 state重新渲染此组件及其子组件。<font color="	#FF6347">你需要将setState()视为请求而不是立即更新state（可能为异步的！！！）</font>。因为React会将多次的setState()放在一起一并执行，这样可以提升效率，减少页面渲染次数。
+
+因为setState()并不总是立即更新state，可能会推迟更新。这导致在调用setState()后立即读取this.state有可能会拿到未更新之前的state。为了解决这个问题，我们可以<font color="	#FF6347">使用componentDidUpdate或setState(updater, callback)的回调函数</font>，保证在state更新后再执行。
+
+**总结：**setState()用于更新状态，它接受两个参数，第一个参数可以**传入一个对象**，也可以传入**一个updater函数**。**传入的对象**代表需要更新的状态及状态值。**updater**为一个带有形参的函数，返回被更新的状态对象，可以接收到state和props；第二个参数是一个可选的回调函数，在状态更新完后进行回调。setState()并不会立即执行状态的更新，而更像是更新状态请求。
+1. 在调用setState()后React会调用enqueueSetState()方法将需要更新的state入队。
+2. 接着调用enqueueUpdate方法里面的batchingStrategy.isBatchingUpdates属性判断当前是否处理批量更新的阶段。若处于，则将需要更新state的组件放入dirtyComponent队列中等待下一次批量更新；若不处于则立即更新组件。
+
+
+### **setState调用之后发生了什么？是同步还是异步的？**
 <font color="	#FF6347">在代码中调用setState后React会将传入的对象与当前组件的状态合并，然后触发调和过程。经过调和过程，React会根据新的状态构建React元素树，然后计算新老元素树节点的差异，根据差异对页面进行渲染。</font>。
 
 根据场景来决定是同步还是异步。
