@@ -690,6 +690,213 @@ place-content: <align-content> <justify-content>
 - grid-template属性是grid-template-columns、grid-template-rows和grid-template-areas这三个属性的合并简写形式
 - grid属性是grid-template-rows、grid-template-columns、grid-template-areas、 grid-auto-rows、grid-auto-columns、grid-auto-flow这六个属性的合并简写形式
 
+### **双飞翼布局与圣杯布局**
+圣杯布局和双飞翼布局是前端工程师需要日常掌握的重要布局方式。两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。
+
+**特点：**      
+1. 两侧宽度固定，中间宽度自适应（三栏布局）
+2. <font color="#FF6347">中间部分在DOM结构上有限，以便先行渲染</font>
+3. 允许三列中的任意一列成为最高列
+4. 只需要使用一个额外的div标签
+
+**圣杯布局：**    
+DOM结构：
+```html
+<div class="header"></div>
+<div class="container">
+  <div class="center"></div>
+  <div class="left"></div>
+  <div class="right"></div>
+</div>
+<div class="footer"></div>
+```
+首先定义出整个布局的DOM结构，主体部分是由`container`包裹的`center,left,right`三列，其中`center`定义在最前面。
+
+CSS代码：
+假设左侧的固定宽度为`200px`，右侧的固定宽度为`150px`，则首先在`container`上设置：
+```css
+#container {
+  padding-left: 200px;
+  padding-right: 200px;
+}
+```
+为左右两列预留出相应的空间，得到如下示意图：
+
+![image](https://user-images.githubusercontent.com/70066311/161888533-8d9fe687-4adb-4fe4-86e6-09935258c632.png)
+
+随后分别为三列设置宽度与浮动，同时对`footer`设置清除浮动：
+
+```css
+#container .column {
+  float: left;
+}
+
+#center {
+  width: 100%;
+}
+
+#left {
+  width: 200px; 
+}
+
+#right {
+  width: 150px; 
+}
+
+#footer {
+  clear: both;
+}
+```
+
+得到如下效果：
+
+![image](https://user-images.githubusercontent.com/70066311/161889070-724b8b8a-5178-47a3-9036-8cf772ba86ae.png)
+
+根据浮动的特性，由于`center`的宽度为`100%`，即占据了第一行的所有空间，所以`left`和`right`被“挤”到了第二行。
+
+接下来的工作是将`left`放置到之前预留出的位置上，这里使用<font color="#FF6347">负外边距（nagetive margin）</font>：
+```css
+#left {
+  width: 200px; 
+  margin-left: -100%;
+}
+```
+
+得到：
+
+![image](https://user-images.githubusercontent.com/70066311/161889254-473b86bc-59fb-41fc-b6f8-21d7bea4dc48.png)
+
+随后还需要使用定位(position)方法：
+```css
+#left {
+  width: 200px; 
+  margin-left: -100%;
+  position: relative;
+  right: 200px;
+}
+```
+
+这里使用`position: relative`和`right: 200px`将`left`的位置在原有位置基础上`左移200px`，以完成`left`的放置：
+
+![image](https://user-images.githubusercontent.com/70066311/161889588-6ef63bc4-fea1-4b99-9a6e-51423d1722ac.png)
+
+接下来放置`right`，只需添加一条声明即可：
+```css
+#right {
+  width: 150px; 
+  margin-right: -150px; 
+}
+```
+
+得到最终的效果图：
+
+![image](https://user-images.githubusercontent.com/70066311/161890580-30d5b27f-65bd-4907-aa8a-3aacc6e0b494.png)
+
+最后，<font color="#FF6347">为了保证布局效果的正常显示，我们要给页面设置一个最小宽度</font>。由于两侧都有固定宽度，而`left`使用了`position: relative`，所以就意味着在`center`开始的区域，还存在着一个`left`的宽度。所以页面的最小宽度应该设置为<font color="#FF6347">200+150+200=550px</font>：
+```css
+body {
+  min-width: 550px;
+}
+```
+
+**双飞翼布局**：    
+
+**DOM结构**
+```html
+<body>
+  <div id="header"></div>
+  <div id="container" class="column">
+    <div id="center"></div>
+  </div>
+  <div id="left" class="column"></div>
+  <div id="right" class="column"></div>
+  <div id="footer"></div>
+<body>
+```
+
+双飞翼布局的DOM结构与圣杯布局的区别是<font color="#FF6347">用`container`仅包裹住`center`，另外将`.column`类从`center`移至`container`上</font>。
+
+**CSS：**
+按照与圣杯布局相同的思路，首先设置各列的宽度与浮动，并且为左右两列预留出空间，以及为`footer`设置浮动清除：
+
+```css
+    .column {
+      float: left;
+    }
+
+    #container {
+      width: 100%;
+    }
+
+    #center {
+      margin-left: 200px;
+      margin-right: 150px;
+      background: cadetblue;
+    }
+
+    #left {
+      width: 200px;
+      background-color: coral;
+    }
+
+    #right {
+      width: 150px;
+      background-color: skyblue;
+    }
+
+    #footer {
+      clear: both;
+      background-color: beige;
+    }
+
+    #header {
+      background-color: brown;
+    }
+```
+
+得到如下效果图：
+
+![image](https://user-images.githubusercontent.com/70066311/161898073-bb8752e9-2dec-4f5b-9d96-a65debf42ebb.png)
+
+将`left`放置到预留位置：
+```css
+#left {
+  width: 200px; 
+  margin-left: -100%;
+}
+```
+
+得到：
+
+![image](https://user-images.githubusercontent.com/70066311/161898592-bc4a7e91-a267-486f-a750-686e3cbedbf8.png)
+
+将`right`放置到预留位置：
+```css
+#right {
+  width: 150px; 
+  margin-left: -150px;
+}
+```
+
+得到
+
+![image](https://user-images.githubusercontent.com/70066311/161898653-8f723506-5760-4d31-8ea9-ec7e269a6353.png)
+
+最后计算最小页面宽度：由于双飞翼布局没有用到`position:relative`进行定位，所以最小页面宽度应该为`200+150=350px`。<font color="#FF6347">但是当页面宽度缩小到350px附近时，会挤占中间栏的宽度，使得其内容被右侧栏覆盖</font>，如下所示：
+
+![image](https://user-images.githubusercontent.com/70066311/161898917-8202629f-2084-44de-b987-8d7060d677e1.png)
+
+因此在设置最小页面宽度时，应该适当增加一些宽度以供中间栏使用（假设为150px），则有：
+```css
+body {
+  min-width: 500px;
+}
+```
+
+**对比圣杯布局和双飞翼布局**
+- 圣杯布局结构上更加自然和直观，在平时的开发中更容易形成这样的布局结构；
+- 双飞翼布局由于不使用定位，所以更加简洁，允许页面的最小宽度小于圣杯布局。
+
 ## 常见的CSS布局单位
 1. px  
 px是屏幕能显示的最小区域。

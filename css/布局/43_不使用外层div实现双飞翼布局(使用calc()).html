@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      min-width: 500px;
+    }
+
+    .column {
+      float: left;
+    }
+
+    #center {
+      margin-left: 200px;
+      margin-right: 150px;
+      /* 通过calc()可以十分方便地计算出center应该占据的自适应宽度 */
+      width: calc(100%-350px);
+      background: cadetblue;
+    }
+
+    #left {
+      width: 200px;
+      margin-left: -100%;
+      background-color: coral;
+    }
+
+    #right {
+      width: 150px;
+      margin-left: -150px;
+      background-color: skyblue;
+    }
+
+    #footer {
+      clear: both;
+      background-color: beige;
+    }
+
+    #header {
+      background-color: brown;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header">header</div>
+  <div id="center" class="column">This is the main content.
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+    dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit
+    lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+    esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio
+    dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla.
+
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+    dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit
+    lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+    esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio
+    dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla.
+  </div>
+
+  <div id="left" class="column">This is the left sidebar.
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+    magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+    nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
+    molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
+    blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla.
+  </div>
+  <div id="right" class="column">This is the right sidebar.
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+    magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+    nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
+    molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
+    blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla.
+  </div>
+  <div id="footer">footer</div>
+</body>
+
+</html>
