@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="box">
+    <div class="item">1</div>
+    <div class="item">222</div>
+    <div class="item">3</div>
+  </div>
+  <style>
+    .box {
+      width: 400px;
+      height: 50px;
+      display: flex;
+      background-color: #eee;
+    }
+    .item {
+      height: 50px;
+    }
+    .item:nth-child(1) {
+      width: 250px;
+      background: red;
+    }
+    .item:nth-child(2) {
+      width: 150px;
+      flex-basis: auto; 
+      flex-shrink: 0; 
+      background: grey;
+    }
+    .item:nth-child(3) {
+      width: 50px; 
+      flex-basis: 100px;
+      flex-shrink: 2;
+      background: yellow;
+    }
+  </style>
+</body>
+</html>
