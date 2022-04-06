@@ -569,11 +569,11 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
 
 - flex-grow：定义项目放大的比例，默认为0。<font color="#FF6347">如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍</font>。
 
-- flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小。</font>。负值对该属性无效。
+- flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小</font>。负值对该属性无效。
 
 - flex-basis：在计算剩余空间之前设置子项的基础宽度。
 
--flex：<font color="#FF6347">flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选</font>。该属性有两个快捷值：<font color="#FF6347">auto (1 1 auto) 和 none (0 0 auto)</font>。
+- flex：<font color="#FF6347">flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选</font>。该属性有两个快捷值：<font color="#FF6347">auto (1 1 auto) 和 none (0 0 auto)</font>。
 
 - align-self：align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 
@@ -597,6 +597,98 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
 
 ### **响应式布局**
 使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
+
+### **Grid布局**
+Grid布局将网页划分为一个个网格，可以任意组合不同的网格，做出各种各样的布局。<font color="#FF6347">使用display: grid指定网格布局</font>。默认情况下，容器元素都为块级元素，也可以设置为行内元素。<font color="#FF6347">使用display: inline-grid指定行内网格布局</font>。
+
+**划分行列**
+- grid-template-colums：定义每一列的列宽
+- grid-template-rows：定义每一行的行高
+
+**实现一个九宫格布局：**
+```html
+  <style>
+    .container {
+      display: grid;      
+      /* grid-template-columns: 100px 100px 100px;
+      grid-template-rows: 100px 100px 100px; */
+
+      /* 除了使用绝对单位，也可以使用百分比 */
+      /* grid-template-columns: 33.33% 33.33% 33.33%;
+      grid-template-rows: 33.33% 33.33% 33.33%; */
+
+      /* 可以使用repeat函数简化重复值 */
+      grid-template-columns: repeat(3, 33.33%);
+      grid-template-rows: repeat(3, 33.33%);
+
+    }
+  </style>
+  
+  <div>foo</div>
+  <div class="container">
+    <div class="item">1</div>
+    <div class="item">2</div>
+    <div class="item">3</div>
+    <div class="item">4</div>
+    <div class="item">5</div>
+    <div class="item">6</div>
+    <div class="item">7</div>
+    <div class="item">8</div>
+    <div class="item">9</div>
+  </div>
+  <div>bar</div>
+```
+
+**网格间隔**
+- row-gap：行间隔
+- column-gap：列间隔
+- gap：上述两个的简写形式
+
+**项目排序顺序**
+- grid-auto-flow：默认值为row，先行后列。
+- grid-auto-flow还可以设置为<font color="#FF6347">row dense和column dense</font>，表示某些项目指定位置后，剩余项目如何放置。
+
+
+**justify-items、align-items**    
+- justify-items属性设置单元格内容的水平位置（左中右）
+- align-items属性设置单元格内容的垂直位置（上中下）
+
+这两个属性的写法完全相同，都可以取下面这些值。
+- start：对齐单元格的起始边缘
+- end：对齐单元格的结束边缘
+- center：单元格内部居中
+- stretch：拉伸，占满单元格的整个宽度（默认值）
+
+place-items属性是align-items属性和justify-items属性的合并简写形式。
+
+```html
+place-items: <align-items> <justify-items>;
+```
+
+**justify-content、align-content**
+- justify-content属性是整个内容区域在容器里面的水平位置（左中右）
+- align-content属性是整个内容区域的垂直位置（上中下）
+
+- start
+- end
+- center
+- stretch
+- space-around
+- space-between
+- space-evenly：<font color="#FF6347">项目与项目的间隔相等，项目与容器边框之间也是同样长度的间隔</font>。
+
+place-content属性是align-content属性和justify-content属性的合并简写形式。
+```html
+place-content: <align-content> <justify-content>
+```
+
+**grid-auto-columns、grid-auto-rows**     
+有时候，项目的指定位置，在现有网格的外部。比如网格只有3列，但某一个项目指定在第5行，这时，浏览器会生成多余的网格，以便放置项目。
+<font color="#FF6347">grid-auto-columns、grid-auto-rows属性就是用来设置浏览器自动生成网格的宽高的。如果不指定，浏览器会根据内容大小，决定新增网格的大小</font>。
+
+**grid-template、grid**    
+- grid-template属性是grid-template-columns、grid-template-rows和grid-template-areas这三个属性的合并简写形式
+- grid属性是grid-template-rows、grid-template-columns、grid-template-areas、 grid-auto-rows、grid-auto-columns、grid-auto-flow这六个属性的合并简写形式
 
 ## 常见的CSS布局单位
 1. px  
