@@ -1105,6 +1105,84 @@ teacher.hanOwnProperty('name')
 
 ### 原型链的终点是什么？怎么打印出原型链的终点
 <font color="#FF6347">原型链的终点是Object.prototype.__proto__ === null</font>。因为原型链上所有的原型都是对象，所有对象都是由Oject构造的。
+
+## 函数柯里化
+函数柯里化是是把<font color="#FF6347">接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术</font>。
+
+**柯里化的作用：**     
+1. 参数复用
+```js
+function url_curring(protocol) {
+  return function (hostname, pathname) {
+    return `${protocol}${hostname}${pathname}`
+  }
+}
+
+// 减少参数的复用
+const url_https = url_curring("https://")
+
+const url1 = url_https('www.baidu.com', '/home')
+const url2 = url_https('www.baidu.com', '/login')
+const url3 = url_https('www.baidu.com', '/user')
+
+console.log(url1)
+console.log(url2)
+console.log(url3)
+```
+
+2. 延迟执行
+```js
+function add() {
+  // 将参数赋值给args
+  // 因为arguments是对象，要将它转化为数组
+  let args = Array.prototype.slice.call(arguments)
+
+  let inner = function () {
+    // 将inner接收到的参数加到args中
+    args.push(...arguments)
+    // 因为不知道有多少次add调用，所以要一直递归
+    return inner
+  }
+
+  // 因为再返回的inner函数之前被调用了toString()
+  // 所以返回的其实是一个字符串
+  // 这里重写toString()方法，进行累加求和
+  inner.toString = function () {
+    return args.reduce(function (pre, cur) {
+      return pre += cur
+    })
+  }
+  return inner
+}
+
+const res = add(1, 5, 6)(2)(3)(4).toString()
+console.log(res)
+```
+
+3. 箭头函数遍历数组
+```js
+const nameList1 = [
+  { mid: "亚索", profession: '中单' },
+  { mid: "永恩", profession: '中单' },
+  { mid: "发条", profession: '中单' },
+  { mid: "刀妹", profession: '中单' },
+]
+
+const nameList2 = [
+  { adc: "vn", profession: 'ADC' },
+  { adc: "efls", profession: 'ADC' },
+  { adc: "萨米拉", profession: 'ADC' },
+  { adc: "EZ", profession: 'ADC' },
+]
+
+const curring = name => element => element[name]
+const name_mid = curring('mid')
+const name_adc = curring('adc')
+
+console.log(nameList1.map(name_mid))
+console.log(nameList2.map(name_adc))
+```
+
  
 ## 执行上下文/作用域链/闭包
 ### 1. 对闭包的理解
@@ -1311,6 +1389,70 @@ CSS文件）</font>。
 - 提取公共第三方库：将公共模块抽取，利用浏览器缓存可以长期缓存这些无需变动的代码
 
 # 计算机网络
+## 什么是HTTPS协议
+HTTPS（超文本传输安全协议）是一种通过计算机网络进行安全通信的传输协议。<font color="#FF6347">HTTPS由HTTP协议进行通信，由SSL/TSL协议进行加密数据包</font>。HTTPS主要的目的是<font color="#FF6347">提供对网站服务器的身份认证，保护交换数据的隐私的完整性</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/162150301-d0d1c9de-cafd-459b-aad5-ce7a943f1330.png)
+
+<font color="#FF6347">HTTP协议采用明文传输，存在信息窃听、信息篡改和信息劫持等问题。而SSL/TSL协议具有身份认证（非对称加密）、信息加密（对称加密）和完整性校验（散列函数）的功能，可以避免此问题发生</font>。
+
+## SSL/TSL的工作原理
+SSL/TSL（安全传输层协议），是介于HTTP和TCP协议之间的一层安全协议。
+
+SSL/TSL主要依赖于三个算法：<font color="#FF6347">散列函数hash、对称加密、非对称加密</font>。
+- 基于散列函数验证信息的完整性
+- 对称加密用于对数据的加密
+- 非对称加密用于身份认证和密钥协商
+
+![image](https://user-images.githubusercontent.com/70066311/162152499-4083c1bc-7a29-42ce-b8b2-e00dc0c6e667.png)
+
+1. 常见的散列函数有MD5、SHA256等。这些函数的特点是<font color="#FF6347">单向不可逆，对输入数据非常敏感、输出的长度固定，任何数据的修改都会影响散列函数的结果，可以用于防止信息篡改并验证数据的完整性</font>。
+
+2. 对称加密：对传输数据进行加密
+
+3. 非对称加密：主要用于身份认证和对称加密使用的密钥，保证数据只能是通信的双方获取。
+
+## 数字证书
+1. 使用一种Hash算法对公钥和其它信息进行加密，生成一个信息摘要。
+2. 让有公信力的认证中心用它的私钥对信息摘要进行加密，生成签名。
+3. 将原始的信息和签名结合在一起，就是**数字证书**。
+
+1. 当接收方收到数字证书时，先根据原始信息使用同样的hash算法生成一个摘要。
+2. 使用公证处的公钥对数字证书中的摘要进行解密。
+3. 最后将解密的摘要和生成的摘要进行对比，就能发现得到的信息是否被修改了。
+
+## HTTPS通信（握手）过程
+1. 客户端向服务器发起请求，请求中包含使用协议的版本号、生成的一个随机数、以及客户端支持的加密方法。
+2. 服务器接收到请求后，确认双方使用的加密方法，并给出服务器的证书、一个服务器生成的随机数。
+3. 客户端确认服务器证书有效后，生成一个新的随机数，并使用数字证书中的公钥，加密这个随机数，然后发送给服务器，并且还会提供一个hash值，用于服务器校验。
+4. 服务器使用自己的私钥，解密客户端发送过来的随机数，并提供一个hash值用于客户端校验。
+5. 客户端和服务器根据约定的加密方法使用前面的三个随机数，生成会话密钥，以后对话的过程都使用这个会话密钥进行加密。
+
+## HTTPS特点
+HTTPS的优点：
+1. HTTPS可以进行身份认证，保证数据发送正确。
+2. HTTPS可以进行加密传输，防止数据在传输过程中被窃取、篡改、监听，确保数据的完整性。
+
+
+HTTPS的缺点：
+1. 可能会遭受中间人攻击。
+2. HTTPS握手握手更加耗时，页面响应更慢。
+3. HTTPS进行加密更浪费资源。
+
+## HTTPS如何保证安全的？
+采用<font color="#FF6347">两种加密方式 + 数字证书</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/162168524-eaeaffb4-3d00-4e8b-ace5-a0946fe44e1b.png)
+
+1. 客户端向服务器发送请求。
+2. 服务器接收到请求后返回给客户端一个证书和一个公钥。
+3. 客户端验证该证书是否有效，如果有效，使用随机数生成会话密钥。
+4. 并使用服务器发送来的公钥对会话密钥进行加密，然后将加密后的发送给服务器。
+5. 服务器解密后得到会话密钥，此后客户端和服务器就可以通过会话密钥进行通信了。
+6. 将明文数据用会话密钥加密后发送，接收端再使用会话密钥进行解密得到明文。
+
+但这么做存在一个问题，如果存在中间人攻击，中间人将自己的公钥发送给客户端，而客户端不知道这个公钥是来自于攻击者的，然后使用这个公钥对会话密钥进行加密，这样攻击者就可以拿到会话密钥，揭秘数据了。使用数字证书可以有效防止中间人攻击。
+
 ##  <font color="#FF6347">HTTP和HTTPS的区别</font>
 HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是明文的，未加密的，因此不安全。HTTPS在HTTP的基础上加入了SSL协议，构建可进行加密传输和身份认证的传输协议，比HTTP安全性更高。  
 主要区别在于：
