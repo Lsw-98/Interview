@@ -10,7 +10,7 @@ function add() {
     return inner
   }
 
-  // 因为再返回的inner函数之前被调用了toString()
+  // 因为在返回的inner函数之前被调用了toString()
   // 所以返回的其实是一个字符串
   // 这里重写toString()方法，进行累加求和
   inner.toString = function () {
