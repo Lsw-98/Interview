@@ -2717,6 +2717,91 @@ React-Router中的history有三种：分别是browserHistory、hashHistory和men
 ```
 从/users/:id 转到 /user/profile/:id。
 
+## Router v6
+```js
+// history模式
+<BrowserRouter>
+  {/* 路由入口：指定跳转到哪一个组件，to用来配置路由地址 */}
+  <Link to='/'>首页</Link>
+  <Link to='/about'>关于</Link>
+  <Link to='/login'>登录</Link>
+  {/* 路由出口：路由对应的组件会在这里进行渲染 */}
+  <Routes>
+    {/* 指定路径和组件的对应关系，用于指定导航链接，完成路由匹配 */}
+    <Route path="/" element={<Home />}></Route>
+    <Route path="/about" element={<About />}></Route>
+    <Route path="/login" element={<Login />}></Route>
+  </Routes>
+</BrowserRouter >
+```
+
+- Link：路由入口，用于指定导航链接，完成路由跳转，最终渲染为a标签
+- Routes：路由出口，路由对应的组件在Routes中进行渲染
+- Route：指定路由地址与组件的对应关系，用于指定导航链接，完成路由匹配
+- BrowserRouter：history模式
+
+### **编程式导航**
+Router v6通过useNavigate钩子函数实现编程式导航
+```js
+import { useNavigate } from 'react-router-dom'
+// 指定钩子函数得到跳转函数
+const navigate = useNavigate()
+// 执行跳转函数，跳转到about页
+navigate('/about')   // 相当于push
+navigate('/about', { replace: true })   // 相当于replace
+navigate(-1)    // 相当于back
+navigate(1)     // 相当于forward
+navigate(-2)    // 相当于go
+```
+
+### **传参**
+Router v6有两种传参方式
+1. searchParams传参
+```js
+// 传参：
+navigage('/about?id=1001')
+// 取参：
+let [params] = useSearchParams()
+let id = params.get('id')
+```
+params是一个对象，里面包含很多方法：get、append、delete、forEach等，可以对传来的参数进行操作。
+
+
+2. params传参
+```js
+// 传参：
+navigage('/about/1001')
+// 取参：
+let params = useParams()
+let id = params.id
+```
+第二种方法的参数就是一个参数对象。
+
+### **嵌套路由**
+1. 定义嵌套路由声明
+```js
+{/* 指定路径和组件的对应关系，用于指定导航链接，完成路由匹配 */}
+<Route path="/" element={<Home />}>
+  {/* 定义二级路由 */}
+  <Route path='board' element={<Board />}></Route>
+  <Route path='article' element={<Article />}></Route>
+</Route>
+```
+
+2. 使用<Outlet />指定二级路由出口     
+然后再Home组件中配置二级路由出口。
+```js
+import { Outlet } from 'react-router-dom'
+{/* 二级路由出口 */}
+<Outlet></Outlet>
+```
+
+### **配置默认路由**
+使用index关键字配置默认路由
+```js
+<Route index element={<Board />}></Route>
+```
+
 ## Hooks
 类组件：类组件是采用ES6 class的写法进行组件编写，类组件内部封装了很多东西，比如state，生命周期函数等，我们我们可以在组件挂载、渲染、卸载阶段分别写不同的逻辑。但使用类组件难以拆分内部逻辑，不方便复用，因此有了函数式组件。     
 函数组件真正的将数据和页面渲染绑定到了一起，实现了输入一组数据，输出一个UI。更加方便复用与拆分。但函数式组件是一种无状态组件，它不可以定义state，没有生命周期函数。而Hooks使得函数式组件有了这些能力。    
