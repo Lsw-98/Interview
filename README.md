@@ -2329,6 +2329,193 @@ console.log(name);   // Bob
 
 
 # React
+## refs
+refs：提供了一种方式，是我们可以访问DOM节点或在render方法中创建React元素。
+
+以下几种情况适用于refs：
+1. 管理焦点，例如文本框或媒体播放
+2. 触发强制动画
+3. 集成第三方DOM库
+
+在官方文档中，<font color="#FF6347">React提醒我们不要过度使用refs</font>。
+
+### **回调形式的refs**
+在React16.3之前，都是使用回调函数的方式使用refs。
+
+<font color="#FF6347">这个回调函数接收React组件实例或DOM元素作为参数，以使他们能在其他地方被存储和访问</font>。
+
+下面是一个<font color="#FF6347">关于refs使用回调函数获取输入框焦点</font>的例子：
+```js
+import React, { Component } from 'react'
+
+export default class Home extends Component {
+  constructor(props) {
+    super(props)
+    // 首先设置节点为 null
+    this.textInput = null
+
+    this.setTextInputRef = element => {
+      // 调用回调函数，将输入框的DOM赋值给textInput
+      this.textInput = element
+    }
+
+    this.focusTextInput = () => {
+      // 使用原生DOM API使text输入框获得焦点
+      if (this.textInput) {
+        // 先让文本框失去焦点，然后点击按钮后使文本框得到焦点
+        this.textInput.focus()
+      }
+    }
+  }
+
+  componentDidMount() {
+    // 组件被挂载后，让文本框自动获得焦点
+    this.focusTextInput()
+  }
+
+  render() {
+    return (
+      <div>
+        {/* 使用ref的回调函数将text输入框DOM节点的引用存储到React */}
+        <input type="text" ref={this.setTextInputRef} />
+        <input type="button" value="Focus the text input" onClick={this.focusTextInput} />
+      </div>
+    )
+  }
+}
+```
+上面的例子，在React组件挂载时，会调用ref回调函数并传入DOM元素，当卸载时又会传入null。<font color="#FF6347">在componentDidMount和componentDidUpdate触发前，React会保证refs一定是最新的</font>。
+
+
+### **createRef**
+#### **Refs的创建**
+在React 16.3之后，<font color="#FF6347">Refs使用React.createRef()创建</font>，通过ref属性附加到React元素。<font color="#FF6347">在组件中通常将refs赋值给属性值，方便在整个组件中使用它们</font>。
+```js
+import React, { Component } from 'react'
+
+export default class Home extends Component {
+  constructor(props) {
+    super(props)
+    // 将ref属性赋值给一个实例属性
+    this.myRef = React.createRef()
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={this.myRef} />
+      </div>
+    )
+  }
+}
+```
+
+### **访问Refs**
+可以通过ref的current访问DOM元素。
+```js
+componentDidMount() {
+  // 在组件的任何地方都可以使用
+  console.log(this.myRef.current);   // <input tepe="text">
+}
+```
+
+ref的值根据节点的类型而有所不同：
+- 当ref属性属于HTML元素时，ref接收到的就是DOM元素
+- 当ref属性属于React组件时，ref接收到的就是组件实例
+- 不可以再函数式组件上使用ref，因为函数式组件没有实例
+
+### **使用createRef实现输入框自动获得焦点**
+```js
+import React, { Component } from 'react'
+
+export default class Home extends Component {
+  constructor(props) {
+    super(props)
+    // 将ref属性赋值给一个实例属性
+    this.textInputRef = React.createRef()
+  }
+
+  componentDidMount() {
+    // 在组件的任何地方都可以使用
+    this.textInputRef.current.focus()
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={this.textInputRef} />
+      </div>
+    )
+  }
+}
+
+```
+
+### **为class组件添加ref**
+```js
+import React, { Component } from 'react'
+
+export default class About extends Component {
+  constructor(props) {
+    super(props);
+    // 创建一个 ref 来存储 textInput 的 DOM 元素
+    this.textInput = React.createRef();
+    this.focusTextInput = this.focusTextInput.bind(this);
+  }
+
+  focusTextInput() {
+    // 直接使用原生 API 使 text 输入框获得焦点
+    // 注意：我们通过 "current" 来访问 DOM 节点
+    this.textInput.current.focus();
+  }
+
+  render() {
+    // 告诉 React 我们想把 <input> ref 关联到
+    // 构造器里创建的 `textInput` 上
+    return (
+      <div>
+        <input
+          type="text"
+          ref={this.textInput} />
+        <input
+          type="button"
+          value="Focus the text input"
+          onClick={this.focusTextInput}
+        />
+      </div>
+    );
+  }
+}
+```
+
+```js
+import React, { Component } from 'react'
+import About from '../About'
+
+export default class Home extends Component {
+  constructor(props) {
+    super(props)
+    // 将ref属性赋值给一个实例属性
+    this.textInputRef = React.createRef()
+  }
+
+  componentDidMount() {
+    // 在组件的任何地方都可以使用
+    this.textInputRef.current.focusTextInput()
+  }
+
+  render() {
+    return (
+      <div>
+        <About ref={this.textInputRef} />
+      </div>
+    )
+  }
+}
+```
+## React 高阶组件
+**高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
+
 ## 生命周期
 ### React的生命周期有哪些
 React生命周期分为三个阶段：
@@ -2671,17 +2858,23 @@ export default App;
 - 如果是兄弟组件，找到它们共同的父组件进行通信。
 
 ## 路由
-### React-Router的实现原理
+### **路由基本功能**
+1. <font color="	#FF6347">保证视图和url的同步</font>。
+
+### **history**
+history可以用来兼容在不同浏览器、不同环境下对历史记录的管理。  
+
+history分为三类，分别是browserHistory、hashHistory和menoryHistory。<font color="	#FF6347">browserHistory利用的是H5中的history接口</font>。<font color="	#FF6347">hashHistory利用的是history中的location属性的hash</font>。
+
+**browserHistory**采用push和replace（编程式路由）来实现url的改变，这两个方法分别封装了history的**pushState**和**replaceState**方法。这两个方法都会改变当前的url，但不会刷新页面。还有例如go()、back()、forward()等方法。这些方法都会触发popState事件，所以在browseHistory采用<font color="	#FF6347">手动触发popState的方式来实现对url改变的监听</font>。 
+
+**hashHistory**通过区分history对象中的location属性中包含的hash字段来渲染不同的组件。
+
+### **React-Router的实现原理**
 React-Router是建立在history之上的，<font color="	#FF6347">history会监听浏览器地址栏的变化，并解析url转化为location对象，然后router匹配到对应的路由，最后渲染对应的组件</font>。
 
 Router负责<font color="	#FF6347">根据当前的url来渲染相应的组件</font>。
 Route<font color="	#FF6347">根据当前的url与自身的path属性进行匹配，匹配成功就渲染对应的组件</font>。
-
-React-Router中的history有三种：分别是browserHistory、hashHistory和menoryHistory。<font color="	#FF6347">browserHistory利用的是H5中的history接口</font>。<font color="	#FF6347">hashHistory利用的是history中的location属性的hash</font>。
-
-**browserHistory**采用push和replace方法来实现url的改变，这两个方法分别封装了history的**pushState**和**replaceState**方法。这两个方法都会改变当前的url，但不会刷新页面。还有例如go()、back()、forward()等方法。这些方法都会触发popState事件，所以在browseHistory采用<font color="	#FF6347">手动触发popState的方式来实现对url改变的监听</font>。 
-
-**hashHistory**通过区分history对象中的location属性中包含的hash字段来渲染不同的组件。
 
 ### 何如配置React-Router实现路由切换
 - 使用\<Route>组件  
@@ -2692,7 +2885,7 @@ React-Router中的history有三种：分别是browserHistory、hashHistory和men
 ```
 
 - \<Switch>和\<Route>  
-在\<Route>外层包裹\<Switch>表示只会匹配到第一个匹配的\<Route>。
+因为\<Route>采用的是模糊匹配，所以可能一次会匹配到多个路由，\<Switch>的作用就是控制每次只匹配一个路由。在\<Route>外层包裹\<Switch>表示只会匹配到第一个匹配的\<Route>。
 ```js
 <Swicth>
   <Route path="/home" component={Home} />
@@ -2701,7 +2894,7 @@ React-Router中的history有三种：分别是browserHistory、hashHistory和men
 ```
 
 - \<Link>、\<NavLink>和\<Redirect>  
-\<Link>组件将被渲染为一个\<a>标签。
+\<Link>就是渲染在页面中的路由跳转链接，\<Link>组件将被渲染为一个\<a>标签。
 ```js
 <Link to="/home">Home</Link>
 // 在页面中被渲染为：<a href="/home">Home</a>
@@ -2717,7 +2910,46 @@ React-Router中的history有三种：分别是browserHistory、hashHistory和men
 ```
 从/users/:id 转到 /user/profile/:id。
 
-## Router v6
+### **Link和a标签的区别**
+从最终渲染的DOM来看，两者都是链接。区别在于：\<Link>是实现路由跳转的链接，一般配合
+\<Route>使用，\<Link>的跳转行为只触发了相匹配的\<Route>对应的页面内容更新，而不会刷新整个页面。
+
+<font color="	#FF6347">我个人的理解</font>：因为React是一个单页面应用，在每次进行路由切换时都是在一个HTML文件中发生的，这个HTML文件在页面首次加载时就已经下载下来了，使用\<Link>在路由切换时不会重新去请求一个HTML文件；而\<a>在每次跳转时都会加载对应页面的HTML文件，在某些网速慢得情况下会出现空白页，导致用户体验不好。\<Link>在通过阻止\<a>标签的默认事件，然后根据href（即\<Link>的to属性）进行页面跳转。
+
+### **Router如何获取URL的参数和历史对象**
+获取URL参数：
+1. get传值。通过`props.location.search`取值。
+2. 动态路由传值。在V6之前的版本可以使用`props.match.params.属性值`来取值；V6
+版本可以通过useParams和useSearchParams钩子函数来取值。
+
+获取历史对象：
+1. useHistory钩子函数获取历史对象。
+2. `props.history`获取历史对象。
+
+### **路由拦截（路由守卫）**
+```js
+const isAuth = () => {
+  // 判断是否有token字段
+  return localStorage.getItem("token")
+}
+
+// 实现路由拦截
+<Route path="/cart" render={()=>{
+  return isAuth() ? <Cart /> : <Redirect to="/login">
+}} />
+
+```
+
+## Router V6
+### **V6版本的一些更改**
+1. \<Switch>重命名为\<Routes>
+2. \<Route>的特性变更（component/render被element替代）
+3. 嵌套路由变得更简单
+4. 使用\<useNavigate>代替\<useHistory>
+5. 使用\<useRoutes>代替react-router-config
+6. 更小的体积
+
+
 ```js
 // history模式
 <BrowserRouter>
