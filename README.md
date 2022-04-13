@@ -2513,6 +2513,222 @@ export default class Home extends Component {
   }
 }
 ```
+
+## Context
+Context提供了一个<font color="#FF6347">无需为每层组件手动添加props，就能在组件树间进行数据传递</font>的方法。某些属性很多组件都需要用，Context提供一种在组件之间共享此类值得方式，而不必显示地通过组件逐层传递props。
+
+### **Context的API**
+1. React.createContext
+```js
+const MyContext = React.createContext(defaultValue);
+```
+<font color="#FF6347">创建一个Context对象，当React渲染一个订阅了这个Context对象（MyContext）的组件，这个组件会从组件树中查找离自己最近的`Provider`，读取当前的Context值</font>。
+
+<font color="#FF6347">将undefined传递给Provider的value时，defaultValue不会生效</font>。
+
+2. Context.Provider
+```js
+<MyContext.Provider value={/* 某个值 */}>
+```
+每个Context对象都会返回一个Provider React组件，它允许组件订阅context的变化。Provider接收一个value属性，传递给组件。一个Provider可以和多个组件右对应关系。<font color="#FF6347">多个Provider也可以嵌套使用，里层的会覆盖外层的</font>。
+
+<font color="#FF6347">当Provider中的value值发生变化时，内部的所有组件都会重新渲染</font>。而value值是否发生变化是通过<font color="#FF6347">浅比较</font>决定的，所以<font color="#FF6347">当Provider的父组件进行重新渲染时，可能会在Provider包含的组件中发生意外渲染</font>。
+
+例如：当Provider 重渲染时，由于 value 属性总是被赋值为新的对象，以下的代码会重新渲染Provider下面所有的组件：
+```js
+class App extends React.Component {
+  render() {
+    return (
+      <MyContext.Provider value={{something: 'something'}}>
+        <Toolbar />
+      </MyContext.Provider>
+    );
+  }
+}
+```
+<font color="#FF6347">为了防止这种情况，可以把value中的属性提升到state中</font>。
+
+```js
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: {something: 'something'},
+    };
+  }
+
+  render() {
+    return (
+      <MyContext.Provider value={this.state.value}>
+        <Toolbar />
+      </MyContext.Provider>
+    );
+  }
+}
+```
+
+3. contextType
+```js
+class MyClass extends React.Component {
+  componentDidMount() {
+    let value = this.context;
+    /* 在组件挂载完成后，使用 MyContext 组件的值来执行一些有副作用的操作 */
+  }
+  componentDidUpdate() {
+    let value = this.context;
+    /* ... */
+  }
+  componentWillUnmount() {
+    let value = this.context;
+    /* ... */
+  }
+  render() {
+    let value = this.context;
+    /* 基于 MyContext 组件的值进行渲染 */
+  }
+}
+MyClass.contextType = MyContext;
+```
+挂在class上的contextType属性可以赋值为由 React.createContext() 创建的 Context 对象，<font color="#FF6347">可以通过this.context获取最近的Context上的值</font>。
+
+4. Context.Consumer
+```js
+<MyContext.Consumer>
+  {value => /* 基于 context 值进行渲染*/}
+</MyContext.Consumer>
+```
+Consumer可以让你在函数式组件中订阅context。
+
+### **何时使用Context**
+Context设计的目的是共享那些对于一个组件树而言是”全局“的数据，例如：当前认证的用户、主题或首选语言。
+
+**逐层传递props**
+```js
+import React from 'react'
+import { Button } from 'antd'
+
+export default function Home() {
+  return (
+    <div>
+      <Toolbar theme="dark" />
+    </div>
+  )
+}
+
+function Toolbar(props) {
+  return (
+    <div>
+      {/* 
+        Toolbar组件接受一个额外的theme属性，然后传递给ThemedButton组件，
+        如果React应用中每个按钮都需要这样，那就很繁琐 
+        因为对于theme这个属性必须逐层传递
+      */}
+      <ThemedButton theme={props.theme} />
+    </div>
+  )
+}
+
+class ThemedButton extends React.Component {
+  render() {
+    return <Button theme={this.props.theme} />
+  }
+}
+```
+
+**使用Context进行传递**
+```js
+import React from 'react'
+import { Button } from 'antd'
+
+// 1. 为theme创建一个context，createContext('light')中的light为默认值
+const ThemeContext = React.createContext('light')
+
+export default function ContextDemo() {
+  return (
+    // 2. 使用Provider将想要共享属性的组件包裹起来
+    // 这样无论组件树多深。都可以访问到Context定义的属性
+    <ThemeContext.Provider value='dark'>
+      <Toolbar />
+    </ThemeContext.Provider>
+  )
+}
+
+function Toolbar() {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  )
+}
+
+class ThemedButton extends React.Component {
+  // 3. 指定contextType读取当前的theme context
+  // React会向上找到最近的theme Provider，然后使用它的值
+  static contextType = ThemeContext
+
+  handleClick = () => {
+    console.log(this.context);
+  }
+
+  render() {
+    return (
+      <Button theme={this.context} onClick={this.handleClick} />
+    )
+  }
+}
+```
+
+**使用多个context**
+```js
+import React from 'react'
+import { Button } from 'antd'
+
+// 1. 为theme创建一个context
+const ThemeContext = React.createContext('light')
+const ColorContext = React.createContext('red')
+
+export default function ContextDemo() {
+  return (
+    // 2. 使用Provider将想要共享属性的组件包裹起来
+    // 这样无论组件树多深。都可以访问到Context定义的属性
+    <ThemeContext.Provider value='dark'>
+      <ColorContext.Provider value='blue'>
+        <Toolbar />
+      </ColorContext.Provider>
+    </ThemeContext.Provider>
+  )
+}
+
+function Toolbar() {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  )
+}
+
+class ThemedButton extends React.Component {
+  render() {
+    return (
+      <ThemeContext.Consumer>
+        {
+          (theme) => (
+
+            < ColorContext.Consumer >
+              {
+                (color) => (
+                  <Button theme={theme} color={color} />
+                )
+              }
+            </ColorContext.Consumer>
+          )
+        }
+      </ThemeContext.Consumer>
+    )
+  }
+}
+```
+
 ## React 高阶组件
 **高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
 
