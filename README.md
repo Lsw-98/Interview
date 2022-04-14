@@ -921,10 +921,58 @@ vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度�
 
 # JS
 ## JS基础
-### JS有哪些数据类型
+### **JS有哪些数据类型**
 JS中有Undefined、Null、Object、Number、String、Boolean、Symbol、BigInt。  
-- Symbol代表创建后独一无二且不可变的数据类型，它主要是为了解决可能出现的全局变量冲突问题。
-- BigInt是一种数字类型的数据，他可以表示任意精度格式的整数，使用BitInt可以安全的存储和操作大整数，即使这个数已经超出了Number能够表示的安全整数范围。
+- Symbol代表创建后独一无二且不可变的数据类型，它主要是为了解决<font color="#FF6347">可能出现的全局变量冲突问题</font>。
+- BigInt是一种数字类型的数据，他可以表示任意精度格式的整数，使用BitInt可以<font color="#FF6347">安全的存储和操作大整数</font>，即使这个数已经超出了Number能够表示的安全整数范围。
+
+这些数据类型可以分为：
+- 原始数据类型：null、undefined、Number、String、Boolean，存储在栈
+- 引用数据类型：<font color="#FF6347">Object、数组和函数</font>，存储在堆
+
+### 原始数据类型和引用数据类型的区别在于<font color="#FF6347">存储位置不同</font>
+- 原始数据类型因为简单，占用空间小，频繁使用，所以放在栈中存储。
+- 引用数据类型大小不固定，占用空间大，如果存储到栈中，会影响性能。<font color="#FF6347">引用数据类型在栈中存放指向堆的指针，在需要使用该值时，js会先在栈中寻找指向堆内存地址的指针，然后获得堆中的实体</font>。
+
+### **数据类型检测方法**
+1. typeof
+```js
+console.log(typeof 2);               // number
+console.log(typeof true);            // boolean
+console.log(typeof 'str');           // string
+console.log(typeof []);              // object    
+console.log(typeof function(){});    // function
+console.log(typeof {});              // object
+console.log(typeof undefined);       // undefined
+console.log(typeof null);            // object
+```
+
+2. instacneof
+instacneof可以正确判断对象的类型，<font color="#FF6347">其内部运行机制是判断变量的原型链中是否能找到该类型的原型</font>。
+
+instacneof只能判断引用数据类型，不能判断原始数据类型。
+```js
+console.log(2 instanceof Number);                    // false
+console.log(true instanceof Boolean);                // false 
+console.log('str' instanceof String);                // false 
+ 
+console.log([] instanceof Array);                    // true
+console.log(function(){} instanceof Function);       // true
+console.log({} instanceof Object);                   // true
+```
+
+3. constructor
+```js
+console.log((2).constructor === Number); // true
+console.log((true).constructor === Boolean); // true
+console.log(('str').constructor === String); // true
+console.log(([]).constructor === Array); // true
+console.log((function() {}).constructor === Function); // true
+console.log(({}).constructor === Object); // true
+```
+
+### **null和undefined的区别**
+null是空对象，而undefined是未定义的。一般定义了一个变量而没赋值时，会返回undefined；而null主要赋值给那些可能返回对象的变量。
 
 ## this
 
@@ -1238,8 +1286,30 @@ Promise是一种异步编程的解决方案，可以解决回调地狱问题。P
 2. 如果不设置回调函数，Promise内部抛出错误，不会反应到外部。
 
 ### Promise是改变状态先执行还是指定回调先执行
-当执行器中的代码为同步时，会先改变状态后执行回调。  
+当执行器中的代码为同步时，会先改变状态后执行回调。
+```js
+let promise1 = new Promise((resolve, reject) => {
+  resolve("ok1")
+  console.log(111);
+}).then(res => {
+  console.log(res);
+}).catch(err => {
+  console.log(err);
+})
+```
 当执行器中的代码为异步时，会先执行回调再改变状态。
+```js
+let promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve("ok2")
+  }, 100)
+}).then(res => {
+  console.log(222);
+  console.log(res);
+}).catch(err => {
+  console.log(err);
+})
+```
 
 ### Primise.then()返回新的promise的结果状态由什么决定？
 由then()返回的回调函数执行的结果决定。
@@ -1418,6 +1488,62 @@ CSS文件）</font>。
 - 提取公共第三方库：将公共模块抽取，利用浏览器缓存可以长期缓存这些无需变动的代码
 
 # 计算机网络
+## 什么是HTTP协议
+HTTP（超文本传输协议）是客户端与服务器之间交换报文的方式，默认使用80端口，是应用层协议，它使用TCP作为传输层协议，保证了数据传输的可靠性。 
+
+## HTTP协议的优点和缺点   
+**优点**：  
+1. 简单：客户端向服务器发送请求时，只需要传送请求方法和路径。
+2. 无连接：限制每次连接只处理一个请求。服务器处理完客户端的请求并收到客户端的应答后，才断开连接，这样可以节省传输时间。
+3. 灵活：HTTP允许传输任意类型的数据。
+4. 无状态：HTTP是无状态协议。缺少状态意味着如果后面的处理需要前面的信息，则必须重传，这样会导致每次连接传送的数据量非常大。如果它不需要前面的数据，应答就非常快。
+
+**缺点**：
+1. 无状态：HTTP服务器不会保存关于客户的任何信息。
+2. 明文传输。
+3. 没有进行身份认证。
+4. 无法验证报文的完整性。
+
+##  <font color="#FF6347">HTTP 1.0 和 HTTP 1.1之间的区别</font>
+- 连接方面：HTTP 1.0使用非持久连接；HTTP 1.1使用持久连接。持久连接可使多个HTTP请求复用同一个TCP连接，以此来避免使用非持久连接时每次需要建立连接的时延。
+- 资源请求方面：HTTP 1.0存在浪费带宽的现象，当只想请求数据的某个部分时，HTTP 1.0会将整个数据返回；而HTTP 1.1允许返回部分数据。
+- 缓存方面：HTTP 1.1比HTTP 1.0的缓存策略更多，例如：Etag、if-Match、if-None-Match等。
+- HTTP 1.1还增加了PUT、HEAD等请求。
+
+##  <font color="#FF6347">HTTP 1.1 和 HTTP 2.0的区别</font>
+- 二进制协议：HTTP 2.0的头部信息和数据体都是二进制，HTTP 1.1的头部信息是文本。
+- 多路复用：HTTP 2.0中客户端和服务器都可以同时发送多个请求或回应，这样就避免了队头堵塞（HTTP 规定报文必须是“一发一收”，如果某个请求因为处理耽误了太多时间，那么它后面的请求就不得不等待，造成<font color="#FF6347">队头堵塞</font>的问题）。
+- 头部数据压缩：HTTP 2.0对头部信息进行了压缩。因为头部信息中例如cookie等字段都是重复，每次请求都会带上这些字段造成带宽的浪费。
+- 服务器推送：HTTP 2.0允许未经服务器允许，向客户端推送资源（静态资源），这样可以减少延迟。
+
+## HTTP 3.0
+在HTTP 2.0中多个HTTP请求会复用一个TCP，一旦发生丢包，会阻塞所有的HTTP请求，这时基于TCP传输可能出现的问题，所以HTTP 3.0把TCP换成了UDP。
+UDP是不可靠的传输协议，不会管传输顺序，不管丢包，所以不会出现HTTP 1.1中的队头阻塞和HTTP 2.0中丢包全部重传的问题。
+
+HTTP 3.0基于UDP协议实现了类似于TCP的多路复用数据流、传输可靠性等功能。
+HTTP 3.0在UDP的基础上增加了一层用来保障数据传输的可靠性，提供了数据包重传、拥塞控制等特性。
+
+## HTTP的性能
+### **长连接**
+HTTP有两种连接方式，一种是持久连接，另一种是非持久连接。
+- 非持久连接指的是服务器必须为每一个请求的对象建立和维护一个全新的连接。
+- 持久连接指的是TCP连接可以被多个请求复用，可以避免每次建立TCP连接三次握手而消耗的时间。
+### **管道网络传输**
+在同一个TCP连接里面，客户端可以发起多个请求，只要第一个请求发送出去了，就可以发出第二个请求，减少整体的响应时间。但服务器还是按照顺序回应请求。
+### **队头堵塞**
+解决方法：
+1. 增加任务队列。分配多个长连接，不至于一个队列的任务阻塞所有任务。
+2. 将域名分出很多二级域名，使它们指向同一台服务器，能够并发的持久连接变多了。
+
+## 常见的HTTP请求方法
+- GET：向服务器获取数据
+- POST：将实体提交到服务器，通常为修改服务器资源
+- PUT：上传文件，更新数据
+- DELETE：删除服务器上的对象
+- HEAD：获取报文首部，<font color="#FF6347">与GET相比，不会返回报文的主体部分</font>
+- TRACE：回显服务器收到的请求，用于测试或诊断 
+- OPTIONS：询问支持的请求方法，用来跨域请求
+
 ## 什么是HTTPS协议
 HTTPS（超文本传输安全协议）是一种通过计算机网络进行安全通信的传输协议。<font color="#FF6347">HTTPS由HTTP协议进行通信，由SSL/TSL协议进行加密数据包</font>。HTTPS主要的目的是<font color="#FF6347">提供对网站服务器的身份认证，保护交换数据的隐私的完整性</font>。
 
@@ -1442,10 +1568,14 @@ SSL/TSL主要依赖于三个算法：<font color="#FF6347">散列函数hash、�
 3. 非对称加密：主要用于身份认证和对称加密使用的密钥，保证数据只能是通信的双方获取。
 
 ## 数字证书
+即使HTTPS是采用加密传输的，但HTTPS仍然是不安全的。如果某个中间人，将自己的公钥发送给了客户端，而客户端并不知情，而是以为是服务器发送过来的公钥，那么它将用这个公钥进行数据发送，中间人就可以使用自己的私钥进行解密，从而达到数据劫持的目的。
+
+### **数字证书的生成过程**
 1. 使用一种Hash算法对公钥和其它信息进行加密，生成一个信息摘要。
 2. 让有公信力的认证中心用它的私钥对信息摘要进行加密，生成签名。
 3. 将原始的信息和签名结合在一起，就是**数字证书**。
 
+### **使用数字证书进行校验**
 1. 当接收方收到数字证书时，先根据原始信息使用同样的hash算法生成一个摘要。
 2. 使用公证处的公钥对数字证书中的摘要进行解密。
 3. 最后将解密的摘要和生成的摘要进行对比，就能发现得到的信息是否被修改了。
@@ -1462,10 +1592,9 @@ HTTPS的优点：
 1. HTTPS可以进行身份认证，保证数据发送正确。
 2. HTTPS可以进行加密传输，防止数据在传输过程中被窃取、篡改、监听，确保数据的完整性。
 
-
 HTTPS的缺点：
 1. 可能会遭受中间人攻击。
-2. HTTPS握手握手更加耗时，页面响应更慢。
+2. HTTPS握手更加耗时，页面响应更慢。
 3. HTTPS进行加密更浪费资源。
 
 ## HTTPS如何保证安全的？
@@ -1507,49 +1636,6 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 ### *HTTPS的缺点
 1. 页面加载时间变长
 2. 开销变大
-
-##  <font color="#FF6347">HTTP 1.0 和 HTTP 1.1之间的区别</font>
-- 连接方面：HTTP 1.0使用非持久连接；HTTP 1.1使用持久连接。持久连接可使多个HTTP请求复用同一个TCP连接，以此来避免使用非持久连接时每次需要建立连接的时延。
-- 资源请求方面：HTTP 1.0存在浪费带宽的现象，当只想请求数据的某个部分时，HTTP 1.0会将整个数据返回；而HTTP 1.1允许返回部分数据。
-- 缓存方面：HTTP 1.1比HTTP 1.0的缓存策略更多，例如：Etag、if-Match、if-None-Match等。
-- HTTP 1.1还增加了PUT、HEAD等请求。
-
-##  <font color="#FF6347">HTTP 1.1 和 HTTP 2.0的区别</font>
-- 二进制协议：HTTP 2.0的头部信息和数据体都是二进制，HTTP 1.1的头部信息是文本。
-- 多路复用：HTTP 2.0中客户端和服务器都可以同时发送多个请求或回应，这样就避免了队头堵塞（HTTP 规定报文必须是“一发一收”，如果某个请求因为处理耽误了太多时间，那么它后面的请求就不得不等待，造成<font color="#FF6347">队头堵塞</font>的问题。
-- 头部数据压缩：HTTP 2.0对头部信息进行了压缩。因为头部信息中例如cookie等字段都是重复，每次请求都会带上这些字段造成带宽的浪费。
-- 服务器推送：HTTP 2.0允许未经服务器允许，向客户端推送资源（静态资源），这样可以减少延迟。
-
-## HTTP协议的优点和缺点
-HTTP是超文本传输协议，是客户端与服务器之间交换报文的格式和方式，默认使用80端口，它使用TCP作为传输层协议，保证了数据传输的可靠性。    
-**优点**：  
-1. 简单：客户端向服务器发送请求时，只需要传送请求方法和路径。
-2. 无连接：限制每次连接只处理一个请求。服务器处理完客户端的请求并收到客户端的应答后，才断开连接，这样可以节省传输时间。
-3. 灵活：HTTP允许传输任意类型的数据。
-4. 无状态：HTTP是无状态协议。缺少状态意味着如果后面的处理需要前面的信息，则必须重传，这样会导致每次连接传送的数据量非常大。   
-
-**缺点**：
-1. 无状态：HTTP服务器不会保存关于客户的任何信息。
-2. 明文传输。
-3. 没有进行身份认证。
-4. 无法验证报文的完整性。
-
-## HTTP 3.0
-HTTP 3.0基于UDP协议实现了类似于TCP的多路复用数据流、传输可靠性等功能。
-HTTP 3.0在UDP的基础上增加了一层用来保障数据传输的可靠性，提供了数据包重传、拥塞控制等特性。
-
-## HTTP的性能
-### *长连接
-HTTP有两种连接方式，一种是持久连接，另一种是非持久连接。
-- 非持久连接指的是服务器必须为每一个请求的对象建立和维护一个全新的连接。
-- 持久连接指的是TCP连接可以被多个请求复用，可以避免每次建立TCP连接三次握手而消耗的时间。
-### *管道网络传输
-在同一个TCP连接里面，客户端可以发起多个请求，只要第一个请求发送出去了，就可以发出第二个请求，减少整体的响应时间。但服务器还是按照顺序回应请求。
-### *队头堵塞
-解决方法：
-1. 增加任务队列。分配多个长连接，不至于一个队列的任务阻塞所有任务。
-2. 将域名分出很多二级域名，使它们指向同一台服务器，能够并发的持久连接变多了。
-
 
 ## 端口的作用
 一个IP地址对应一台主机，一台主机可以提供多个服务，例如ftp服务、web服务等。如果只有一个IP号就无法区分对应的服务，因此要使用IP+端口的方式来区分不同的服务。
@@ -2329,6 +2415,8 @@ console.log(name);   // Bob
 
 
 # React
+## React理念
+
 ## refs
 refs：提供了一种方式，是我们可以访问DOM节点或在render方法中创建React元素。
 
@@ -2728,6 +2816,89 @@ class ThemedButton extends React.Component {
   }
 }
 ```
+
+## React组件传值的几种方式
+1. props
+    - 父传子：通过在子组件中写属性的方式传递数据，子组件需要调用props接收数据。
+    - 子传父：父组件向子组件传递一个函数，子组件再回调这个函数，将数据以参数的形式传给父组件，父组件就可以在自己方法中对传入的数据进行处理。
+    ```js
+    //父组件
+    import Child from './Child.js'；
+    export default class Parent extend compenent{
+      getData=(data)=>{
+        console.log(data);
+      }
+      render(){
+        return (
+          <div>
+            父组件
+            <Child getData={this.getData}/>
+          </div>
+        )
+      }
+    }
+
+    //子组件
+    export default class Child extend compenent{
+      state={
+        data:[1,2,3]
+      }
+      render(){
+        const {data}=this.state;
+        return (
+          <div>
+            子组件
+            <button onClick={()=>{this.props.getData(data)}}><button>
+          </div>
+        )
+      }
+    }
+    ```
+
+2. Context：Context无需为每层组件手动添加props，就能在组件间传递数据。
+```js
+// Context 可以让我们无须明确地传遍每一个组件，就能将值深入传递进组件树。
+// 为当前的 theme 创建一个 context（“light”为默认值）。
+const ThemeContext = React.createContext('light');
+class App extends React.Component {
+  render() {
+    // 使用一个 Provider 来将当前的 theme 传递给以下的组件树。
+    // 无论多深，任何组件都能读取这个值。
+    // 在这个例子中，我们将 “dark” 作为当前的值传递下去。
+    return (
+      <ThemeContext.Provider value="dark">
+        <Toolbar />
+      </ThemeContext.Provider>
+    );
+  }
+}
+
+// 中间的组件再也不必指明往下传递 theme 了。
+function Toolbar() {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+class ThemedButton extends React.Component {
+  // 指定 contextType 读取当前的 theme context。
+  // React 会往上找到最近的 theme Provider，然后使用它的值。
+  // 在这个例子中，当前的 theme 值为 “dark”。
+  static contextType = ThemeContext;
+  render() {
+    return <Button theme={this.context} />;
+  }
+}
+```
+被Context.Provider包裹的组件，不再需要逐层传递props就可以取到数据。
+
+3. redux：redux是一个组件状态管理库，可以轻松实现非父子组件且嵌套关系复杂的组件之间的数据传递问题。
+
+4. 路由传值
+    - 使用router v6中的新钩子函数 useSearchParams和useParams
+    - 使用query和state传参，但是刷新页面后参数会丢失
 
 ## React 高阶组件
 **高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
@@ -3254,12 +3425,12 @@ import { Outlet } from 'react-router-dom'
 类组件：类组件是采用ES6 class的写法进行组件编写，类组件内部封装了很多东西，比如state，生命周期函数等，我们我们可以在组件挂载、渲染、卸载阶段分别写不同的逻辑。但使用类组件难以拆分内部逻辑，不方便复用，因此有了函数式组件。     
 函数组件真正的将数据和页面渲染绑定到了一起，实现了输入一组数据，输出一个UI。更加方便复用与拆分。但函数式组件是一种无状态组件，它不可以定义state，没有生命周期函数。而Hooks使得函数式组件有了这些能力。    
 
-### 为什么useState使用数组还不是对象
+### 为什么useState使用数组而不是对象
 如果使用数组，那么调用者在解构useState中的值时可以自由对这些值命名；而使用对象就必须用对象中的命名。
 
 ### Hooks的使用限制
-- <font color="	#FF6347">不在循环、条件或嵌套函数中使用Hooks</font>
-- <font color="	#FF6347">只能在函数时组件中调用Hooks</font>
+- <font color="	#FF6347">不在循环、条件或嵌套函数中使用Hooks</font>。
+- <font color="	#FF6347">只能在函数时组件中调用Hooks</font>。
 React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中使用Hooks，可能会造成取值错位等错误发生。
 
 ### 常用的Hooks
@@ -3285,7 +3456,7 @@ React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中
 const value = useContext(TestContext);
 ```
 
-- useEffect：副作用钩子，数据获取、消息订阅、操作DOM等都属于副作用。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="	#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
+- useEffect：副作用钩子，<font color="	#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="	#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
 
 - useRef：获得组件的实例，多用于\<input>、\<form>等带有输入的DOM标签。
 

@@ -18,14 +18,3 @@ new Promise(function (reslove) {
   console.log('promise2');
 })
 console.log('script end');
-
-/**
- * script start
- * async1 start
- * async2 
- * promise1
- * script end
- * asnyc1 end
- * promise2
- * setTimeOut
- */

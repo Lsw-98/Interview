@@ -12,12 +12,3 @@ setTimeout(() => {
   console.log('promise1', promise1)
   console.log('promise2', promise2)
 }, 2000)
-
-// 打印结果：
-/**
- * promise1 Promise {<pending>}
- * promise2 Promise {<pending>}
- * Uncaught (in promise) Error: error!!!
- * promise1 Promise {<fulfilled>: "success"}
- * promise2 Promise {<rejected>: Error: error!!}
- */
