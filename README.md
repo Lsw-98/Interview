@@ -2537,8 +2537,118 @@ console.log(name);   // Bob
 
 
 # React
-## React理念
+## JSX
+JSX是JS XML，用来在React中代替js。JSX的<font color="#FF6347">执行速度更快；是类型安全的，在编译过程中就能发现错误；使用JSX编写更加快速</font>。
+下面就是一个简单的JSX语法：
+```js
+const element = <h1>Hello, world!</h1>
+```
 
+JSX其实是`React.createElement(component, props, ...children)`的语法糖，所以在组件中没有看到使用react却需要引入react就是因为使用了JSX。
+
+<font color="#FF6347">React使用JSX后会使代码变得更简洁，结构层次更清晰</font>。但在实际运行时，会使用babel插件将JSX语法的代码转化为React.createElement的代码。
+
+## 虚拟DOM
+### **什么是DOM**
+DOM是用一颗逻辑树来表示一个文档，树的每个分支的终点都是一个节点，可以用特定的方式（编写JS、CSS、HTML）来改变这个树的结构，从而改变文档结构、样式或内容。
+
+### **什么是虚拟DOM**
+虚拟DOM就是一个JS对象，通过对象的方式来表示DOM结构，通过事务处理机制，将多次DOM修改的结果一次性更新到页面上，<font color="#FF6347">从而有效的减少页面渲染次数，减少修改DOM重绘重排的时间，提高渲染性能</font>。
+
+<font color="#FF6347">React在内存中维护一个跟真实DOM一样的虚拟DOM树，再改动完组件后，会再生成一个新的虚拟DOM，React会将新的虚拟DOM和原来的虚拟DOM进行对比，找出两个DOM树的不同的地方（diff），然后在真实DOM上更新diff，提高渲染速度</font>。
+
+### **为什么要使用虚拟DOM**
+1. 提供更好的性能
+对比一下修改DOM时真实DOM操作和虚拟DOM的操作：
+- 对于真实DOM：生成HTML字符串，重建`所有`DOM元素
+- 对于虚拟DOM：生成虚拟DOM节点，采用diff算法，更新出现变化的真实DOM节点
+
+可以看出，虚拟DOM虽然要进行更多的步骤，但它的性能消耗是极低的。
+
+2. 跨平台
+使用虚拟DOM可以很方便的进行跨平台操作。
+
+### **diff算法的原理**
+diff算法探讨的就是<font color="#FF6347">虚拟DOM树发生变化后，生成DOM树更新补丁的方式、它通过对比新旧两颗虚拟DOM树的变更差异，将更新补丁作用于真实DOM，以最小的成本完成试图更新</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/163707594-1c5dc046-dfd3-4645-ae48-e1884123074a.png)
+
+具体流程如下：
+1. 真实DOM首先映射为虚拟DOM
+2. 当虚拟DOM发生变化时，根据变化计算生成`patch`，这个`patch`就是一个结构化的数据，包含了增加、更新、删除等操作。
+3. 根据patch去更新真是DOM，反馈到用户页面上。
+
+<font color="#FF6347">这样一个生成补丁，更新差异的过程称为diff算法</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/163707651-03869a59-baff-417f-8225-3c773301ecef.png)
+
+diff算法可以总结为三个策略，分别从树、组件以及元素三个层面进行复杂度优化：
+策略一：**忽略节点跨层级操作场景，提升对比效率（基于树进行对比）**
+这一策略需要进行树比对，即对树进行分层比较。树比对的处理手法是非常“暴力”的，即两棵树只对同一层次的节点进行比较，如果发现节点已经不存在了，则该节点及其子节点会被完全删除掉，不会用于进一步的比较，这就提升了比对效率。
+
+策略二：**如果组件的class一致，则默认为相似的树结构，否则默认为不同的树结构（基于组件进行对比）**
+在组件对比中：
+- 如果组件是同一类型，则进行树对比
+- 如果不是则直接放入补丁中
+- 只要父组件类型不同，就会被重新渲染
+
+策略三：**同一层级的子节点，可以通过标记 key 的方式进行列表对比。（基于节点进行对比）**
+元素比对主要发生在同层级中，通过标记节点操作生成补丁。节点操作包含了插入、移动、删除等。其中节点重新排序同时涉及插入、移动、删除三个操作，所以效率消耗最大，此时策略三起到了至关重要的作用。通过标记 key 的方式，React 可以直接移动 DOM 节点，降低内耗。
+
+### **React中的key是什么**
+key是React用于追踪哪些列表中元素被修改、被添加、被移除的辅助标识。在开发中，我们要保证每个元素的key在其同级的元素具有唯一性。
+
+<font color="#FF6347">diff算法中会借助key来判断该元素是新创建的还是被移动而来的元素，从而减少不必要的渲染</font>。
+
+- key具有唯一性
+- 尽量不要用数组中的index作为key
+- 不要再render的时候使用随机数或其它操作给元素加上不稳定的key，因为这样造成的性能开销比不加key更多
+
+### **受控组件与非受控组件**
+1. 受控组件
+在使用表单来收集用户输入时，例如\<input>、\<select>、\<textarea>等元素都要绑定一个`change`事件，当表单状态发生变化时，就会触发`onChange`事件，更新组件的state。这种组件为<font color="#FF6347">受控组件</font>，在受控组件中，组件渲染出的状态与它的value或checked属性相对应，react通过这种方法消息组件的局部状态，是整个状态可控。
+
+受控组件更新state的流程：
+- 可以通过初始state中设置表单的默认值
+- 每当表单的值发生变化时，调用onChange事件处理器
+- 事件处理器通过事件对象e拿到改变后的状态，并更新组件的state
+- 一旦通过setState方法更新state，就会触发视图的重新渲染，完成表单组件的更新
+
+**受控组件的缺陷：**
+表单元素的值都是由React组件进行管理，当有多个输入框，或者多个这种组件时，如果想同时获取到全部的值就必须每个都编写事件处理函数，这会让代码看起来很臃肿，所以为了解决这种情况，出现了非受控组件。
+
+2. 非受控组件 
+如果一个表单组件没有value或checked属性时，就是非受控组件。在非受控组件中，可以使用一个ref来获取DOM中的表单值，而不是为每个状态更新编写一个事件处理函数。
+
+如下第一个\<input>是一个非受控组件，它通过ref获取input输入框输入的值。
+```js
+class NameForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  handleSubmit(event) {
+    alert('A name was submitted: ' + this.input.value);
+    event.preventDefault();
+  }
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" ref={(input) => this.input = input} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
+```
+
+**<font color="#FF6347">页面中所有输入类的DOM如果是现用现取得称为非受控组件，而通过setState将输入的值维护到state中，需要时再从state获取，数据就受到了state得控制，这样的就是受控组件</font>**。
+
+
+## React理念
 ## refs
 refs：提供了一种方式，是我们可以访问DOM节点或在render方法中创建React元素。
 
@@ -3063,7 +3173,7 @@ constructor(props){
 ```js
 static getDrivedStateFromProps(props, state)
 ```
-getDrivedStateFromProps()方法是一个静态方法，不可以在该函数内部使用this。getDrivedStateFromProps()接受两个参数，<font color="	#FF6347">props代表接收到的新的参数，state代表当前组件的state对象</font>，会返回一个对象用来更新当前的state对象，如果不更新会返回null。
+<font color="	#FF6347">getDrivedStateFromProps()方法是一个静态方法</font>，不可以在该函数内部使用this。getDrivedStateFromProps()接受两个参数，<font color="	#FF6347">props代表接收到的新的参数，state代表当前组件的state对象</font>，会返回一个对象用来更新当前的state对象，如果不更新会返回null。
 
 该方法会在<font color="	#FF6347">组件装载、接受到新的props、setState和forceUpdate时被调用</font>。
 
