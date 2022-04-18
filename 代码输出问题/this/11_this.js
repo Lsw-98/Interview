@@ -18,8 +18,3 @@ var obj = {
 console.log(obj.getX())
 console.log(obj.getY())
 
-
-/**
- * 3
- * 6
- */

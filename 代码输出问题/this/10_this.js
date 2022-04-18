@@ -15,9 +15,3 @@ obj.bar();
 var foo = obj.foo;
 foo();
 
-
-/**
- * 2
- * 1
- * 1
- */

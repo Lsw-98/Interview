@@ -17,8 +17,3 @@ o();
 obj.say();
 obj.pro.getPro();
 
-/**
- * 1111 window
- * 1111 say
- * window
- */

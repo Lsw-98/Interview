@@ -13,9 +13,3 @@ var myObject = {
 
 myObject.func();
 
-/**
- * bar
- * bar
- * undefined
- * bar 
- */

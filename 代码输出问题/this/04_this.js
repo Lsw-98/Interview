@@ -6,8 +6,3 @@ var obj = {
 }
 obj.fun()
 new obj.fun()
-
-/**
- * cuggz
- * undefined
- */

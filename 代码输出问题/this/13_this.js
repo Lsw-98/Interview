@@ -8,7 +8,3 @@ var y = a(6);
 console.log(x.x)
 console.log(y.x)
 
-/**
- * undefined
- * 6
- */

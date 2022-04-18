@@ -12,8 +12,3 @@ var baz = new bar(3);
 console.log(obj1.a);
 console.log(baz.a);
 
-/**
- * 2
- * 2
- * 3
- */

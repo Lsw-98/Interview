@@ -974,10 +974,38 @@ console.log(({}).constructor === Object); // true
 ### **null和undefined的区别**
 null是空对象，而undefined是未定义的。一般定义了一个变量而没赋值时，会返回undefined；而null主要赋值给那些可能返回对象的变量。
 
+### **new操作符实现原理**
+new的执行过程：
+1. 首先创建一个空对象
+2. 设置原型，将对象的原型设置为prototype对象
+3. 让函数的this指向这个对象，执行构造函数（为这个对象添加属性）
+4. 判断函数的返回值类型，如果是值类型，返回创建的对象，如果是引用类型，返回这个引用类型的对象
+
+```js
+function objectFactory() {
+  let newObject = null;
+  let constructor = Array.prototype.shift.call(arguments);
+  let result = null;
+  // 判断参数是否是一个函数
+  if (typeof constructor !== "function") {
+    console.error("type error");
+    return;
+  }
+  // 新建一个空对象，对象的原型为构造函数的 prototype 对象
+  newObject = Object.create(constructor.prototype);
+  // 将 this 指向新建对象，并执行函数
+  result = constructor.apply(newObject, arguments);
+  // 判断返回对象
+  let flag = result && (typeof result === "object" || typeof result === "function");
+  // 判断返回结果
+  return flag ? result : newObject;
+}
+// 使用方法
+objectFactory(构造函数, 初始化参数);
+```
+
 ## this
-
-
-## call()、apply()、bind()
+### **call()、apply()、bind()**
 例子1:
 ```js
 const name = "小王"
@@ -1052,6 +1080,38 @@ call、bind、apply这三个函数的第一个参数都是this的指向对象，
 <font color="#FF6347">apply的所有参数都要放在一个数组中</font>。
 <font color="#FF6347">bind除了返回的是函数外，其余都和call是一样的</font>。
 
+### **this指向问题**
+this是执行上下文的一个属性，它指向最后一次调用这个方法的对象。可以通过下面四种方法来判断：
+1. **函数调用模式**：当一个函数不是一个对象的属性时，直接作为函数来调用，那么<font color="#FF6347">this指向全局对象</font>。
+```js
+const obj = {
+  a: 2,
+  b: {
+    c: function test() {
+      function test2() {
+        console.log(this);   // window
+      }
+      test2()   // 直接作为函数来调用
+    }
+  }
+}
+
+obj.b.c()
+```
+
+2. **方法调用模式**：如果一个函数作为一个对象的方法来调用时，this指向这个对象。
+3. **构造器调用模式**：如果一个函数用new调用时，函数执行前会新创建一个对象，this指向这个新创建的对象。
+4. **apply、call、bind调用模式**：apply接收两个参数，<font color="#FF6347">一个是this绑定的对象，一个是参数数组</font>。call方法接收多个参数<font color="#FF6347">一个是this绑定的对象，其余的时 传入的参数</font>。bind方法除了返回的是函数外，其余的都和call一样。
+
+### **判断this指向的七种方法**
+1. obj.fun()   <font color="#FF6347">this指向obj</font>
+2. fun() 或 (function(){ ... })() 或 多数回调函数 或 定时器函数   <font color="#FF6347">this指向window</font>
+3. new Fun()   <font color="#FF6347">this指向new正在创建的新对象</font>
+4. 类型名.prototype.共有方法=function(){ ... }   <font color="#FF6347">this指向将来谁调用指谁，同第一种情况</font>
+5. DOM或jq中事件处理函数中的this  <font color="#FF6347">当前正在触发事件的DOM元素对象</font>，如果需要使用简化版函数，必须$(this)
+6. 箭头函数中的this  <font color="#FF6347">箭头函数外部作用域中的this</font>
+7. jQuery.fn.自定义函数=function(){ ... }   <font color="#FF6347">this指向将来调用这个自定义函数的 . 前的jQuery子对象</font>
+
 ## 深拷贝与浅拷贝
 如何区分深拷贝与浅拷贝，简单点来说，就是假设B复制了A，当修改A时，看B是否会发生变化，如果B也跟着变了，说明这是浅拷贝；如果B没变，那就是深拷贝。
 
@@ -1073,24 +1133,24 @@ call、bind、apply这三个函数的第一个参数都是this的指向对象，
 要是<font color="#FF6347">在堆内存中也开辟一个新的内存专门为b存放值</font>，就像基本类型那样，岂不就达到深拷贝的效果了。
 
 ## 原型与原型链
-### prototype（原型）
+### **prototype（原型）**
 在JS中，每个函数都有一个prototype属性，这个属性指向函数的原型对象。
 ```js
 function Person(age) {
     this.age = age       
 }
-Person.prototype.name = 'kavin'
+Person.prototype.name = 'kavin'   
 var person1 = new Person()
 var person2 = new Person()
 console.log(person1.name) //kavin
 console.log(person2.name)  //kavin
 ```
 
-在上面的代码中，函数的prototype指向了一个对象，而这个对象正是调用构造函数时创建的实例的原型，也就是person1和person2的原型。
+在上面的代码中，函数的prototype指向了一个对象，而这个对象正是调用构造函数时创建的实例的原型，也就是person1和person2的原型。而Person.prototype是一个构造函数，所以可以使用Person.prototype可以定义属性。
 <font color="#FF6347">每个JS对象创建时，就会与之关联另一个对象，这个对象就是我们说的原型，每个对象都会从原型中继承属性</font>。
 ![image](https://user-images.githubusercontent.com/70066311/161051022-d32de349-62ec-49b8-babd-0bfb3b951aca.png)
 
-### __proto__
+### **\_\_proto\_\_**
 <font color="#FF6347">该属性指向对象的原型</font>。
 
 ``` js
@@ -1099,10 +1159,11 @@ function Person() {
 var person = new Person();
 console.log(person.__proto__ === Person.prototype); // true
 ```
+上面代码实例化了一个对象`person`，而这个对象的__proto__属性就指向它的原型。
 ![image](https://user-images.githubusercontent.com/70066311/161052367-8f33ff21-829f-405d-a2c5-378b9f276c5a.png)
 
 
-### constructor
+### **constructor**
 <font color="#FF6347">每个原型都有一个constructor属性，指向关联的构造函数</font>。
 
 ```js
@@ -1113,7 +1174,7 @@ console.log(Person===Person.prototype.constructor)  //true
 ```
 ![image](https://user-images.githubusercontent.com/70066311/161053035-ddd97909-4237-4cda-8ccb-06edaf7ab145.png)
 
-### 实例与原型
+### **实例与原型**
 当读取实例的属性时，如果找不到，就会查找与对象关联的原型的属性，如果还是找不到，就会去原型的原型中进行查找，直到找到为止。最上层的原型是一个Object，它的原型为null。
 ```js
 function Person() {
@@ -1133,10 +1194,10 @@ console.log(person.name) // Kevin
 
 ![image](https://user-images.githubusercontent.com/70066311/161053741-1713e101-c2c6-432e-8477-874c4839edd3.png)
 
-### 构造函数、原型和实例的关系
+### **构造函数、原型和实例的关系**
 <font color="#FF6347">每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个指向原型对象的内部指针</font>。
 
-### 原型链
+### **原型链**
 假如我们让原型对象等于另一个原型的实例，结果会怎样？显然，此时的原型对象将包含一个指向另一个原型的指针，相应地，另一个原型中也包含着一个指向另一个构造函数的指针。假如另一个原型又是另一个类型的实例，那么上述关系依然成立。如此层层递进，就构成了实例与原型的链条。这就是所谓的原型链的基本概念。
 
 ![image](https://user-images.githubusercontent.com/70066311/161055142-79c09e45-9710-4b0c-be3c-7cd27ed688e7.png)
@@ -1152,7 +1213,7 @@ teacher.hanOwnProperty('name')
 ```
 
 ### 原型链的终点是什么？怎么打印出原型链的终点
-<font color="#FF6347">原型链的终点是Object.prototype.__proto__ === null</font>。因为原型链上所有的原型都是对象，所有对象都是由Oject构造的。
+<font color="#FF6347">原型链的终点是Object.prototype.\_\_proto\_\_ === null</font>。因为原型链上所有的原型都是对象，所有对象都是由Oject构造的。
 
 ## 函数柯里化
 函数柯里化是是把<font color="#FF6347">接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术</font>。
@@ -1233,19 +1294,152 @@ console.log(nameList2.map(name_adc))
 
  
 ## 执行上下文/作用域链/闭包
-### 1. 对闭包的理解
+### **1. 对闭包的理解**
 **闭包是指有权访问另一个函数作用域中变量的函数**。创建闭包最常见的方法就是在一个函数中创建另一个函数，创建的函数可以访问到当前函数的局部变量。  
 闭包有两个常用的用途：
  - <font color="#FF6347">在函数外部能够访问到函数内部的变量</font>。可以通过外部调用闭包函数，从而在外部访问到函数内部的变量，可以使用这种方法来创建私有变量。
  - <font color="#FF6347">是已经运行结束的函数中的上下文变量对象继续留在内存中，因为闭包函数保留了这个变量对象的引用，所以这个变量对象不会被回收</font>。
+
 在JS中，闭包存在的意义就是让我们可以在函数外部访问函数内部的变量。
+比如，函数 A 内部有一个函数 B，函数 B 可以访问到函数 A 中的变量，那么函数 B 就是闭包。
+```js
+function A() {
+  let a = 1
+  window.B = function () {
+      console.log(a)
+  }
+}
+A()
+B() // 1
+```
+当我们将B作为返回值，就可以得到A中的变量的值了。
+
+下面有一个在面试中关于必报的典型例子：
+```js
+for (var i = 1; i <= 5; i++) {
+  setTimeout(function timer() {
+    console.log(i)
+  }, i * 1000)
+}
+```
+因为`setTimeout()`是一个异步函数，所以会先执行完`for`，此时i已经=6，所以会打印5个6。可以使用三种方式解决上述问题：
+1. 使用let定义i
+```js
+for (let i = 1; i <= 5; i++) {
+  setTimeout(function timer() {
+    console.log(i)
+  }, i * 1000)
+}
+```
+
+2. 使用闭包
+```js
+for (var i = 1; i <= 5; i++) {
+  (function(j) {
+    setTimeout(function timer() {
+      console.log(j)
+    }, j * 1000)
+  })(i)
+}
+```
+在上面的代码中，使用立即执行函数将i传入函数内部，这个时候值就被固定在参数j上面不会改变，当执行timer时，就可以使用外部函数的变量j。
+
+3. 使用setTimeout的回调函数
+```js
+for (var i = 1; i <= 5; i++) {
+  setTimeout(function timer(j) {
+    console.log(j)
+  }, i * 1000, i)
+}
+```
+
+**使用闭包要注意的点：**    
+1. 因为使用闭包函数中的变量会一直保存到内存中，内存消耗很大，容易浪费资源，解决办法是<font color="#FF6347">在退出函数之前，将不用的变量全部删除</font>。
+2. 闭包会在父函数外部，改变父函数内部的值。
+
+### **闭包的优点和缺点**
+优点：可以在全局重复使用变量，便不会造成变量污染。可以用来定义私有属性和私有方法。
+
+缺点：比普通函数更消耗内存，会导致网页性能变差。
+
+### **闭包的应用**
+1. 防抖与节流     
+防抖
+```js
+function debounce(fn, delay) {
+  let timer = null   // 借助闭包
+  return function () {
+    if (timer) {
+      clearTimeout(timer)   // 取消由 setTimeout() 方法设置的定时操作。
+    }
+    timer = setTimeout(fn, delay)
+  }
+}
+```
+节流
+```js
+// 定时器版
+function throttleTime(fn, delay) {
+  let timer = null   // 表示当前函数是否在执行
+  return function () {
+    if (!timer) {
+      timer = setTimeout(() => {
+        fn()
+        timer = null
+      }, delay)
+    }
+  }
+}
+
+// 时间戳版
+function throttleTimeStamp(fn, delay) {
+  let preTime = Date.now()
+  return function () {
+    let nowTime = Date.now()
+    if (nowTime - preTime >= delay) {
+      // 保存函数的执行时间
+      preTime = Date.now()
+      return fn()
+    }
+  }
+}
+```
+2. 函数柯里化
+```js
+function add() {
+  // 将参数赋值给args
+  // 因为arguments是对象，要将它转化为数组
+  let args = Array.prototype.slice.call(arguments)
+
+  let inner = function () {
+    // 将inner接收到的参数加到args中
+    args.push(...arguments)
+    // 因为不知道有多少次add调用，所以要一直递归
+    return inner
+  }
+
+  // 因为在返回的inner函数之前被调用了toString()
+  // 所以返回的其实是一个字符串
+  // 这里重写toString()方法，进行累加求和
+  inner.toString = function () {
+    return args.reduce(function (pre, cur) {
+      return pre += cur
+    })
+  }
+  return inner
+}
+
+const res = add(1, 5, 6)(2)(3)(4).toString()
+console.log(res)
+
+```
 
 ### 2.作用域、作用域链
 **全局作用域**  
  - 最外层函数和最外层函数外面定义的变量拥有全局作用域
  - 所有未定义直接赋值的变量自动声明为全局作用域
- - suoyouwindow对象的属性拥有全局作用域
- - 全局作用域容易引起命名冲突问题
+ - 所有window对象的属性拥有全局作用域
+ - 全局作用域容易引起命名冲突问题，过多的全局作用域变量会污染全局命名空间
 **函数作用域**  
  - 函数作用域声明在函数内部
  - 内层作用域可以访问到外部，反之不行
@@ -1258,9 +1452,14 @@ console.log(nameList2.map(name_adc))
 在当前作用域中查找所需变量，但该作用于没有这个变量，那么这个变量就是自由变量，如果在自己的作用域找不到该变量就去父级作用域查找，知道访问到window的作用域终止，这一层层的关系就是作用域链。
 
 ### 3.执行上下文
-**执行上下文栈**  
-js使用执行上下文栈来管理执行上下文。  
-当js执行代码时，首先遇到全局代码，会创建一个全局执行上下文并压入执行栈中，每当遇到一个函数调用，就会为该函数创建一个新的执行上下文并压入栈顶，引擎会执行位于执行上下文栈顶的函数，当函数执行完后，执行上下文从栈中弹出，继续执行下一个执行上下文。当所有代码都执行完毕后，从栈中弹出全局执行上下文。
+1. 全局执行上下文
+任何不在函数内部的都是全局执行上下文，它首先会创建一个全局window对象，并且设置this的值等于这个全局对象，<font color="#FF6347">一个程序中只有一个全局上下文</font>。
+2. 函数执行上下文
+当一个函数被调用时，就会为该函数创建一个新的执行上下文，<font color="#FF6347">函数的上下文可以有任意多个</font>。
+
+### **执行上下文栈**
+- JS使用执行上下文栈来管理执行上下文
+- 当JS执行代码时，首先遇到全局代码，会创建一个全局执行上下文并且压入执行栈中，每当遇到一个函数调用，就会为该函数创建一个新的执行上下文并压入栈顶，引擎会执行位于执行上下文栈顶的函数，当函数执行完成之后，执行上下文从栈中弹出，继续执行下一个上下文。当所有的代码都执行完毕之后，从栈中弹出全局执行上下文。
 
 ## 异步编程
 ### JS异步机制
@@ -1670,6 +1869,16 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 - 网站快照停止（网页快照是搜索引擎在收录网页时，对网页进行备份，存在自己的服务器缓存里）
 - 收录减少
 - 权重下降
+
+### **kepp-alive**
+keep-alive就是使用长连接。
+优点：
+- 较少的CPU和内存使用
+- 降低了拥塞控制
+- 减少了请求的延迟
+
+缺点：
+- 可能长期没有连接请求导致TCP链接无效占用，浪费系统资源
 
 ## DNS
 ### 1. DNS协议
@@ -2461,14 +2670,14 @@ console.log(obj2.c(1));    // 11
 5. let创建的变量可以修改指针指向（可重新赋值）
 
 ## const对象可以修改吗？
-const保证的并不是值不变，而是const变量指向的内存地址不变，<font color="	#FF6347">对于基本数据类型</font>，其值就永远保存在变量指向的那个内存地址，因此等同于常量。但<font color="	#FF6347">对于引用类型的数据（对象和数组）</font>，变量指向数据的内存地址，const只能保证这个指针是固定不变的，至于它指向的数据结构是不是可变的，就完全不能控制了。
+const保证的并不是值不变，而是const变量指向的内存地址不变，<font color="	#FF6347">对于基本数据类型</font>，其值就永远保存在变量指向的那个内存地址，因此等同于常量。但<font color="#FF6347">对于引用类型的数据（对象和数组）</font>，变量指向数据的内存地址，const只能保证这个指针是固定不变的，至于它指向的数据结构是不是可变的，就完全不能控制了。
 
 ## 为什么箭头函数不能作为构造函数
-<font color="	#FF6347">构造函数需要this这个对象，用于接收参来的参数，以及在构造函数的最后将这个this返回</font>。而箭头函数没有this，所以不能作为构造函数。
+<font color="#FF6347">构造函数需要this这个对象，用于接收参来的参数，以及在构造函数的最后将这个this返回</font>。而箭头函数没有this，所以不能作为构造函数。
 
 ## 如果new一个箭头函数会怎么样
 因为箭头函数相对于普通函数并没有自己的this指向，而构造函数需要由this，所以箭头函数不能new。
-<font color="	#FF6347">new操作符实现的步骤如下</font>：
+<font color="#FF6347">new操作符实现的步骤如下</font>：
 
 1. 创建一个对象
 2. 将构造函数的作用域赋值给新对象（也就是将新对象的__proto__属性指向构造函数的prototype属性）
@@ -3132,9 +3341,6 @@ class ThemedButton extends React.Component {
     - 使用router v6中的新钩子函数 useSearchParams和useParams
     - 使用query和state传参，但是刷新页面后参数会丢失
 
-## React 高阶组件
-**高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
-
 ## 生命周期
 ### React的生命周期有哪些
 React生命周期分为三个阶段：
@@ -3757,30 +3963,32 @@ Redux主要解决的问题是将Redux的状态与React的UI绑定到一起，当
 ### Redux异步<font color="	#FF6347">中间件</font>
 (1) redux-thunk
 
+## 合成事件
+合成事件是react模拟DOM原生事件的一个事件对象，其优点如下：
+1. 兼容所有浏览器，兼容性好
+2. 将事件统一放到一个数组，避免频繁的新增删除（垃圾回收）
+3. 方便react统一管理和事务机制
 
 ## React事件机制
-React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组建挂载销毁时统一订阅和移出事件</font>。  
+React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上。当事件发生并冒泡到document时，React将事件内容封装并交由真正的处理函数运行，这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组件挂载销毁时统一订阅和移除事件</font>。  
 可以使用**event.preventDefault**阻止事件冒泡。
 
 ![事件机制](https://user-images.githubusercontent.com/70066311/157618463-b5fc6510-f7f9-498f-9722-cf7458d6972c.jpg)
 
 ### *实现合成事件的目的
- - 合成事件是一个跨浏览器的原生时间包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。
- - 对于原生浏览器事件来说，浏览器会给监听器创建一个事件对象，如果你有很多的事件监听，那么就需要分配很多的事件对象，造成高额的内存分配问题，但对于合成事件来说，有一个事件池专门来管理它们的创建和销毁，当事件需要被使用时，就会从池子中复用对象，事件回调结束后，就会销毁事件对象上的属性，从而便于下次复用事件对象。
+ - 合成事件是一个跨浏览器的原生事件包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。
+ - 对于原生浏览器事件来说，浏览器会给监听器创建一个事件对象，如果你有很多的事件监听，那么就需要分配很多的事件对象，造成高额的内存分配问题，但<font color="	#FF6347">对于合成事件来说，有一个事件池专门来管理它们的创建和销毁，当事件需要被使用时，就会从池子中复用对象，事件回调结束后，就会销毁事件对象上的属性，从而便于下次复用事件对象</font>。
 
 ## React的事件和普通的HTML事件有什么不同？
 1. 事件的命名方式不同，原生事件为全小写，react事件为小驼峰
 2. 事件函数处理语法不同，原生事件为字符串，react事件为函数
 3. react事件不能采用return false的方式来阻止浏览器的默认行为，而必须明确调用preventDefault()来阻止默认行为
 
-## 合成事件
-合成事件是react模拟DOM原生事件的一个事件对象，其优点如下：
-1. 兼容所有浏览器，兼容性好
-2. 将事件统一放到一个数组，避免频繁的新增删除
-3. 方便react统一管理和事务机制
+## react事件执行顺序
+事件的执行顺序为<font color="#FF6347">原生事件先执行，合成事件再执行</font>。合成事件会冒泡到document上，所以**尽量避免原生事件和合成事件混用**。<font color="	#FF6347">如果原生事件阻止冒泡，那么就会导致合成事件不执行</font>。
 
-## react时间执行顺序
-事件的执行顺序为<font color="#FF6347">原生事件先执行，合成事件再执行</font>。合成事件会冒泡到document上，所以**尽量避免原生事件和合成事件混用**。如果原生事件阻止冒泡，那么就会导致合成事件不执行。
+## React 高阶组件
+**高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
 
 ## React.Component 和 React.PureComponent 的区别
 PureComponent表示一个纯组件，可以<font color="#FF6347">减少render渲染次数，从而提高组件的性能</font>。  

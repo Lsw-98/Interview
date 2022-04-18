@@ -17,10 +17,3 @@ console.log(obj2.a);
 var bar = new obj1.foo(4)
 console.log(obj1.a);
 console.log(bar.a);
-
-/**
- * 2
- * 3
- * 2
- * 4
- */

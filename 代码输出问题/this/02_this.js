@@ -9,6 +9,3 @@ obj.say()
 
 var anotherObj = { a: 30 }
 obj.say.apply(anotherObj)
-
-
-// 10 10
