@@ -972,7 +972,191 @@ console.log(({}).constructor === Object); // true
 ```
 
 ### **null和undefined的区别**
-null是空对象，而undefined是未定义的。一般定义了一个变量而没赋值时，会返回undefined；而null主要赋值给那些可能返回对象的变量。
+null是空对象，而undefined是未定义的。<font color="#FF6347">一般定义了一个变量而没赋值时，会返回undefined；而null主要赋值给那些可能返回对象的变量</font>。
+
+### **为什么0.1+0.2 ! == 0.3，如何让其相等**
+```js
+console.log(0.1 + 0.2)   // 0.30000000000000004
+```
+
+计算机是通过二进制进行存储数据的，而0.1和0.2的二进制都是无限循环的数。在JS中，只有一种数字类型Number。它的实现<font color="#FF6347">遵循了IEEE 754标准</font>，使用64位固定长度来表示，也就是标准的double双精度浮点数。而在二进制中，小数部分最多保留52位，剩余的部分要舍去，遵循”0舍1入的原则“。
+
+简单来说，<font color="#FF6347">0.1和0.2的小数部分用二进制表示都是一个无限循环的数字，在计算机中最多保留了52位，所以将0.1与0.2相加不等于0.3</font>。
+
+解决方法：
+1. 采用四舍五入保留小数的函数
+```js
+// 四舍五入保留一位小数  
+console.log((0.1 + 0.2).toFixed(1))   // 0.3
+```
+
+2. 对精度进行判断
+设置一个误差范围，通常称为“机器精度”。对JavaScript来说，这个值通常为2 ** -52，在ES6中，提供了Number.EPSILON属性，而它的值就是2 ** -52，只要判断0.1+0.2-0.3是否小于Number.EPSILON，如果小于，就可以判断为0.1+0.2 ===0.3
+```js
+function numberepsilon(arg1,arg2){                   
+  return Math.abs(arg1 - arg2) < Number.EPSILON;        
+}        
+
+console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
+```
+
+### **如何获取安全的undefined值**
+因为undefined不是一个js的字面量，所以可以用来当作变量，但这样会影响正常的undefined的判断。如果想获得安全的undefined的值，可以使用<font color="#FF6347">void</font>。<font color="#FF6347">void并不改变表达式的结果，只是让表达式不返回值，因此可以用**void 0**来获得undefined</font>。
+
+### **typeof NaN的结果是什么**
+NaN代表<font color="#FF6347">**不是一个数字**</font>，指在数字类型的运算中发生错误的情况。<font color="#FF6347">NaN与自身不相等，是唯一一个非自反值</font>。
+```js
+console.log(typeof NaN);   // number
+console.log(NaN !== NaN);   // true
+```
+
+### **isNaN和Number.isNaN的区别**
+<font color="#FF6347">isNaN本意是**通过Number方法把参数转换成数字类型**，如若转换成功，则返回false，反之返回true，它只判断参数是否会转换为数字</font>。
+
+而Number.isNaN用来严格判断传入的值是否等于NaN，<font color="#FF6347">它首先会判断传入的值是否为数字类型，如果不是，直接返回false</font>。
+
+```js
+const a = 2
+console.log(isNaN(a));    // false
+console.log(Number.isNaN(a));    // false
+
+const b = "b2"
+console.log(isNaN(b));   // true
+console.log(Number.isNaN(b));    // false
+```
+
+### **==的判断流程**
+1. 首先判断两者的类型是否相同，不相同则进行类型转换
+2. 判断是否是null与undefined进行比较，是的话返回true  (null == undefined，而null !== undefined)
+3. 判断两者类型是否为string和number，如果是则将string转换为number
+```js
+1 == '1'
+      ↓
+1 ==  1
+```
+4. 判断两者是否有boolean，有的话就把boolean转换为number进行比较
+```js
+'1' == true
+        ↓
+'1' ==  1
+        ↓
+ 1  ==  1
+```
+5. 判断两者是否有一者是object且另一方为string、number或symbol，如果是就把object转为原始类型再进行判断
+```js
+'1' == { name: 'js' }
+        ↓
+'1' == '[object Object]'
+```
+
+![image](https://user-images.githubusercontent.com/70066311/163975853-4d06fe0a-c818-45aa-9d53-a5c695ed54dd.png)
+
+### **Object.is()与比较操作符"==="、"=="的区别**
+- "=="：如果两边类型不一致，会转换类型再做比较
+- "==="：如果两边类型不一致，直接返回false
+- Object.is()：与 "===" 判断相同，但<font color="#FF6347">-0与+0不再相等，两个NaN是相等的</font>。
+
+### **JS中的包装类**
+在JS中，三大基本类型String、Number、Boolean没有属性和方法，JS为了方便开发者使用这三个基本类型进行快速开发，实现了包装类，使String、Number、Boolean变为String对象、Number对象、Boolean对象，是他们可以添加属性并使用某些方法。
+
+### **JS进行隐式类型转换**
+1. ToPrimitive()方法：将值转换为基本数据类型。如果<font color="#FF6347">值为基本类型，则直接返回值本生；如果值为对象，则：</font>。
+```js
+/**
+ * obj为需要转换的对象
+ * type为结果类型 
+ */
+ToPrimitive(obj, type)
+```
+当type为**Number**时：
+- 调用obj的valueOf方法，如果为原始值，则返回
+- 调用toString方法，如果为原始值，则返回
+- 抛出TypeError异常
+
+当type为**String**时：
+- 调用obj的toString方法，如果为原始值 ，则返回
+- 调用valueOf方法，如果为原始值，则返回
+- 抛出TypeError异常
+
+当type为Date时，默认为String类型，其余情况下默认为Number类型。
+
+2. 使用字符串拼接可以隐式转换为String类型
+```js
+1 + '23' // '123'
+1 + false // 1 
+1 + Symbol() // Uncaught TypeError: Cannot convert a Symbol value to a number
+'1' + false // '1false'
+false + true // 1
+```
+3. 使用操作符拼接可以隐式转换为Number类型
+```js
+1 * '23' // 23
+1 * false // 0
+1 / 'aa' // NaN
+```
+4. 使用 ==、>、< 操作符可以隐式转换为Boolean类型
+```js
+3 == true // false, 3 转为number为3，true转为number为1
+'0' == false //true, '0'转为number为0，false转为number为0
+'0' == 0 // '0'转为number为0
+'ca' < 'bd' // false
+'a' < 'b' // true
+```
+
+### **Object.assign和扩展运算符时深拷贝还是浅拷贝**
+扩展运算符是浅拷贝：
+```js
+let obj1 = {
+  a: 1,
+  b: 2,
+  c: {
+    d: 4,
+  },
+}
+
+let obj2 = { ...obj1 }
+obj1.a = 111
+obj1.c.d = 444
+
+console.log(obj1);
+console.log(obj2);
+```
+
+Object.assign是浅拷贝：
+```js
+let obj1 = {
+  a: 1,
+  b: 2,
+  c: {
+    d: 4,
+  },
+}
+
+let obj2 = Object.assign(obj1)
+obj1.a = 111
+obj1.c.d = 444
+
+console.log(obj1);
+console.log(obj2);
+```
+<font color="#FF6347">Object.assign()方法接收的第一个参数是**目标对象**，后面所有的参数作为**源对象**，Object.assign会把所有的源对象放入到目标对象中</font>。
+
+<font color="#FF6347">扩展运算符会将数组或对象中每个值都拷贝到新的数组或对象中</font>。
+
+### **如何判断一个对象是空对象**
+1. 使用JSON.stringify
+```js
+const obj = {}
+console.log(JSON.stringify(obj) === "{}");
+```
+
+2. 使用Object.keys().length
+```js
+const obj = {}
+console.log(Object.keys(obj).length === 0);
+```
+
+
 
 ### **new操作符实现原理**
 new的执行过程：
@@ -998,11 +1182,137 @@ function objectFactory() {
   // 判断返回对象
   let flag = result && (typeof result === "object" || typeof result === "function");
   // 判断返回结果
-  return flag ? result : newObject;
+  return flag ? result : newObject
 }
 // 使用方法
-objectFactory(构造函数, 初始化参数);
+objectFactory(构造函数, 初始化参数)
 ```
+
+### **map和object的区别**
+<font color="#FF6347">Map 对象存有键值对，其中的键可以是任何数据类型；Map对象记得键的原始插入顺序；Map对象具有表示映射大小的属性</font>。
+
+**Map的API：**      
+- new Map()：创建新的Map对象
+- set()：为Map对象中的键设置值
+- get()：获取Map对象中键的值
+- clear()：	删除Map中的所有元素
+- delete()：删除由键指定的元素
+- has()：如果键存在，则返回 true
+- size：返回Map的长度
+
+Map三个遍历生成函数和一个遍历方法：
+- entries()：返回Map对象中键/值对的数组
+- keys()：返回Map对象中键的数组
+- values()：返回Map对象中值的数组
+- forEach()：为每个键/值对调用回调
+
+使用set给Map的键值
+```js
+// 创建对象
+const apples = {name: 'Apples'};
+const bananas = {name: 'Bananas'};
+const oranges = {name: 'Oranges'};
+
+// 创建新的 Map
+const fruits = new Map();
+
+// 给Map添加新元素
+fruits.set(apples, 500);
+fruits.set(bananas, 300);
+fruits.set(oranges, 200);
+```
+
+使用数组给Map添加键值
+```js
+const apples = {name: 'Apples'};
+const bananas = {name: 'Bananas'};
+const oranges = {name: 'Oranges'};
+
+// 创建新的 Map
+const fruits = new Map([;
+  [apples, 500],
+  [bananas, 300],
+  [oranges, 200]
+]);
+```
+
+使用get获取Map中键的值
+```js
+fruits.get(apples);    // 返回 500
+```
+<font color="#FF6347">get中直接传入键值，如果传入非键值会找不到返回undefined</font>。
+
+|     | Map  | Object |
+|  ----  | ----  | ---- |
+| 意外的键  | Map默认不包含任何键，只包含显示插入的键 | Object有原型，原型链上的键名可能会和自己定义的键名产生冲突 |
+| 键的类型  | Map的键可以为任意类型 | Object的键为String |
+| 键的顺序  | Map中的key是有序的 | Object的键是无序的 |
+| Size  | Map有size属性 | Object对长度只能手动计算 |
+| 迭代  | Map可以被直接迭代 | Object需要获取键后才可以迭代 |
+| 性能  | 在频繁增删键值时表现更好 | 在频繁添加和删除键值对的场景下未作出优化。 |
+
+### **Map和weakMap的区别**
+map本质上就是键值对的集合，但是普通的Object中的键值对中的键只能是字符串。而ES6提供的Map数据结构类似于对象，但是它的键不限制范围，可以是任意类型，是一种更加完善的Hash结构。<font color="#FF6347">如果Map的键是一个原始数据类型，只要两个键严格相同，就视为是同一个键</font>。
+
+实际上Map是一个数组，他的每个数据也都是一个数组：
+```js
+const map = [
+     ["name","张三"],
+     ["age",18],
+]
+```
+
+WeakMap 对象也是一组键值对的集合，其中的键是弱引用的。<font color="#FF6347">**其键必须是对象**，原始数据类型不能作为key值，而值可以是任意的</font>。
+
+WeakMap的API：
+- set(key,value)：设置键名key对应的键值value，然后返回整个Map结构，如果key已经有值，则键值会被更新，否则就新生成该键。（因为返回的是当前Map对象，所以可以链式调用）
+- get(key)：该方法读取key对应的键值，如果找不到key，返回undefined。
+- has(key)：该方法返回一个布尔值，表示某个键是否在当前Map对象中。
+- delete(key)：该方法删除某个键，返回true，如果删除失败，返回false。
+- 其clear()方法已经被弃用，所以<font color="#FF6347">可以通过创建一个空的WeakMap并替换原对象来实现清除</font>。
+
+有时想在某个对象上面存放一些数据，但是这会形成对于这个对象的引用。一旦不再需要这两个对象，就必须手动删除这个引用，否则垃圾回收机制就不会释放对象占用的内存。而weakMap设计的目的在于<font color="#FF6347">**WeakMap的键名所引用的对象都是弱引用**，垃圾回收机制不将弱引用考虑在内</font>。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就是说，一旦不再需要，<font color="#FF6347">**WeakMap 里面的键名对象和所对应的键值对会自动消失，不用手动删除引用**</font>。
+
+**总结：**
+- Map 数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+- WeakMap 结构与 Map 结构类似，也是用于生成键值对的集合。但是 WeakMap 只接受对象作为键名（ null 除外），不接受其他类型的值作为键名。而且 WeakMap 的键名所指向的对象，不计入垃圾回收机制。
+
+
+### **JS中的内置对象**
+1. 值属性：<font color="#FF6347">这些全局属性返回一个简单值，这些值没有自己的属性和方法</font>，例如：NaN、infinity、undefined、null
+2. 函数属性：全局函数可以直接调用，不需要在调用时指定所属对象，执行结束后会将结果直接返回给调用者。例如：eval、parseFloat、parseInt等。
+
+eval() 函数计算 JavaScript 字符串，并把它作为脚本代码来执行。
+```js
+const a = "123"
+console.log(typeof a);   // float
+console.log(typeof parseFloat(a));   // number
+console.log(typeof parseInt(a));     // number
+console.log(eval("2 + 2"));   // 4
+```
+3. 基本对象：Object、Function、Boolean、Symbol、Error等
+4. 数字和日期对象：Number、Date、Math
+5. 字符串对象：String
+6. 可索引的集合对象：Array
+7. 使用键的集合对象：Map、Set、WeakMap、WeakSet
+8. 结构化数据：JSON
+9. 控制抽象对象：Promise
+
+### **对JSON的理解**
+<font color="#FF6347">JSON是一种基于文本的轻量级数据交换格式，它可以被任何编程语言读取和作为数据格式来传递，结构清晰，便于阅读</font>。
+
+在项目开发中，JSON作为前后端数据交换的方式。<font color="#FF6347">在前端，将一个符合JSON格式的数据结构**序列化为JSON字符串**，然后将它传递到后端，后端通过JSON格式的字符串解析后生成对应的数据结构，以此来实现前后端数据的传递</font>。
+
+js提供了两个函数来实现js数据结构和JSON格式的转换处理：
+- JSON.stringify：<font color="#FF6347">传入一个符合JSON格式的数据结构，将其转化为一个JSON字符串</font>。
+- JSON.parse()：<font color="#FF6347">将JSON格式的字符串转化为js数据结构</font>。
+
+### **JS脚本延迟加载的方式**
+1. setTimeout
+2. 将js脚本放在文档的最底部，使其最后来执行
+3. **defer属性**：给js脚本添加defer属性，这个属性<font color="#FF6347">会让脚本的加载与文档的解析同步，然后在文档解析完成后再执行这个脚本文件，这样的话就可以使页面的渲染不被阻塞</font>。
+4. **async属性**：给js脚本添加async属性，这个属性<font color="#FF6347">会使脚本异步加载，不会阻塞页面解析的过程，但当脚本加载完成后会立即执行，如果这时页面还没渲染完成的话同样会造成页面阻塞</font>。多个async属性的脚本执行顺序是不可预测的，一般不会按照代码的顺序依次执行。
+5. **动态创建DOM**：可以对文档加载事件进行监听，<font color="#FF6347">当文档加载完成后再动态创建script标签来引入js脚本</font>。
 
 ## this
 ### **call()、apply()、bind()**
@@ -1584,6 +1894,18 @@ await必须写在async()函数内部，await表达式的运算结果取决于它
  4. 重复2.3步骤直到所有代码执行完毕
 
 
+ ## 面向对象
+ ### ****
+
+ ## 垃圾回收机制
+ ### **垃圾回收的概念**
+ <font color="#FF6347">JS代码运行时，需要分配内存空间来存储变量和值，当变量不再参与运行时，就需要系统收回被占用的内存空间</font>。
+
+ ### **回收机制**
+ - JS具有自动回收机制，会定期对那些不再使用的变量、对象.
+ 
+
+
  ### 并行和并发的区别
 |     | 并发  | 并行  |
 |  ----  | ----  | ---- |
@@ -2151,16 +2473,16 @@ ACK：确认序号有效；SYN：发起一个新连接。
 SYN洪泛攻击属于DOS攻击的一种，它的原理是：
 - 在三次握手中，<font color="	#FF6347">服务器发送`SYN/ACK`包之后，收到客户端发送的`ACK`之前的TCP连接称为半连接</font>，此时服务器处于`SYN_RECV`状态，如果收到客户端的ACK，则TCP连接成功；如果未收到，则会不断重发请求直至成功。
 - `SYN`的攻击者伪造大量IP地址，向服务器不断发送`SYN`包，服务器返回`SYN/ACK`包，并等待客户的信任。由于源地址是不存在的，服务器需要不断地重新发送`SYN/ACK`包，直至超时。
-- 这会影响正差的`SYN`包的发送，导致网络拥塞，甚至超时。
-
-### **三次握手的第三次丢包会发生什么？** 
-- 服务器端：超过一定时间未收到客户端发来的确认包，会重传`SYN/ACK`包、若多次重传后还未收到确认包，则会关闭该连接。  
-- 客户端：客户端在发送`ACK`包后会认为该连接建立成功，随后发送数据进行通信，服务器段会返回一个`RST`包告诉客户端这个连接异常已被关闭，这样客户端就知道三次握手失败了。
+- 这会影响正常的`SYN`包的发送，导致网络拥塞，甚至超时。
 
 **防范：**
 - SYN cookies技术
 - 增大最大半连接数，缩短超时时间
 - 过滤网关
+
+### **三次握手的第三次丢包会发生什么？** 
+- 服务器端：超过一定时间未收到客户端发来的确认包，会重传`SYN/ACK`包、若多次重传后还未收到确认包，则会关闭该连接。  
+- 客户端：客户端在发送`ACK`包后会认为该连接建立成功，随后发送数据进行通信，服务器段会返回一个`RST`包告诉客户端这个连接异常已被关闭，这样客户端就知道三次握手失败了。
 
 ### **如果已经建立了连接，但客户端出现了故障怎么办？**
 通过<font color="	#FF6347">**定时器与超时重传机制**</font>，尝试获取**确认**，直到最后自动断开连接。
