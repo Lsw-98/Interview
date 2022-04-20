@@ -2736,26 +2736,44 @@ DNS劫持由于涉嫌违法，已被监管起来。而http劫持依然非常盛�
 ## 浏览器本地产存储
 ### 浏览器本地存储方式及使用场景
 (1) Cookie    
-Cookie是为了<font color="	#FF6347">判断网络中两个请求是否由同一个用户发起的</font>，Cookie的本质是一个文本。
+在<font color="	#FF6347">使用HTTP协议本身不对请求和响应之间的通信状态进行保存，所以引用了Cookie</font>，Cookie的本质是一个文本，可以用来<font color="	#FF6347">判断网络中两个请求是否由同一个用户发起的</font>。
 
-Cookie是无法跨域的，这也保证了隐私性和安全性，无法获取其他网站的Cookie。如果想要不同域之间共享Cookie，必须使用Nginx反向代理或向其他网站写Cooike
+**Cookie的组成**
+1. <font color="#FF6347">NAME=[VALUE]</font>
+Cookie的值，NAME是唯一标识Cookie的名称，不区分大小写；VALUE是存储在Cookie里的字符串值，该值必须通过URL编码
+2. <font color="#FF6347">Domain=[域名]</font>
+Cookie有效的域，发送到这个与所有的请求都会包含对应的Cookie
+3. <font color="#FF6347">Path=[PATH]</font>
+4. <font color="#FF6347">Expires=[DATE]</font>
+Cookie的有效期。浏览器结束后会删除所有Cookie
+5. <font color="#FF6347">Secure</font>
+设置仅在使用HTTPS进行通信时才发送Cookie
+6. <font color="#FF6347">HttpOnly</font>
+设置只在服务器上读取，不能再通过JS读取Cookie
+
+**Cookie的特性**
+- Cookie一旦创建成功，名称就无法改变
+- Cookie在请求一个新的页面时，都会被发送过去
+- <font color="	#FF6347">Cookie是无法跨域的，这也保证了隐私性和安全性，无法获取其他网站的Cookie</font>。如果想要不同域之间共享Cookie，必须使用Nginx反向代理或向其他网站写Cooike
+- Cookie的体积小，一般不超过4k
+- Cookie的个数有限，如果超过Cookie个数的限制，则会删除之前设置的Cookie
 
 **Cookie的使用场景**：
 1. 统计页面的点击次数
-2. 与session结合使用，将sessionId存储到Cookie中，每次发送请求都携带这个sessionId，这样服务器段就知道是谁发送的请求了。
+2. 与session结合使用，<font color="	#FF6347">将sessionId存储到Cookie中，每次发送请求都携带这个sessionId，这样服务器段就知道是谁发送的请求了</font>。
 
 (2) LocalStorage
 有时我们储存的信息比较多，Cookie就存储不下了，这时候就需要LocalStorage。
 
 LocalStorage的优点：
-- 相比Cookie可以存储更多的信息
-- LocalStorage是持久存储的，除非主动清理，不然会永久存在
+- 相比Cookie可以存储更多的信息，大小一般为5MB
+- <font color="	#FF6347">LocalStorage是持久存储的，除非主动清理，不然会永久存在</font>
 - 仅储存在本地，不会像Cookie那样每次发起请求都会被携带
 
 LocalStorage的缺点：
 - 存在浏览器兼容问题
 - 如果浏览器设置为隐私模式，则无法读取到LocalStorage
-- 受同源策略的限制
+- 受同源策略的限制，即<font color="	#FF6347">端口、协议、主机地址有任何一个不相同都不会访问</font>
 
 LocalStorage常用的API：
 ```js
@@ -2777,14 +2795,14 @@ LocalStorage.key(index)
 
 LocalStorage的适用场景：
 1. 网站有换主题之类的功能
-2. 在网站中用户的浏览信息也会保存到LocalStorage中，还有网站中不常变动的个人信息也保存在LocalStorage中。
+2. 在网站中<font color="	#FF6347">用户的浏览信息</font>也会保存到LocalStorage中，还有网站中<font color="	#FF6347">不常变动的个人信息</font>也保存在LocalStorage中。
 
 (3) SessionStorage
-SessionStorage用于临时保存同一个标签页中的数据，刷新页面不会删除SessionStorage，关闭标签页才会删除SessionStorage。
+SessionStorage用于<font color="	#FF6347">临时保存同一个标签页中的数据，刷新页面不会删除SessionStorage，关闭标签页才会删除SessionStorage</font>。
 
-SessionStorage和LocalStorage的区别：
-1. SessionStorage和LocalStorage都存储在本地
-2. SessionStorage也有同源策略的限制，SessionStorage只有在同一浏览器的同一窗口下才能共享
+SessionStorage和LocalStorage的对比：
+1. <font color="	#FF6347">SessionStorage和LocalStorage都存储在本地</font>
+2. SessionStorage也有同源策略的限制，<font color="	#FF6347">SessionStorage只有在同一浏览器的同一窗口下才能共享</font>
 3. SessionStorage和LocalStorage都不能被爬虫获取
 
 SessionStorage常用的API：
@@ -2806,7 +2824,29 @@ SessionStorage.key(index)
 ```
 
 SessionStorage的适用场景：
-由于<font color="	#FF6347">SessionStorage具有时效性</font>，可以用来存储一些网站的游客登录信息，还有临时的浏览记录的信息，当网站关闭之后，这些信息也就随之消除了。
+由于<font color="	#FF6347">SessionStorage具有时效性</font>，可以用来存储一些网站的<font color="	#FF6347">游客登录信息，还有临时的浏览记录的信息</font>，当网站关闭之后，这些信息也就随之消除了。
+
+### **Cookie、LocalStorage、SessionStorage区别**
+- Cookie：<font color="	#FF6347">Cookie是服务器端用于记录用户状态的一种方式，由服务器设置，在客户端存储，然后每次发起同源请求后，发送给服务器端</font>，Cookie最多能存储4k，生命周期由expires指定，Cookie只能被同源的页面访问共享。
+- LocalStorage：是浏览器本地存储的方法，<font color="	#FF6347">除非手动删除，不然会被永久保存在本地，可以用来存储主题颜色、用户一些补偿修改的信息等</font>，只能被同源的页面访问。
+- SessionStorage：是浏览器本地存储方法，<font color="	#FF6347">刷新不会删除存储，在关闭页面时会删除存储</font>，SessionStorage只能被同一个窗口的同源页面访问。
+
+### **：IndexedDB**
+当本地存储大量数据时，就可以使用：IndexedDB。<font color="#FF6347">：IndexedDB是浏览器提供的一种本地的数据库存储机制，他不是关系型数据库，它内部采用对象仓库的形式存储数据</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/164193620-422d47c0-c81f-4286-9f9f-775ab98cf5a8.png)
+
+- 一个域名下可以包含多个数据库
+- 一个数据库包括多个对象仓库
+- 每个对象仓库中包含多条数据记录
+
+**IndexedDB的特点**
+1. **键值对存储**：所有类型的数据都可以直接存入，包括JS对象。<font color="#FF6347">对象仓库中，数据以“键值对”的形式保存，每条数据记录都有对应的主键，主键都是独一无二的，不能有重复</font>。
+2. **异步**：IndexedDB操作时不会锁死浏览器，用户依然可以进行其他操作。LocalStorage的操作是同步的。<font color="#FF6347">异步的设计是为了防止大量数据的读写，拖慢网页的表现</font>。
+3. **支持事务**：如果在操作时有一步失败，那么整个事务就取消，数据库就回滚到事务发生之前的状态，不存在只改写一部分数据的情况。
+4. **同源限制**：每个数据库对应创建它的域名，网页只能访问自身域名下的数据库，而不能访问跨域的数据库。
+5. **存储空间大**
+6. **支持二进制存储**
 
 ## 跨域
 ### 1. 同源策略
@@ -2820,14 +2860,39 @@ SessionStorage的适用场景：
 | http://store.company.com:81/dir/etc.html  | 跨域 | 端口不同 ( http:// 默认端口是80) |
 | http://news.company.com/dir/other.html  | 跨域 | 主机不同 |
 同源策略主要限制了三个方面：
-1. 当前域下的js脚本不能访问其他域下的cookie、localStorage
-2. 当前域下的js脚本不能操作或访问其它域下的DOM
-3. 当前域下的ajax无法发送跨域请求
+1. **数据层面**：当前域下的js脚本不能访问其他域下的cookie、localStorage
+2. **DOM层面**：当前域下的js脚本不能操作或访问其它域下的DOM
+3. **网络层面**：当前域下的ajax无法发送跨域请求
 
-同源策略的目的主要是<font color="	#FF6347">为了保证用户的信息安全</font>。
+同源策略的目的主要是<font color="	#FF6347">为了保证用户的信息安全，防止恶意网站盗取资源</font>。
 
 ### 2. 如何解决跨域问题
 1. CORS跨域资源共享机制
+跨域资源共享机制（CORS）使用额外的HTTP头来告诉浏览器，让运行在一个origin上的web应用被允许访问来自不同源服务器上的指定资源。当一个资源从与该资源本身所在的服务器不同的域、协议或端口请求一个资源时，资源会发起一个跨域HTTP请求。
+
+CORS需要浏览器与服务器同时支持，整个CORS过程都是浏览器完成的，无需用户参与。
+
+浏览器将CORS分为简单请求和非简单请求：     
+简单请求不会触发<font color="	#FF6347">CORS预检请求</font>，若请求满足以下两个条件，就可以看作是简单请求：
+- 请求方法是：GET/POST/HEAD
+- HTTP的头信息为以下的字段：  
+    - Accept（浏览器能够处理的内容类型）
+    - Accept-Language（浏览器当前设置的语言）
+    - Content-Language（）
+    - Last-Event-ID（）
+    - Content-Type（后面的文档是什么类型）
+
+简单请求的过程：
+
+
+2. JSONP    
+**JSONP**的原理就是利用`<script>`标签没有对跨域限制。实现跨域主要得益于`<script>`的两个特点：
+- src属性能够访问任何URL资源，并不会受到同源策略的限制
+- 如果访问的资源包含JS代码，其会在下载后自定执行
+
+JSONP的缺点：
+- 具有局限性，仅支持get方法
+- 不安全，可能会遭受XSS攻击
 
 
 # 前端性能优化
