@@ -27,3 +27,10 @@ function objectFactory() {
 
 // 使用方法
 // objectFactory(构造函数, 初始化参数)
+function Fun() {
+  this.a = 10;
+  this.b = 20;
+}
+
+const f1 = objectFactory(Fun)
+console.log(f1)
