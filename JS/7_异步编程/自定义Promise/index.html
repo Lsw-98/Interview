@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./17_then方法的回调异步执行.js"></script>
+</head>
+
+<body>
+  <script>
+    let p = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("ok")
+        // reject("err")
+        // throw "err"
+      }, 1000);
+      console.log(1111);
+    }).then(res => {
+      console.log(res);
+    })
+
+    console.log(333);
+
+    // p.then(res => {
+    //   console.log(111);
+    //   throw "111err"
+    // }).then(res => {
+    //   console.log(222);
+    // }).then(res => {
+    //   console.log(333);
+    // }).catch(err => {
+    //   console.log(err);
+    // })
+
+    // const test = p.then(res => {
+    //   console.log(res);
+    // return new Promise((resolve, reject) => {
+    // resolve("success")
+    // reject("no")
+    // throw "fail"
+    // })
+    // }, err => {
+    //   console.log(err);
+    // })
+
+    // console.log(test);
+
+    // const p1 = Promise.resolve("1")
+    // const p3 = Promise.resolve(Promise.resolve("3"))
+    // const p2 = Promise.resolve(new Promise((resolve, reject) => {
+    //   resolve("2")
+    // }))
+    // let result = Promise.race([p1, p2, p3])
+    // console.log(result);
+  </script>
+</body>
+
+</html>

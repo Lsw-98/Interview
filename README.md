@@ -1282,13 +1282,26 @@ WeakMap的API：
 1. 值属性：<font color="#FF6347">这些全局属性返回一个简单值，这些值没有自己的属性和方法</font>，例如：NaN、infinity、undefined、null
 2. 函数属性：全局函数可以直接调用，不需要在调用时指定所属对象，执行结束后会将结果直接返回给调用者。例如：eval、parseFloat、parseInt等。
 
-eval() 函数计算 JavaScript 字符串，并把它作为脚本代码来执行。
+eval() 函数计算 JavaScript 字符串，并把它作为脚本代码来执行。<font color="#FF6347">当参数格式是字符串时，JavaScript引擎会调用eval()执行，而eval的执行环境是全局作用域</font>。
 ```js
 const a = "123"
 console.log(typeof a);   // float
 console.log(typeof parseFloat(a));   // number
 console.log(typeof parseInt(a));     // number
 console.log(eval("2 + 2"));   // 4
+
+let b = function () {
+  console.log('outer')
+}
+function container () {
+  let b = function () {
+    console.log('inner')
+  }
+  setTimeout(b,1000)
+  setTimeout('b()', 5000)
+}
+container()
+// inner  outer
 ```
 3. 基本对象：Object、Function、Boolean、Symbol、Error等
 4. 数字和日期对象：Number、Date、Math
@@ -1780,22 +1793,64 @@ Promise是ES6引入的异步编程的解决方案，Promise可以封装异步操
 3. generator  
 4. async  
 当函数内部执行到一个await语句时，如果语句返回一个promise对象，那么函数会等待promise变为resolve状态在继续向下执行。
-### 对Promise的理解
-Promise是一种异步编程的解决方案，可以解决回调地狱问题。Promise有三种状态：pending（进行中）、resolved（已完成）、rejected（已拒绝）。Promise只能由pending转化到resolved状态或pending转化到rejected状态。一旦从进行中状态转化为其他状态就不可再改变了。  
-### Promise使用流程
+
+### **setTimeout、Promise、Async/Await 的区别**
+1. setTimeout
+```js
+console.log('script start')	//1. 打印 script start
+setTimeout(function(){
+    console.log('settimeout')	// 4. 打印 settimeout
+})	// 2. 调用 setTimeout 函数，并定义其完成后执行的回调函数
+console.log('script end')	//3. 打印 script start
+// 输出顺序：script start->script end->settimeout
+```
+
+2. Promise
+<font color="#FF6347">Promise本身是同步的立即执行函数，当在执行器中执行resolve或者reject的时候，此时是异步操作，会先执行then/catch等，当主栈完成后，才会去调用resolve/reject中存放的方法执行</font>。
+
+```js
+console.log('script start')
+let promise1 = new Promise(function (resolve) {
+    console.log('promise1')
+    resolve()
+    console.log('promise1 end')
+}).then(function () {
+    console.log('promise2')
+})
+setTimeout(function(){
+    console.log('settimeout')
+})
+console.log('script end')
+// 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
+```
+
+当JS主线程执行到Promise对象时：
+- promise1.then() 的回调就是一个 task
+- promise1 是 resolved或rejected: 那这个 task 就会放入当前事件循环回合的 microtask queue
+- promise1 是 pending: 这个 task 就会放入 事件循环的未来的某个(可能下一个)回合的 microtask queue 中
+- setTimeout 的回调也是个 task ，它会被放入 macrotask queue 即使是 0ms 的情况
+
+3. async/await
+async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。<font color="#FF6347">可以理解为，是让出了线程，跳出了 async 函数体</font>。
+
+### **对Promise的理解**
+Promise是一种异步编程的解决方案，可以解决回调地狱问题。<font color="#FF6347">Promise有三种状态：pending（进行中）、resolved（已完成）、rejected（已拒绝）。Promise只能由pending转化到resolved状态或pending转化到rejected状态。一旦从进行中状态转化为其他状态就不可再改变了</font>。  
+
+### **Promise使用流程**
 首先创建Promise实例，然后Promise对象会执行异步操作，若异步操作成功，则调用resolve()方法并将Promise对象的状态改为resolved，失败则调用reject()方法并将Promise对象的状态改为rejected。在后续调用then方法时，若Promise对象的的状态为resolved，则调用第一个回调函数，否则调用第二个回调函数。then()方法的返回对象也是一个Promise对象，因此可以进行链式调用。
 
-### Promise转换状态的三种方式
+### **Promise转换状态的三种方式**
 1. resolve函数
 2. reject函数
-3. 抛出错误：使用throw抛出错误
+3. 抛出错误：使用throw抛出错误，promise的状态变为rejected
 
 **Promise的缺点：**
 1. 无法取消，一旦新建就会立即执行。
 2. 如果不设置回调函数，Promise内部抛出错误，不会反应到外部。
 
 ### Promise是改变状态先执行还是指定回调先执行
-当执行器中的代码为同步时，会先改变状态后执行回调。
+<font color="#FF6347">当执行器中的代码为同步时，会先改变状态后执行回调</font>。
+
 ```js
 let promise1 = new Promise((resolve, reject) => {
   resolve("ok1")
@@ -1806,7 +1861,8 @@ let promise1 = new Promise((resolve, reject) => {
   console.log(err);
 })
 ```
-当执行器中的代码为异步时，会先执行回调再改变状态。
+<font color="#FF6347">当执行器中的代码为异步时，会先执行回调再改变状态</font>。
+
 ```js
 let promise2 = new Promise((resolve, reject) => {
   setTimeout(() => {
@@ -1820,11 +1876,11 @@ let promise2 = new Promise((resolve, reject) => {
 })
 ```
 
-### Primise.then()返回新的promise的结果状态由什么决定？
+### Promise.then()返回新的promise的结果状态由什么决定？
 由then()返回的回调函数执行的结果决定。
-- 如果抛出异常，则新的promise的状态为rejected
-- 如果返回的是非promise的值，则新的promise状态为fulfilled
-- 如果返回的是promise，则promise的执行结果为新的promise的结果
+- 如果<font color="#FF6347">抛出异常</font>，则新的promise的状态为rejected
+- 如果<font color="#FF6347">返回的是非promise的值</font>，则新的promise状态为fulfilled
+- 如果<font color="#FF6347">返回的是promise</font>，则promise的执行结果为新的promise的结果
 
 ### 如何中断promise链
 <font color="#FF6347">返回一个状态为pendding的promise对象</font>。
@@ -1849,7 +1905,7 @@ const promise1 = new Promise((resolve, reject) => {
 2. Promise方法  
 
 **all()**   
-all()方法可以完成并行任务，它接收一个数组，数组的每一项都是一个promise对象，<font color="#FF6347">当数组中所有的promise的状态都达到了resolved的时候，all方法的状态就会变为resolved，如果有一个状态变为了rejected，那么all方法的状态就会变成rejected</font>。all()方法成功后返回一个数组，该数组记录着每个promise的resolve执行的值。失败后返回最先被reject失败状态的值。  
+all()方法可以完成并行任务，它接收一个数组，数组的每一项都是一个promise对象，<font color="#FF6347">当数组中所有的promise的状态都达到了resolved的时候，all方法的状态就会变为resolved，如果有一个状态变为了rejected，那么all方法的状态就会变成rejected</font>。all()方法**成功后返回一个数组**，该数组记录着每个promise的resolve执行的值。**失败后返回最先被reject失败状态的值**。  
 
 **race()**
 race()方法和all()方法一样，区别是race()会返回最先执行完的promise对象。
@@ -1866,8 +1922,8 @@ async的返回值为promise对象。这个promise的状态是由async的返回�
 
 ### await
 await必须写在async()函数内部，await表达式的运算结果取决于它等的是什么：
- - 如果它等到是普通表达式，那么表达式的运算结果就是await返回的结果。
- - 如果等到的是promise对象，那么await会等promise对象的状态变为resolve后，得到resolve的值，作为await表达式的运算结果。
+ - 如果它等到是<font color="#FF6347">普通表达式，那么表达式的运算结果就是await返回的结果</font>。
+ - 如果等到的是<font color="#FF6347">promise对象，那么await会等promise对象的状态变为resolve后，得到resolve的值，作为await表达式的运算结果</font>。
 
  ### async/await对比promise的优势
  1. 代码阅读起来更加像同步。promise虽然解决了回调地狱问题，但then的链式调用也会带来额外的阅读负担。
@@ -1880,7 +1936,6 @@ await必须写在async()函数内部，await表达式的运算结果取决于它
  <font color="#FF6347">JS有一个主线程和一个调用栈，所有的任务都会被放到调用栈中等待主线程执行</font>。
 
  在JS中，任务被分为两种，一种宏任务，一种微任务。
-
  宏任务主要为script全部代码、setTimeout、setInterval。
  
  微任务执行栈在执行完同步任务后，查看执行栈是否为空，如果执行栈为空，就会去检查微任务队列是否为空，如果为空时，就执行宏任务，否则就一次性执行完所有微任务。
@@ -1893,20 +1948,46 @@ await必须写在async()函数内部，await表达式的运算结果取决于它
  3. 宏任务代码执行完后，检测微任务队列，若微任务队列不为空，一次性执行完所有微任务
  4. 重复2.3步骤直到所有代码执行完毕
 
+### **并行和并发的区别**
+|     | 并发  | 并行  |
+|  ----  | ----  | ---- |
+| 概念  | 在某个时刻通过CPU切换对多个任务进行处理  | 同一时刻发生多个事件  |
+| CPU资源  | 需要对CPU资源进行抢占 | 不会对CPU资源进行抢占 |
+| 线程切换  | 会进行线程切换  | 线程之间不会进行切换 |
 
- ## 面向对象
- ### ****
+### **setTimeout、setInterval、requestAnimationFrame 各有什么特点？**
+1. setTimeout
+<font color="#FF6347">由于JS是单线程执行的，如果前面的代码影响了性能，就会导致setTimeout不会按期执行</font>。可以通过代码修正校准定时器。
 
- ## 垃圾回收机制
- ### **垃圾回收的概念**
- <font color="#FF6347">JS代码运行时，需要分配内存空间来存储变量和值，当变量不再参与运行时，就需要系统收回被占用的内存空间</font>。
+2. setInterval
+setInterval是<font color="#FF6347">每隔一定delay就执行一次回调函数</font>。它和setTimeout一样，<font color="#FF6347">不能在预期的时间执行任务，而且存在累计执行的问题</font>。
 
- ### **回收机制**
- - JS具有自动回收机制，会定期对那些不再使用的变量、对象所占用的内存进行释放，原理就是找到不再使用的变量，然后释放掉其占用的内存。
- - JS有全局变量和局部变量。 <font color="#FF6347">全局变量会一直保存在内存中，直到页面卸载才回收变量内存；局部变量声明在函数内部，会在函数执行结束后回收内存</font>。
- - 当使用闭包时，函数内部定义的局部变量会一直留在内存中，不会被使用。 <font color="#FF6347">所以尽量避免使用闭包，以免造成内存泄漏</font>。
+**setInterval的缺点：**     
+1. 无视代码错误：setInterval不关心自己调用的代码是否报错
+2. 无网络延迟：setInterval不会管网络延迟（流量剧增、临时断网、带宽限制等），指挥定时发送请求，导致客户端网络队列中都是请求。
+3. 不保证执行：如果你调用的函数需要花很长时间才能完成，那某些调用会被直接忽略。
+
+**setTimeout和setInterval的区别**
+1. setTimeout() 方法用于在指定的毫秒数后调用函数或计算表达式；而setInterval()则可以在每隔指定的毫秒数循环调用函数或表达式，直到clearInterval把它清除。
+2. <font color="#FF6347">setTimeout()只执行一次，setInterval()可以执行多次</font>。
+3. setTimeout用于延迟执行某方法或功能。setInterval则一般用于刷新表单，对于一些表单的假实时指定时间刷新同步。
+
+3. requestAnimationFrame
+<font color="#FF6347">requestAnimationFrame自带函数节流功能，延时效果精准</font>。
+
+## 面向对象
+### ****
+
+## 垃圾回收机制
+### **垃圾回收的概念**
+<font color="#FF6347">JS代码运行时，需要分配内存空间来存储变量和值，当变量不再参与运行时，就需要系统收回被占用的内存空间</font>。
+
+### **回收机制**
+- JS具有自动回收机制，会定期对那些不再使用的变量、对象所占用的内存进行释放，原理就是找到不再使用的变量，然后释放掉其占用的内存。
+- JS有全局变量和局部变量。 <font color="#FF6347">全局变量会一直保存在内存中，直到页面卸载才回收变量内存；局部变量声明在函数内部，会在函数执行结束后回收内存</font>。
+- 当使用闭包时，函数内部定义的局部变量会一直留在内存中，不会被使用。 <font color="#FF6347">所以尽量避免使用闭包，以免造成内存泄漏</font>。
  
- ### **垃圾回收方式**
+### **垃圾回收方式**
 1. 标记清除：
 - 当变量进行执行环境时，就标记这个变量`进入环境`，被标记为`进入幻境`的变量是不能被回收的，因为他们正在被使用。当变量离开环境时，就会被标记为`离开环境`，被标记为`离开环境`的变量会被内存释放。
 - 垃圾收集器在运行时会给存储在内存中的所有变量加上标记。然后，它会去掉环境中的变量和被环境中的变量引用的标记，剩下的变量将被视为需要删除的变量，垃圾收集器完成内存清除工作，销毁那些带有标记的值并回收他们所占用的内存。
@@ -1940,13 +2021,6 @@ obj2.a = null
 2. **被遗忘的计时器或回调函数**：设置了setInterval而忘记取消它，<font color="#FF6347">如果循环函数有对外部变量的引用的话</font>，那么这个变量会被一直留在内存中，而无法被回收
 3. **闭包**：不合理的使用闭包，会导致变量一直存在内存中
 4. **脱离DOM的引用**：<font color="#FF6347">获取了一个DOM元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以无法被回收</font>
-
- ### 并行和并发的区别
-|     | 并发  | 并行  |
-|  ----  | ----  | ---- |
-| 概念  | 在某个时刻通过CPU切换对多个任务进行处理  | 同一时刻发生多个事件  |
-| CPU资源  | 需要对CPU资源进行抢占 | 不会对CPU资源进行抢占 |
-| 线程切换  | 会进行线程切换  | 线程之间不会进行切换 |
 
 ### for in 和 for of 的区别
 - for in会遍历对象的原型连，性能差；for of只遍历当前对象
