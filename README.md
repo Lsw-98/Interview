@@ -4,6 +4,191 @@
     &emsp;&emsp;整个库的文档都是自己整理，自己手码的，有错误的地方，请指出，谢谢!!!。如果你喜欢的话，麻烦点一个star吧，谢谢!!!  
     &emsp;&emsp;下面进行正题。  
 
+# HTML篇
+### **src和href的区别**
+src指向外部资源的位置，在请求src资源时会将其指向的资源下载并应用到文档内。<font color="	#FF6347">当浏览器解析到该元素时，**会暂停其他资源的下载和处理**，直到将该资源加载、编译、执行完毕</font>，图片和框架等元素也是如此。<font color="	#FF6347">所以应该将js文件的引入放到文档最底部</font>。
+
+href指向网络资源所在的位置，建立与当前元素或当前文档之间的链接，如果在文档中添加：
+```html
+<link href=”common.css” rel=”stylesheet”/>
+```
+那么浏览器会识别该文档为css文件，就会<font color="	#FF6347">**并行下载资源并不会停止对当前文档的处理**，建议使用link来引入css，而不是@import</font>。
+
+**src与href的区别在于**：
+1. src用于引入外部资源；href用于引入网络资源
+2. src在解析外部资源时会暂停其他资源的下载和处理；href会并行处理下载资源和处理当前文档
+3. src用于替换当前元素；href用于在当前文档和引用资源之间建立连接
+
+### **对HTML语义化的理解**
+语义化就是根据内容选择合适的标签。
+
+语义化的优点如下：
+- 对机器友好，带有语义化的文字表现力丰富，适合搜索引擎爬取有效信息。
+- 对开发者友好：语义化标签增强了可读性，便于团队开发与维护。
+
+常见的语义化标签：
+```html
+<header></header>  头部
+<nav></nav>  导航栏
+<section></section>  区块（有语义化的div）
+<main></main>  主要区域
+<article></article>  主要内容
+<aside></aside>  侧边栏
+<footer></footer>  底部
+```
+
+### **DOCTYPE的作用**
+告诉浏览器应该以什么样的文档类型来解析文档。
+
+### **script标签中defer和async的区别**
+如果没有defer和async属性，浏览器会立即加载并执行相应的脚本，不会等待后续加载的文档元素，读取到就会开始加载和执行，这样就阻塞了后续文档的加载。
+
+![image](https://user-images.githubusercontent.com/70066311/164873705-75330fb5-1c29-4c32-ab4a-cf76ef1e9342.png)
+
+上图中蓝色代表js脚本网络加载时间，红色代表js脚本执行时间，绿色代表html解析。可以看出<font color="	#FF6347">defer和async属性都是去异步加载外部的js脚本文件，他们都不会阻塞页面的解析，区别在于：</font>
+- 执行顺序：多个带async属性的标签，不能保证加载的顺序；多个defer属性的标签，按照加载顺序执行。
+- 脚本是否并行执行：async属性，表示后续文档的加载和执行与js脚本的加载和执行是并行进行的，在加载完js脚本后会暂停html脚本的解析，立即执行js脚本；而defer属性在加载完js脚本后会等待html解析完后在执行js脚本。
+
+### **常用的meta标签有哪些**
+1. charset：执行编码类型
+```html
+<meta charset="UTF-8" >
+```
+
+2. keywords：页面关键词
+```html
+<meta name="keywords" content="关键词" />
+```
+
+3. description：页面描述
+```html
+<meta name="description" content="页面描述内容" />
+```
+
+4. viewport：适配移动端
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+```
+
+5. refresh：页面重定向和刷新
+```html
+<meta http-equiv="refresh" content="0;url=" />
+```
+
+### **HTML5有哪些更新**
+1. 语义化标签
+2. 媒体标签：audio、video、source
+3. 表单
+    - 表单类型：
+        - email：验证邮箱
+        - url：验证URL
+        - number：只能输入数字
+        - date：日期选择
+    - 表单属性：
+        - placeholder：提示信息
+        - autofocus：自动获取焦点
+        - required：输入框不能为空
+    - 表单事件：
+        - oninput：每当输入框的内容发生变化时都会触发此事件
+4. 进度条：progress标签用来表示任务进度
+5. DOM查询：document.querySelector()和document.querySelectorAll()可以查询标签、类、ID
+6. Web存储
+localStorage和sessionStorage
+7. 新增了画布Canvas，可以在网页上绘制图像
+8. SVG矢量图：使用XML格式定义图形，在图像改变尺寸的情况下图像质量不会有损失
+8. 新增了Geolocation：定位用户位置
+
+### **行内元素有哪些，块级元素有哪些、空元素有哪些**
+- 行内元素：a、b、span、img、input
+- 块级元素：div、ul、ol、li、h1~h6、p
+- 空元素：没有内容的HTML标签，即没有闭合标签：br、hr、img、input
+
+### **对于web worker的理解**
+当JS执行耗时长的同步任务时，会阻塞后面的线程，而<font color="	#FF6347">web worker给JS创建多线程的运行环境，将一些任务分配给worker线程，主线程执行的同时worker线程也在执行，这样在进行复杂操作时就不会阻塞主线程了</font>。
+
+### **HTNL5离线存储**
+离线存储是指：<font color="	#FF6347">在用户没有连接网络时，可以正常访问应用或某些网站，当用户连接后，自动更新用户机器上的缓存文件</font>。
+
+### **strong和b、i和em、title和h1的区别**
+- strong标签有语义，是起到加重语气的效果，而b标签是没有的，b标签只是一个简单加粗标签。b标签之间的字符都设为粗体，strong标签加强字符的语气都是通过粗体来实现的，而搜索引擎更侧重strong标签。
+- title属性没有明确意义只表示是个标题，H1则表示层次明确的标题，对页面信息的抓取有很大的影响
+- i内容展示为斜体，em表示强调的文本
+
+### **label的作用是什么**
+label标签用来定义与表单控件的关系，会自动将焦点转到和label标签对应的表单控件上。
+```html
+<label for="mobile">Number:</label>
+<input type="text" id="mobile"/>
+
+<label>Date:<input type="text"/></label>
+```
+
+### **SVG和Canvas的区别**
+- SVG是使用XML格式定义的矢量图，SVG是基于XML的，可以为其添加JS事件处理器。如果SVG对象的属性发生变化，那么浏览器能够自动重现图形。其特点如下：
+    - 不依赖分辨率
+    - 支持事件处理器
+    - 适合带有大型渲染区域的应用程序，例如地图
+    - 复杂度高会减慢渲染速度
+    - 不适合游戏应用
+- Canvas通过JS来绘制图形，其位置发生改变，就会重新进行渲染。其特点如下：
+    - 依赖分辨率
+    - 不支持事件处理器
+    - 可以以图片格式保存图像
+
+### **head标签的作用**
+head可以引入脚本、样式、提供元信息等。还可以规定字符集，描述了文档的各种属性，例如title、description。还可以配置是否适配移动端等。
+
+### **严格模式与怪异模式**
+- 严格模式：浏览器按照W3C标准解析代码
+- 怪异模式：浏览器按照自己的方式解析代码，模拟浏览器的行为，以防止老站点无法工作
+
+HTML5不分严格模式与怪异模式
+
+### **HTML5 drag API**
+- dragstart：在开始拖放元素时触发的事件
+- drag：正在拖放时触发的事件
+- dragenter：在被拖放元素进入某元素时触发
+- dragover：在被拖放在某元素内移动时触发
+- dragleave：在被拖放元素移出目标元素时触发
+- drop：在目标元素完全接受被拖放元素时触发
+- dragend：在整个拖放操作结束时触发
+
+### **前端无障碍**
+前端无障碍是指<font color="	#FF6347">任何人都可以平等的、方便的、无障碍地获取信息、利用信息</font>。常见的无障碍设计例如：键盘上突起的F和J键，可以使人们方便的找到键盘字母的位置；某些浏览器无法显示图像，采用文字或声音的方式描述图像。
+
+腾讯无障碍说明：每个页面至少有一个h1并不为空、每个页面应至少有一个导航栏、每个页面的title不应长于60个字符等等。字节跳动无障碍短视频。无障碍检测工具：pa11y，可以很方便的进行用户测试，例如假设你自己是一个纯键盘的网站浏览者，尝试一下用键盘浏览自己开发的网站，是否能够方便的导航到网页的各个部分，并进行无障碍的阅读和交互。
+
+### **对SPA的理解**
+SPA为单页面应用，它将所有活动局限于一个Web页面中，仅在该Web页面初始化时加载相应的HTML、JS、CSS，一旦页面加载完成了，<font color="	#FF6347">SPA不会因为用户的操作而进行页面的重新加载或跳转，取而代之的是利用JS动态的变换HTML的内容</font>，从而实现UI与用户交互。
+
+优点：
+1. 避免了页面的重新加载
+2. 对服务器的压力小
+3. 前后端职责分离，前端负责页面交互，后端负责数据处理
+
+缺点：
+1. 初次加载耗时多。SPA应用需要在页面初次加载时就将JS、CSS同一加载，可以通过路由懒加载实现部分页面按需加载
+2. 兼容性差
+3. 不利于SEO
+
+### **BOM对象**
+BOM是浏览器对象，常用的BOM属性：
+- location对象
+    - location.href：返回或设置当前文档的url
+    - location.search：返回URL中的查询字符串部分
+    - location.port：返回URL中的端口
+    - location.hash：返回URL中#后面的部分
+- history对象
+    - history.go
+    - history.back
+    - history.forward
+
+### **click在ios上有300ms延迟的原因，应该如何解决**
+iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕上，采用了双击缩放，浏览器为了区分用户是单机还是双击进行操作，所以设置了300ms的延迟。
+
+- 禁用缩放：将缩放禁用，就没有300ms的延迟了
+- FastClick：在检测到touched事件后，立即触发一个模拟click事件，并把浏览器300ms之后真正触发的click事件阻断掉。
+
 # CSS篇
 
 ## 盒子模型
@@ -12,6 +197,8 @@
      margin、border、padding、content
  - IE盒子模型包括2个部分：
      margin、content(padding、border、content)
+
+盒模型主要由padding、border和content组成，不包括margin，<font color="	#FF6347">margin是边框外的边距，可以理解为盒子与其他元素的边距</font>。
 
 ### *如何转化盒子模型
     标准盒子模型：box-sizing: content-box  
@@ -39,64 +226,10 @@
  - 子元素选择器（>）
  - 属性选择器（a[href]）
 
-### *CSS属性哪些可以继承
- 1. 字体系列属性：
-    - font：组合字体
-
-    - font-family：规定元素的字体系列
-
-    - font-weight：设置字体的粗细
-
-    - font-size：设置字体的尺寸
-
-    - font-style：定义字体的风格
-
-    - font-variant：设置小型大写字母的字体显示文本，这意味着所有的小写字母均会被转换为大写，但是所有使用小型大写字体的字母与其余文本相比，其字体尺寸更小。
-
- 2. 文本系列属性：
-    - text-indent：文本缩进
-
-    - text-align：文本水平对齐
-
-    - line-height：行高
-
-    - word-spacing：增加或减少单词间的空白（即字间隔）
-
-    - letter-spacing：增加或减少字符间的空白（字符间距）
-
-    - text-transform：控制文本大小写
-
-    - direction：规定文本的书写方向
-
-    - color：文本颜色
- 3. 元素可见性：visibility
- 4. 表格布局属性：
-    - caption-side： 指定表格标题的位置
-
-    - border-collapse：设置表格的边框是否被合并为一个单一的边框
-
-    - border-spacing：设置相邻单元格的边框间的距离
-
-    - empty-cells：设置是否显示表格中的空单元格
-
-    - table-layout：为表格设置表格布局算法
- 5. 列表属性:
-    - list-style-type：设置一些不同的列表样式
-    
-    - list-style-image：指定列表中的列表项标记的图像
-    
-    - list-style-position：规定列表中列表项目标记的位置
-    
-    - list-style：设置列表属性
-
-
-### *CSS属性哪些不可以继承
-    border、margin、padding
-
-## CSS优先级算法问题
+### **CSS优先级算法问题**
     !important > 内联样式 > id > class > 标签 > 通配 
 
-### *CSS权重计算
+### **CSS权重计算**
 首先我给每个CSS选择器赋一个权重：
  - !important权重为10000
  - 内联样式权重为：1000
@@ -107,8 +240,109 @@
 
 然后计算每个样式的权重值，权重大的优先
 
-### *注意事项
+### **注意事项**
 1. 继承得到的样式的优先级最低
+2. 如果权重相同，最后出现的样式生效
+3. 样式来源不同时：内联样式 > 内部样式 > 外部样式 > 浏览器用户自定义样式 > 浏览器默认样式
+
+### **CSS属性哪些可以继承**
+ 1. 字体系列属性：
+    - font：组合字体
+    - font-family：规定元素的字体系列
+    - font-weight：设置字体的粗细
+    - font-size：设置字体的尺寸
+    - font-style：定义字体的风格
+    - font-variant：设置小型大写字母的字体显示文本，这意味着所有的小写字母均会被转换为大写，但是所有使用小型大写字体的字母与其余文本相比，其字体尺寸更小。
+
+ 2. 文本系列属性：
+    - text-indent：文本缩进
+    - text-align：文本水平对齐
+    - line-height：行高
+    - word-spacing：增加或减少单词间的空白（即字间隔）
+    - letter-spacing：增加或减少字符间的空白（字符间距）
+    - text-transform：控制文本大小写
+    - direction：规定文本的书写方向
+    - color：文本颜色
+ 3. 元素可见性：visibility
+ 4. 表格布局属性：
+    - caption-side： 指定表格标题的位置
+    - border-collapse：设置表格的边框是否被合并为一个单一的边框
+    - border-spacing：设置相邻单元格的边框间的距离
+    - empty-cells：设置是否显示表格中的空单元格
+    - table-layout：为表格设置表格布局算法
+ 5. 列表属性:
+    - list-style-type：设置一些不同的列表样式    
+    - list-style-image：指定列表中的列表项标记的图像
+    - list-style-position：规定列表中列表项目标记的位置
+    - list-style：设置列表属性
+
+
+### **CSS属性哪些不可以继承**
+1. display
+2. 文本属性：
+    - text-decoration：规定添加到文本的装饰
+    - text-shadow：文本阴影效果
+    - white-space：空白符的处理
+3. 盒子模型的属性：border、padding、margin、width、height
+4. 背景属性：background、background-color、background-image、background-repeat
+5. 定位属性：position、top、right、bottom等
+6. 页面样式属性：size
+
+### **display有哪些属性，作用是什么？**
+  display: none   - 表示该元素不会显示，并且从文档流中移除    
+  display: block  - 把某元素转化为块元素，会占一行，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>  
+  display: inline - 把某元素转化为行内元素，<font color="	#FF6347">默认宽度为内容宽度，不可以设置宽高，同行显示 </font>  
+  display: inline-block - 把某元素转化为行内块元素  
+  display: list-item - 像块级元素一样显示，但会加上一个标记，例如：  
+  ![list-item](https://user-images.githubusercontent.com/70066311/157609326-04ade374-811f-429f-a68a-0ce65da62d21.png)  
+  display：table - 将元素当作表格使用，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>    
+  display: inherit - 继承父元素的display属性
+
+### **display的block、inline和inline-block的区别**
+- block：    
+      - <font color="#FF6347">元素表现为块级元素，可以设置宽高，独占一行，若没有设置宽度，则默认填满父级元素的宽度</font>。     
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>。
+      - <font color="#FF6347">使用width和height都会生效</font>。
+- inline：   
+      - <font color="#FF6347">元素表现为行内元素</font>；   
+      - <font color="#FF6347">不能设置宽高，大小完全由内容撑开</font>；   
+      - <font color="#FF6347">padding上下左右都有效，但margin只有左右会产生效果，上下不生效</font>。
+      - <font color="#FF6347">使用width和height不会生效</font>。
+- inline-block：     
+      - <font color="#FF6347">对外表现为行内元素，对内表现为块级元素</font>     
+      - <font color="#FF6347">可以设置宽高</font>    
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>
+
+## 隐藏元素的方式
+1. display:none是彻底消失，<font color="	#FF6347">不在文档流中占位，浏览器也不会解析该元素，不会响应绑定事件，子节点不会继承</font>。  
+2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
+3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="	#FF6347">会响应绑定的事件</font>。  
+4. z-index:负值是其他元素覆盖该元素，实现隐藏  
+
+- 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生回流，造成文档重排；而visibility切换时不会引起回流，只会引起本元素重绘</font>。
+
+```html
+<style>
+  div {
+    width: 200px;
+    height: 200px;
+    background-color: pink;
+    /* display: none; */
+    visibility: hidden;
+    
+  }
+</style>
+
+<div>
+  123
+</div>
+<ul>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+</ul>
+```
+
 
 ## 用CSS画一个三角形    
 1.可以使用border(边框)画，设置边框三边为透明，另一边不透明
@@ -203,25 +437,6 @@
   </style>
 ```
 
-## display有哪些属性，作用是什么？
-  display: none   - 表示该元素不会显示，但盒子还在DOM中    
-  display: block  - 把某元素转化为块元素，会占一行，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>  
-  display: inline - 把某元素转化为行内元素，<font color="	#FF6347">默认宽度为内容宽度，不可以设置宽高，同行显示 </font>  
-  display: inline-block - 把某元素转化为行内块元素  
-  display: list-item - 像块级元素一样显示，但会加上一个标记，例如：  
-  ![list-item](https://user-images.githubusercontent.com/70066311/157609326-04ade374-811f-429f-a68a-0ce65da62d21.png)  
-  display：table - 将元素当作表格使用，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>    
-  display: inherit - 继承父元素的display属性
-
-## 行内元素和块级元素
-|  |  行内元素   | 块级元素  |
-| ---- |  ----  | ----  |
-| 可否设置宽高 | 设置宽高无效，宽高为内容宽高  | 可以设置宽高 |
-| 可否设置padding和margin | 可以设置水平方向的、不可设置垂直方向的  | 可以设置任意方向的padding和margin |
-| 可否自动换行 | 不会自动换行  | 自动换行 |
-| 排列方式 |   | 一块占一行，从上到下排列 |
-
-
 ## BFC规范
 BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面的子元素不会影响到外面的元素
 
@@ -302,35 +517,6 @@ Normalize.css：可以增强跨浏览器渲染的一致性
 
 ### *缺点
 可维护性差（例如图片位置进行修改或内容宽高修改）
-
-## 隐藏元素的方式
-1. display:none是彻底消失，<font color="	#FF6347">不在文档流中占位，浏览器也不会解析该元素，不会响应绑定事件，子节点不会继承</font>。  
-2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
-3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="	#FF6347">会响应绑定的事件</font>。  
-4. z-index:负值是其他元素覆盖该元素，实现隐藏  
- - 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生回流，造成文档重排；而visibility切换时不会引起回流，只会引起本元素重绘</font>。
-
-```html
-<style>
-  div {
-    width: 200px;
-    height: 200px;
-    background-color: pink;
-    /* display: none; */
-    visibility: hidden;
-    
-  }
-</style>
-
-<div>
-  123
-</div>
-<ul>
-  <li>1</li>
-  <li>2</li>
-  <li>3</li>
-</ul>
-```
 
 ## opacity和rgba的区别
 opacity和rgba都可以给元素设置透明度，但不同之处在于：
@@ -2807,6 +2993,36 @@ DNS劫持由于涉嫌违法，已被监管起来。而http劫持依然非常盛�
 (3) 事件触发线程：
 当JS引擎进程执行到如setTimeout、鼠标事件、AJAX异步请求等操作时，会把对应的任务添加到事件触发线程中，事件触发线程会把这些事件添加到一个事件队列里，等待JS引擎进程处理。
 
+## 浏览器缓存
+### **什么是浏览器缓存**
+**浏览器缓存**是浏览器在本地磁盘对用户最近请求过的文档进行存储，当访问者再次访问同一页面时，浏览器就可以直接从本地磁盘加载文档。
+
+### **浏览器缓存的优点**
+1. 减少了冗余的数据传输
+2. 减少了服务器压力，提升了网站性能
+3. 加载了页面加载的速度
+
+### **对浏览器的缓存机制的理解**
+浏览器缓存全过程：
+- 浏览器第一次加载资源时，服务器返回200，浏览器从服务器下载该资源文件，并缓存资源文件与response header，以供下次加载时对比使用
+- 下次加载资源时，由于强制缓存优先级较高，先比较当前时间与上次返回200时的时间差，如果没有超过cache-control（控制HTTP缓存）设置的max-age，则没有过期，并命中强缓存，直接从本地读取资源。如果浏览器不支持HTTP1.1，则使用expires头判断是否过期
+- 如果资源已过期，则表明强缓存没有被命中，则开始协商缓存，向服务器发送带有if-None-Match和if-Modified-Since的请求
+- 服务器收到请求后，优先根据Etag的值判断被请求的文件有没有做修改，Etag值一致则没有修改，命中协商缓存，返回304；如果不一致则有改动，直接返回新的资源文件带上新的Etag值并返回200
+- 如果服务器收到的请求没有Etag值，则将if-Modified-Since和被请求文件的最后修改时间做比对，一致则命中协商缓存，返回304；不一致则返回新的last-modified和文件并返回200
+
+![image](https://user-images.githubusercontent.com/70066311/164454205-0c23d922-41b3-45b6-933e-16db887a7b00.png)
+
+很多网站的资源后面都加了**版本号**，这么做是因为：<font color="	#FF6347">每次升级了JS或CSS文件后，为了防止浏览器进行缓存，强制改变版本号，客户端浏览器就会重新下载新的JS或CSS文件，以保证用户能够及时获得网站的最新更新</font>。
+
+### **协商缓存与强缓存**
+**强缓存**：不会向服务器发送请求，直接从缓存中读取资源，**返回200状态码**。
+
+强缓存可以通过两种方式来设置：分别是htpp头信息中的Expires属性和Cache-Control属性。
+1. <font color="	#FF6347">服务器通过在响应头中添加 Expires 属性，来指定资源的过期时间</font>。在过期时间以内，该资源可以被缓存使用，不必再向服务器发送请求。这个时间是一个绝对时间，它是服务器时间
+
+**协商缓存**：向服务器发送请求，服务器根据这个请求的request header的一些参数来判断是否命中协商缓存，如果命中，则**返回304状态码**，并带上新的response header通知浏览器从缓存中读取资源；如果没命中，则将新的资源返回。
+
+
 ## 浏览器本地产存储
 ### 浏览器本地存储方式及使用场景
 (1) Cookie    
@@ -3021,10 +3237,10 @@ JSONP的缺点：
 懒加载是指<font color="	#FF6347">延迟加载，当图片进入到页面的可视区域内在加载，起到延迟加载，缓解服务器压力的作用</font>。而预加载会增加服务器压力，他会<font color="	#FF6347">提前将资源加载并保存到本地，需要用到资源时直接从本地读取，这样可以减少用户等待时间，提升用户体验，但会给服务器增加压力</font>。
 
 ## 回流（重排）和重绘
-### *回流
+### **回流**
 当部分或全部元素的尺寸、属性或结构发生变化时，浏览器会重新渲染部分或全部文档的过程称为回流。
 
-### *会导致回流的操作
+### **会导致回流的操作**
 - 页面首次渲染
 - 浏览器的窗口大小发生变化
 - 元素的内容发生变化
@@ -3038,17 +3254,17 @@ JSONP的缺点：
 1. 全局范围：从根节点开始，对整个渲染树进行重新布局
 2. 局部范围：对渲染树的某部分进行重新布局
 
-### *重绘
+### **重绘**
 当页面中某些元素的样式发生变化，但不会影响其在文档流中的位置时，浏览器就会对这些元素进行重绘。
 
-### *会导致重绘的操作
+### **会导致重绘的操作**
 - color、background-color、 background-image
 - outline-color、outline-width、outline-decoration
 - border-radius、visibility、box-shadow
 
 <font color="	#FF6347">当触发回流时，一定会触发重绘；但触发了重绘，不一定会重排</font>。
 
-### *如何避免重排和重绘
+### **如何避免重排和重绘**
 1. 在操作DOM时，尽量在底层的DOM节点进行操作
 2. 不要使用table布局
 3. 不要频繁操作元素样式
