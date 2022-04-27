@@ -663,16 +663,16 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
 ```
 
 ## 重绘与重排
-### *重排
+### **重排**
 <font color="	#FF6347">当DOM的变化引起了元素几何属性的变化时</font>，比如：改变元素的宽高、元素的位置等，导致浏览器不得不重新计算元素的几何属性，并重新构建渲染树，这个过程为重排
 
-### *重绘
+### **重绘**
 完成重排后，将重新构建的渲染树渲染到页面上，这个过程称为重绘。  
 
 <font color="	#FF6347">重排负责元素的几何属性更新，重绘负责元素的样式更新。重排必然会带来重绘，但重绘不一定带来重排，例如改变背景颜色，不会引起重排，但会带来重绘。</font>
 
 ## 定位与浮动
-### *浮动的工作原理
+### **浮动的工作原理**
 - 浮动的元素会脱离文档流，不占据空间（引起高度塌陷问题）
 - 浮动元素碰到包含它的边框或其他浮动元素的边框会停留
 
@@ -2231,6 +2231,133 @@ setInterval是<font color="#FF6347">每隔一定delay就执行一次回调函数
 3. requestAnimationFrame
 <font color="#FF6347">requestAnimationFrame自带函数节流功能，延时效果精准</font>。
 
+### **AJAX、Fetch、axios**
+**AJAX**      
+<font color="#FF6347">AJAX可以在不更新全局的情况下更新局部页面。通过在与服务器进行数据交换，可以是网页实现异步更新</font>。
+
+**创建AJAX**     
+```js
+// 1. 创建 XMLHttpRequest 实例
+let xhr = XMLHttpRequest()
+// 2. 打开和服务器的连接
+xhr.open('get', 'URL')
+// 3.发送
+xhr.send()
+// 4. 接收变化。
+xhr.onreadystatechange = () => {
+    if(xhr.readyState == 4 && xhr.status == 200){   // readyState: ajax 状态，status：http 请求状态
+        console.log(xhr.responseText);   //响应主体
+    }
+}
+```
+1. 创建`AJAX`实例：`let xhr = new XMLHttpRequest()`
+2. 打开请求，配置请求前的配置项：`xhr.open([http method], [url], [async], [userName], [userPass])`
+    - `http methods` 请求方式：`post`，`get`，`delete`，`put`，`head`，`options`，`trace`，`connect`
+    - `url`：想服务器请求的路径
+    - `async`：是否为异步请求
+    - `userName`、`userPass`：用户名与密码
+3. 发送请求：`XMLHttpRequest.send()` 方法中如果 Ajax 请求是异步的则这个方法发送请求后就会返回，如果Ajax请求是同步的，那么请求必须知道响应后才会返回。
+4. 接收数据
+
+**AJAX的缺点：**
+- 本是针对MVC变成，不符合前端MVVM的浪潮
+- 基于原生的XHR开发
+- 配置和调用方式混乱
+
+**axios原理**
+<font color="#FF6347">axios是使用promise封装的ajax，它内部有两个拦截器，分别是request拦截器和response拦截器</font>。
+
+- 请求拦截器的作用是<font color="#FF6347">在请求发送之前进行一些操作，例如在每个请求体上加入token</font>
+- 响应拦截器的作用是<font color="#FF6347">接收到响应后做的一些操作，例如登录失败后需要重新登录跳转到登录页</font>
+
+**axios的特点**
+- 由浏览器端发起请求
+- 支持promise API
+- 监听请求和返回
+- 更好的格式化，自动将数据转换为json数据
+- 安全性更高，可抵御XSRF攻击
+
+**axios常用的方法**
+axios常用的方法有`get`、`post`、`put`、`patch`、`delete`等。其中<font color="#FF6347">`get`和`post`返回的都是`promise`对象，可以使用`promise`方法</font>
+
+1. `axios.get(url[, config])`：get请求用于列表和信息查询
+```js
+axios.get('apiURL', {
+    param: {
+        id: 1
+    }
+    // param 中的的键值对最终会 ? 的形式，拼接到请求的链接上，发送到服务器。
+}).then(res => {
+    console.log(res);
+})
+.catch( error => {
+    console.log(error)
+}
+```
+
+2. `axios.delete(url[, config])`：删除
+```js
+axios.delete('apiURL', {
+    params: {
+        id: 1
+    },
+    timeout: 1000
+})
+```
+
+3. `axios.post(url[, data[, config]])`：post请求用于信息的添加
+```js
+axios.post('apiURL',{
+        user: '小新',
+        age: 18
+}).then( res => {
+    console.log(res);
+})
+.catch( error => {
+    console.log(error)
+}
+```
+
+4. `axios.put(url[, data[, config]])`：更新操作
+```js
+axios.put('apiURL', {
+    name: '小新',
+})
+```
+
+5. `axios.patch(url[, data[, config]])`：更新操作
+```js
+axios.patch('apiURL', {
+    id: 13,
+},{
+   timeout: 1000,
+})
+```
+
+**put和patch的区别**
+`patch`方法用来更新局部资源，<font color="#FF6347">假设我们有一个UserInfo，里面有userId，userName，userGender等10个字段。可你的编辑功能因为需求，在某个特别的页面里只能修改userName，这个时候就可以使用`patch`</font>。    
+
+`put`也适用于更新数据，但必须提供完整的资源对象。
+
+**axios相关配置**
+- url：用于请求服务器的url
+- method：请求方法，默认为get
+- baseURL：会自动加到url前面
+- proxy：用于配置代理
+- transformRequest：允许在服务器发送请求之前修改请求数据
+
+
+**fetch**    
+`fetch`是http请求数据的方式，它使用Promise，但不使用回调函数。`fetch`采用模块化设计，<font color="#FF6347">通过数据流处理数据，对于请求大文件或网速慢的情况相当有用</font>。默认情况下fetch不会接收或发送cookies。
+
+### **Fetch、ajax与axios的区别**
+- 传统的ajax利用的是`HMLHttpRequest这个对象`，和后端进行交互。而`JQury ajax`是对原生`XHR`的封装，多请求间有嵌套的话就会出现回调地狱的问题。
+- `axios`使用`promise`封装`XHR`，解决了回调地狱的问题。
+- 而`Fetch`没有使用`XHR`，使用的是`promise`
+
+### **Fetch和Ajax比有什么优点**
+`Fetch`使用的是`promise`，方便使用异步，没有回调地狱的问题。
+
 ## 面向对象
 ### ****
 
@@ -3098,7 +3225,7 @@ Chrome浏览器包括：浏览器主进程、GOU进程、网络进程、多个�
 ### **浏览器<font color="	#FF6347">渲染进程</font>的线程有哪些**
 ![image](https://user-images.githubusercontent.com/70066311/160823144-9939b969-30e7-4460-b752-b2c609d7595b.png)20
 (1) GUI渲染进程：    
-负责渲染页面，解析HTML、CSS，构建DOM树。当页面发生重绘或回流时，该线程就会执行。
+负责渲染页面，解析HTML、CSS，构建DOM树。当页面发生重绘或重排时，该线程就会执行。
 
 (2) JS引擎线程：     
 负责解析、执行JS脚本，一个页面无论什么时候都只有一个JS引擎在运行JS脚本。
@@ -3730,6 +3857,27 @@ console.log(name);   // Bob
 
 
 # React
+## 什么是React
+<font color="	#FF6347">React是一个用于构建用户界面的JS库，主要用于构建UI。
+
+- React具有较高的性能，采用虚拟DOM、diff算法、shouldComponentUpdate、useMemo()等方法来提高性能。
+- React采用JSX代替JS，执行速度更快，并且是类型安全的，可以对数据类型进行检查。
+- React使用组件化发开思想，提高复用性。
+- React使用单向数据流，减少了重复代码。
+
+</font>
+
+## 类组件与函数式组件
+- 类组件
+
+
+- 函数式组件
+
+
+### state和props的区别
+props是从组件外部传入的，主要用于父组件向子组件传递数据，具有只读性，只能通过外部组件主动传递数据来渲染子组件。state的作用是组件自己用来创建、修改、管理自身状态，他是组件的私有属性，不可通过外部修改，只能在组件内部通过this.setState修改，修改state会导致页面重新渲染。
+
+
 ## JSX
 JSX是JS XML，用来在React中代替js。JSX的<font color="#FF6347">执行速度更快；是类型安全的，在编译过程中就能发现错误；使用JSX编写更加快速</font>。
 下面就是一个简单的JSX语法：
@@ -3743,7 +3891,7 @@ JSX其实是`React.createElement(component, props, ...children)`的语法糖，�
 
 ## 虚拟DOM
 ### **什么是DOM**
-DOM是用一颗逻辑树来表示一个文档，树的每个分支的终点都是一个节点，可以用特定的方式（编写JS、CSS、HTML）来改变这个树的结构，从而改变文档结构、样式或内容。
+DOM是使用一颗逻辑树来表示一个文档，树的每个分支的终点都是一个节点，可以用特定的方式（编写JS、CSS、HTML）来改变这个树的结构，从而改变文档结构、样式或内容。
 
 ### **什么是虚拟DOM**
 虚拟DOM就是一个JS对象，通过对象的方式来表示DOM结构，通过事务处理机制，将多次DOM修改的结果一次性更新到页面上，<font color="#FF6347">从而有效的减少页面渲染次数，减少修改DOM重绘重排的时间，提高渲染性能</font>。
@@ -3776,8 +3924,9 @@ diff算法探讨的就是<font color="#FF6347">虚拟DOM树发生变化后，生
 ![image](https://user-images.githubusercontent.com/70066311/163707651-03869a59-baff-417f-8225-3c773301ecef.png)
 
 diff算法可以总结为三个策略，分别从树、组件以及元素三个层面进行复杂度优化：
+
 策略一：**忽略节点跨层级操作场景，提升对比效率（基于树进行对比）**
-这一策略需要进行树比对，即对树进行分层比较。树比对的处理手法是非常“暴力”的，即两棵树只对同一层次的节点进行比较，如果发现节点已经不存在了，则该节点及其子节点会被完全删除掉，不会用于进一步的比较，这就提升了比对效率。
+这一策略需要进行树比对，即对树进行分层比较。树比对的处理手法是非常“暴力”的，即<font color="#FF6347">两棵树只对同一层次的节点进行比较</font>，如果发现节点已经不存在了，则该节点及其子节点会被完全删除掉，不会用于进一步的比较，这就提升了比对效率。
 
 策略二：**如果组件的class一致，则默认为相似的树结构，否则默认为不同的树结构（基于组件进行对比）**
 在组件对比中：
@@ -3794,8 +3943,8 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 <font color="#FF6347">diff算法中会借助key来判断该元素是新创建的还是被移动而来的元素，从而减少不必要的渲染</font>。
 
 - key具有唯一性
-- 尽量不要用数组中的index作为key
-- 不要再render的时候使用随机数或其它操作给元素加上不稳定的key，因为这样造成的性能开销比不加key更多
+- <font color="#FF6347">尽量不要用数组中的index作为key</font>。因为在进行删除操作时会发生误删的现象。
+- <font color="#FF6347">不要再render的时候使用随机数或其它操作给元素加上不稳定的key，因为这样造成的性能开销比不加key更多</font>
 
 ### **受控组件与非受控组件**
 1. 受控组件
@@ -4541,9 +4690,6 @@ React会将多次的setState合并为一次执行，提高性能，减少页面�
 
 <font color="	#FF6347">replaceState只会保留nextState中的值，原来的state将被删除，相当于赋值</font>。
 
-### state和props的区别
-props是从组件外部传入的，主要用于父组件向子组件传递数据，具有只读性，只能通过外部组件主动传递数据来渲染子组件。state的作用是组件自己用来创建、修改、管理自身状态，他是组件的私有属性，不可通过外部修改，只能在组件内部通过this.setState修改，修改state会导致页面重新渲染。
-
 ### 校验propTypes
 propTypes用来对传入的props数据进行验证，若props与propTypes定义的数据类型不符，控制台会报警告。可以避免随着程序越来越复杂出现的问题，还可以让程序变得更加易读。
 
@@ -4935,25 +5081,135 @@ export default function App() {
 ### 对Redux的理解
 <font color="	#FF6347">Redux是一个用来管理数据状态的工具</font>。因为React传递数据是单向的，父组件可以向子组件通过props传递数据，而子组件无法直接向父组件传递数据，这样的单向数据流成就了React的数据可控性。随着项目越来越大，state也越来越难以管理，而使用Redux可以轻松管理这些state。
 
-### Redux的工作原理
-当组件想要更新状态时，Redux会创建一个action对象，action对象包含两个数据，一个是必备的type，表示action类型，第二个state，在action不会修改state的值，而是等待store调用dispatch()方法将store传递给reducer，reducer才是真正更新state值的对象。reducer接收两个参数，一个是preState，一个是action，通过匹配不同
-action.type来执行不同的逻辑，然后返回一个新的state。store在组件挂载到页面后(componentDidmount)通过subscribe()方法一直监听reducer，通过getState()方法得到新的经过reducer处理后的state。
+Redux专门用于管理数据状态（容器组件），而React用于处理视图层逻辑，实现页面渲染（UI组件），两者通过connect连接起来。
 
 ![redux原理图](https://user-images.githubusercontent.com/70066311/160605698-6166cd12-93e9-491e-8474-65a0163114d8.png)
 
 ### Redux主要解决的问题
 Redux主要解决的问题是将Redux的状态与React的UI绑定到一起，当使用dispatch(action)改变state时可以自动更新页面。
 
-### Redux异步<font color="	#FF6347">中间件</font>
-(1) redux-thunk
+### Redux的工作原理
+<font color="	#FF6347">当组件想要更新状态时，Redux会创建一个action对象，action对象包含两个数据，一个是必备的type，表示action类型，第二个state，在action不会修改state的值，而是等待store调用dispatch()方法将action对象传递给reducer，reducer才是真正更新state值的对象。reducer接收两个参数，一个是preState，一个是action，通过匹配不同的action.type来执行不同的逻辑，然后返回一个新的state。store在组件挂载到页面后(componentDidmount)通过subscribe()方法一直监听reducer，一旦reducer改变完状态，就可以通过getState()方法得到新的经过reducer处理后的state</font>。
 
+### **Redux深入理解**
+Redux源码主要分为以下几个模块文件：
+- compose.js：提供从右到左进行函数式编程
+- createStore.js：提供作为生成唯一store的函数
+- combineReducers.js：提供合并多个reducer的函数，保证store的唯一性
+- bindActionCreators.js：可以让开发者在不直接接触dispacth的前提下进行更改state的操作
+- applyMiddleware.js：通过中间件来增强dispatch的功能
+
+### **Redux工作流程**
+1. 首先用户通过dispatch()函数发出Action对象
+2. Store自动调用Reducer并传入两个参数，一个是当前的State，另一个是Action对象
+3. Reducer更新后返回新的State
+4. State一旦发生变化，Store就会调用监听函数，来更新View
+
+### **Redux怎么实现属性传递的，原理**
+<font color="	#FF6347">view -> action -> reducer -> store -> view</font>
+1. 用户在view通过触发某些事件调用mapDispatchToProps()将action对象传给store
+2. store自动调用reducer修改state
+3. store通过subscribe()监听state是否发生变化，当state发生改变时，store就可以调用getState()方法获取到新的state
+4. store通过mapStateToProps()方法将新的state映射到view中
+
+
+### **Redux的中间件是什么**
+<font color="	#FF6347">view -> action -> middleware -> reducer -> store -> view</font>
+Redux中间件是对dispatch的扩展，位于action -> reducer之间，使用中间件可以进行异步操作、action过滤、异常报告等功能。
+
+### Redux异步<font color="	#FF6347">中间件</font>
+1. redux-thunk    
+优点：     
+- 体积小，只有不到20行代码
+- 使用简单
+
+缺点：     
+- 通常一个请求需要大量的代码，而且很多都是重复性质的
+- 耦合严重：异步代码和action耦合在一起，不便于管理
+- 功能少，在开发中有些功能需要自己封装
+
+2. redux-saga
+redux-saga是一个管理redux应用异步操作的中间件，它通过创建Sagas将所有异步操作逻辑存放在一个文件进行集中处理，一次将同步与异步操作分离，以便于管理与维护。      
+优点：     
+- 异步解耦：异步操作放在单独的文件中，降低耦合性
+- 异常可以直接使用try/catch捕获
+- 功能强大：提供了大量的saga辅助函数供开发者使用
+- 灵活：可以将多个saga并行/串行起来，形成异步流
+- 易于测试
+
+缺点：   
+- 体积庞大
+- 功能过剩：其实有很多功能都很难能用到
+- ts支持不友好
+- 学习难度大
+
+### **Redux怎么处理并行操作**
+<font color="	#FF6347">使用redux-saga</font>。    
+
+- takeEvery：可以让多个saga任务并行被fork执行
+```js
+import {
+    fork,
+    take
+} from "redux-saga/effects"
+
+const takeEvery = (pattern, saga, ...args) => fork(function*() {
+    while (true) {
+        const action = yield take(pattern)
+        yield fork(saga, ...args.concat(action))
+    }
+})
+```
+
+- takeLastest
+takeLastest不允许多个saga并行执行，一旦收到新的发起的action，就会取消前面的所有fork任务。<font color="	#FF6347">在处理AJAX请求的时候，如果只希望获取最后一个请求的响应，taskLastest变得非常有用</font>。
+```js
+import {
+    cancel,
+    fork,
+    take
+} from "redux-saga/effects"
+
+const takeLatest = (pattern, saga, ...args) => fork(function*() {
+    let lastTask
+    while (true) {
+        const action = yield take(pattern)
+        if (lastTask) {
+            yield cancel(lastTask) // 如果任务已经结束，则 cancel 为空操作
+        }
+        lastTask = yield fork(saga, ...args.concat(action))
+    }
+})
+```
+
+### **Redux状态管理器和变量挂载到window中有什么区别**
+二者都是存储数据以供后期使用。
+- Redux状态更改可以回溯，数据多了的时候可以清晰地知道改动在哪里发生，完整的提供了一套状态管理模式；而window不可以。
+
+### **Redux和VueX的区别和共同思想**
+1. 区别：
+    - VueX改进了Redux中的Action和Reducer函数，以mutations变化函数取代Reducer，无需switch，只需要在对应的mutations中改变state的值即可
+    - 由于Vue自动重新渲染的特性，无需subscribe重新渲染函数，只要生成新的state即可
+    - VueX数据流的顺序是：View调用store.commit提交对应的请求到Store中对应的mutations函数 -> store改变
+
+通俗的理解就是：<font color="	#FF6347">VueX弱化了dispatch，通过commit进行store状态的更改，取消了action的概念，不必传入特定的action形式进行指定变更；弱化reducer，基于commit参数直接对数据进行转变，使得框架变得更加简单</font>。
+
+2. 共同思想：Redux和VueX都是以MVVM思想进行设计，将数据从视图层抽离出来，实现变化可预测、单一数据源。
+
+### **Redux中的connect有什么作用**
+<font color="	#FF6347">connect负责连接Redux和React</font>
+
+1. 获取State：connect通过context获取Provider中store，通过store.getState()获取整个store tree上所有state。
+2. 包装原组件
+3. 监听Store tree变化：connect缓存了store tree中state的状态，通过当前state状态 和变更前 state 状态进行比较，从而确定是否调用 this.setState()方法触发Connect及其子组件的重新渲染。
+
+## React事件机制
 ## 合成事件
 合成事件是react模拟DOM原生事件的一个事件对象，其优点如下：
 1. 兼容所有浏览器，兼容性好
 2. 将事件统一放到一个数组，避免频繁的新增删除（垃圾回收）
 3. 方便react统一管理和事务机制
 
-## React事件机制
 ### **事件代理**
 React未将事件处理函数与对应的DOM节点直接关联，而是在顶层使用了一个<font color="	#FF6347">全局事件监听器</font>监听所有的事件。
 
