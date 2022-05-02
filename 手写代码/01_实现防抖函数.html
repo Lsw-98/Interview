@@ -24,7 +24,9 @@
         if (timer) {
           clearTimeout(timer)   // 取消由 setTimeout() 方法设置的定时操作。
         }
-        timer = setTimeout(fn, delay)
+        timer = setTimeout(() => {
+          fn()
+        }, delay);
       }
     }
 

@@ -839,6 +839,27 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
     2. <font color="#FF6347">高度塌陷</font>
 
 ### **响应式布局**
+响应式布局就是一个网站同时能兼容多个终端。    
+优点：
+1. 面对不同分辨率设备灵活性强
+2. 能够快捷解决多设备显示适应问题
+
+缺点：
+1. 不能兼容所有浏览器
+2. 加载时间长
+3. 一定程度上改变了网站原有的布局结构，使用户混淆
+
+响应式布局分为三个部分：
+- 流式布局
+- 媒体查询
+- 响应式布局
+
+1. 流式布局（百分比布局）。元素的宽高定位等属性都以百分数参照父标签的属性来设定。常见的布局单位有：%、em、rem。
+
+2. 媒体查询。使用@media查询，可以针对不同的媒体类型定义不同的样式。
+
+3. 响应式布局：常见的响应式布局为两栏布局、三栏布局
+
 使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
 
 ### **Grid布局**
@@ -1145,10 +1166,21 @@ body {
 ### **JS有哪些数据类型**
 JS中有Undefined、Null、Object、Number、String、Boolean、Symbol、BigInt。  
 - Symbol代表创建后独一无二且不可变的数据类型，它主要是为了解决<font color="#FF6347">可能出现的全局变量冲突问题</font>。
+
+```js
+let genericSymbol = Symbol();
+let otherGenericSymbol = Symbol();
+console.log(genericSymbol == otherGenericSymbol); // false
+
+let fooSymbol = Symbol('foo');
+let otherFooSymbol = Symbol('foo');
+console.log(fooSymbol == otherFooSymbol); // false
+```
+
 - BigInt是一种数字类型的数据，他可以表示任意精度格式的整数，使用BitInt可以<font color="#FF6347">安全的存储和操作大整数</font>，即使这个数已经超出了Number能够表示的安全整数范围。
 
 这些数据类型可以分为：
-- 原始数据类型：null、undefined、Number、String、Boolean，存储在栈
+- 原始数据类型：null、undefined、Number、String、Boolean、Symbol，存储在栈
 - 引用数据类型：<font color="#FF6347">Object、数组和函数</font>，存储在堆
 
 ### 原始数据类型和引用数据类型的区别在于<font color="#FF6347">存储位置不同</font>
@@ -1190,6 +1222,162 @@ console.log(('str').constructor === String); // true
 console.log(([]).constructor === Array); // true
 console.log((function() {}).constructor === Function); // true
 console.log(({}).constructor === Object); // true
+```
+
+### **<font color="#FF6347">数组的常用方法</font>**
+**增**     
+- push，会对数组产生影响
+- unshift，会对数组产生影响
+- splice，会对数组产生影响
+- concat，不会对数组产生影响
+
+push()方法接收任意数量的参数，并将它们添加到数组的末尾，返回数组的最新长度。
+
+```js
+let colors = []; // 创建一个数组
+let count = colors.push("red", "green"); // 推入两项
+console.log(count) // 2
+```
+
+unshift()方法在数组的开头添加任意多个值，返回数组的最新长度
+
+```js
+let colors = new Array(); // 创建一个数组
+let count = colors.unshift("red", "green"); // 从数组开头推入两项
+alert(count); // 2
+```
+
+splice()传入三个参数，分别是开始位置、0（要删除的元素）、插入的元素，返回一个空数组
+
+```js
+let colors = ["red", "green", "blue"];
+let removed = colors.splice(1, 0, "yellow", "orange")
+console.log(colors) // red,yellow,orange,green,blue
+console.log(removed) // []
+```
+
+concat()会先创建一个数组的副本，然后将元素添加到副本的末尾，最后返回一个新构建的数组，不会影响原始数组。
+
+```js
+let colors = ["red", "green", "blue"];
+let colors2 = colors.concat("yellow", ["black", "brown"]);
+console.log(colors); // ["red", "green","blue"]
+console.log(colors2); // ["red", "green", "blue", "yellow", "black", "brown"]
+```
+
+**删**
+- pop，会对数组产生影响
+- shift，会对数组产生影响
+- splice，会对数组产生影响
+- slice，不会对数组产生影响
+
+pop()用于删除数组的最后一项，返回被删除的项
+
+```js
+let colors = ["red", "green"]
+let item = colors.pop(); // 取得最后一项
+console.log(item) // green
+console.log(colors.length) // 1
+```
+
+shift()用于删除数组的第一项，返回这一项
+
+```js
+let colors = ["red", "green"]
+let item = colors.shift(); // 取得第一项
+console.log(item) // red
+console.log(colors.length) // 1
+```
+
+splice()传入两个参数，分别是开始位置、删除元素的数量，返回包含删除元素的数组
+
+```js
+let colors = ["red", "green", "blue"];
+let removed = colors.splice(0,1); // 删除第一项
+console.log(colors); // green,blue
+console.log(removed); // red，只有一个元素的数组
+```
+
+slice()创建一个包含原数组中一个或多个元素的新数组，不会影响原始数组
+
+```js
+let colors = ["red", "green", "blue", "yellow", "purple"];
+let colors2 = colors.slice(1);
+let colors3 = colors.slice(1, 4);
+console.log(colors)   // red,green,blue,yellow,purple
+concole.log(colors2); // green,blue,yellow,purple
+concole.log(colors3); // green,blue,yellow，左闭右开
+```
+
+**改**
+- splice
+
+splice()传入三个参数，分别是开始位置、删除元素的数量、插入的元素，返回删除元素的数组
+
+```js
+let colors = ["red", "green", "blue"];
+let removed = colors.splice(1, 1, "red", "purple"); // 插入两个值，删除一个元素
+console.log(colors); // red,red,purple,blue
+console.log(removed); // green，只有一个元素的数组
+```
+
+**查**
+- indexOf
+- includes
+- find
+
+indexOf()查找元素，返回元素坐标，没有找到返回-1
+
+```js
+let numbers = [1, 2, 3, 4, 5, 4, 3, 2, 1];
+numbers.indexOf(4) // 3
+```
+
+includes()返回元素在数组中的位置，如果找到则返回true，否则为false
+
+```js
+let numbers = [1, 2, 3, 4, 5, 4, 3, 2, 1];
+numbers.includes(4) // true
+```
+
+find()返回满足条件的第一个元素
+
+```js
+const people = [
+    {
+        name: "Matt",
+        age: 27
+    },
+    {
+        name: "Nicholas",
+        age: 29
+    }
+];
+people.find((element, index, array) => element.age < 28) // // {name: "Matt", age: 27}
+```
+
+**排序方法**：reverse、sort
+
+**filter**的作用也是生成一个新数组，在遍历数组的时候将返回值为 true 的元素放入新数组，我们可以利用这个函数删除一些不需要的元素
+
+```js
+let array = [1, 2, 4, 6]
+let newArray = array.filter(item => item !== 6)
+console.log(newArray) // [1, 2, 4]
+```
+
+**map**的作用是生成一个新数组，遍历原数组，将每个元素拿出来做一些变换然后放入到新的数组中。
+
+```js
+[1, 2, 3].map(v => v + 1) // -> [2, 3, 4]
+```
+
+**reduce**可以将数组中的元素通过回调函数最终转换为一个值。例如实现数组求和。
+
+```js
+const arr = [1,2,3]
+const sum = arr.reduce((acc,current)=>acc + current,0)
+console.log(sum)
 ```
 
 ### **null和undefined的区别**
@@ -1279,6 +1467,12 @@ console.log(Number.isNaN(b));    // false
 
 ### **JS中的包装类**
 在JS中，三大基本类型String、Number、Boolean没有属性和方法，JS为了方便开发者使用这三个基本类型进行快速开发，实现了包装类，使String、Number、Boolean变为String对象、Number对象、Boolean对象，是他们可以添加属性并使用某些方法。
+
+### **JS中的类型转换机制**
+JS类型转换分为：
+- 强制转换（显示转化）
+- 自动转换（隐式转换）
+
 
 ### **JS进行隐式类型转换**
 1. ToPrimitive()方法：将值转换为基本数据类型。如果<font color="#FF6347">值为基本类型，则直接返回值本生；如果值为对象，则：</font>。
@@ -2406,7 +2600,7 @@ obj2.a = null
 4. **脱离DOM的引用**：<font color="#FF6347">获取了一个DOM元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以无法被回收</font>
 
 ### for in 和 for of 的区别
-- for in会遍历对象的原型连，性能差；for of只遍历当前对象
+- for in会遍历对象的原型链，性能差；for of只遍历当前对象
 - for in获取对象的index；for of获取对象的value
 - for in适合遍历对象，不适合遍历数组；for of可以用来遍历数组、类数组对象，字符串、Set、Map 以及 Generator 对象。
 
@@ -3867,17 +4061,6 @@ console.log(name);   // Bob
 
 </font>
 
-## 类组件与函数式组件
-- 类组件
-
-
-- 函数式组件
-
-
-### state和props的区别
-props是从组件外部传入的，主要用于父组件向子组件传递数据，具有只读性，只能通过外部组件主动传递数据来渲染子组件。state的作用是组件自己用来创建、修改、管理自身状态，他是组件的私有属性，不可通过外部修改，只能在组件内部通过this.setState修改，修改state会导致页面重新渲染。
-
-
 ## JSX
 JSX是JS XML，用来在React中代替js。JSX的<font color="#FF6347">执行速度更快；是类型安全的，在编译过程中就能发现错误；使用JSX编写更加快速</font>。
 下面就是一个简单的JSX语法：
@@ -3888,6 +4071,47 @@ const element = <h1>Hello, world!</h1>
 JSX其实是`React.createElement(component, props, ...children)`的语法糖，所以在组件中没有看到使用react却需要引入react就是因为使用了JSX。
 
 <font color="#FF6347">React使用JSX后会使代码变得更简洁，结构层次更清晰</font>。但在实际运行时，会使用babel插件将JSX语法的代码转化为React.createElement的代码。
+
+## 类组件与函数式组件
+- 类组件
+类组件就是通过类的方式编写的组件，类组件有如下特点：
+- <font color="#FF6347">必须继承`React.Component`</font>
+- <font color="#FF6347">`render`被放在了组件的原型对象上，供实例使用</font>
+- <font color="#FF6347">`render`中的`this`就是组件的实例对象</font>
+
+**执行了ReactDOM.render(<MyComponent/>.......之后，发生了什么？**
+1. `React`解析组件标签，找到`MyComponent`组件
+2. 发现组件是使用类定义的，随后new出来该类的实例，并通过该实例调用原型上的`render`方法
+3. 将`render`返回的`虚拟DOM`转为`真实DOM`，呈现在页面中
+
+- 函数式组件
+通过函数的方式编写的组件，函数式组件更符合React组件化发开的思想，保证了同样的输入会返回同样的输出。
+
+**执行了ReactDOM.render(<MyComponent/>.......之后，发生了什么？**
+1. `React`解析组件标签，找到`MyComponent`组件
+2. 发现组件是使用函数定义的，随后调用该函数，将`render`返回的`虚拟DOM`转为`真实DOM`，呈现在页面中
+
+**区别**
+1. 生命周期方面，类组件有`生命周期函数`；函数组件可以使用`useEffect()`代替生命周期函数
+2. state方面：类组件通过`setState()`进行状态管理；函数组件通过`useState()`进行状态管理
+3. 在性能优化方面，类组件通过`shouldComponentUpdate()`方法进行性能优化；函数式组件通过`useMemo()`方法进行性能优化
+
+### **state和props的区别**
+state和props都是用来给组件提供数据参数的，state由组件内部自己定义，props由外部传入。
+
+在函数式组件中，state通过useState钩子函数创建并通过setXxx()方法修改state的值；在类组件中，state可以在构造函数内部定义，也可以在构造函数外部定义，通过setState()方法修改state的值。在调用setState()方法修改state后react会调用render函数重新渲染页面，更新页面中的数据。
+
+props是由外部组件传入的数据，react具有单向数据流的特性，所以他的主要作用是从父组件向子组件传递数据，props除了可以传一般数据类型，还可以传入对象、数组等引用数据类型，甚至还可以将回调函数传给子组件，子组件可以通过调用回调函数来实现向父组件通信。在子组件中，props是不可变的，如果想改变props，只能通过外部组件的传入进行更改。
+
+**区别：**
+相同点：
+- 两者都是js对象
+- 两者都用于保存数据
+- props和state都可以出发重新渲染
+
+不同点：
+- props是外部传递给组件的，而state在组件内被组件自己管理的
+- props在组件内部是不可修改的，但state在组件内部可以进行修改
 
 ## 虚拟DOM
 ### **什么是DOM**
@@ -4645,7 +4869,7 @@ setState()将对组件state的更新排入队列，并通知React需要使用更
 <font color="	#FF6347">在代码中调用setState后React会将传入的对象与当前组件的状态合并，然后触发调和过程。经过调和过程，React会根据新的状态构建React元素树，然后计算新老元素树节点的差异，根据差异对页面进行渲染。</font>。
 
 根据场景来决定是同步还是异步。
-- 同步：在React无法控制的地方，比如原生事件，例如：addEventListener、setTimeout、setInterval等事件中，就只能同步更新。
+- <font color="	#FF6347">同步：在React无法控制的地方，比如DOM原生事件，例如：addEventListener、setTimeout、setInterval等事件中，就只能同步更新</font>。
 - 异步：在React生命周期和合成事件中，<font color="	#FF6347">React可以把多次setState合并到一起进行更新，提高效率</font>。    
 
 <font color="	#FF6347">setState设计为异步，可以提升性能。如果每次setState都要进行一次更新，那么意味着render函数会被频繁调用，这样效率很低。React采用延迟更新策略，可以把多次setState合并到一起进行更新，提高效率</font>。
@@ -4662,6 +4886,15 @@ setState()将对组件state的更新排入队列，并通知React需要使用更
   value + 1
 </button>
 ```
+
+### setState的第二个参数是什么？
+setState的第二个参数是一个回调函数，在组件重新渲染完后执行，等价于在componentDidUpdate中执行。在这个回调函数中可以拿到更新的后state的值。
+
+### setState和replaceState的区别是什么？
+setState用来设置状态，它接收两个参数，第一个参数是新的状态值，第二个参数是一个可选的回调函数，在状态改变后执行，可以获取到状态改变后的值。
+React会将多次的setState合并为一次执行，提高性能，减少页面渲染次数。<font color="	#FF6347">setState只是覆盖原来的状态，不会减少原来的状态</font>。
+
+<font color="	#FF6347">replaceState只会保留nextState中的值，原来的state将被删除，相当于赋值</font>。
 
 ### getDefaultProps和defaultProps
 getDefaultProps和defaultProps用于指定属性的默认值。
@@ -4680,15 +4913,6 @@ static defaultProps = {
   name: "lsw"
 }
 ```
-
-### setState的第二个参数是什么？
-setState的第二个参数是一个回调函数，在组件重新渲染完后执行，等价于在componentDidUpdate中执行。在这个回调函数中可以拿到更新的后state的值。
-
-### setState和replaceState的区别是什么？
-setState用来设置状态，它接收两个参数，第一个参数是新的状态值，第二个参数是一个可选的回调函数，在状态改变后执行，可以获取到状态改变后的值。
-React会将多次的setState合并为一次执行，提高性能，减少页面渲染次数。<font color="	#FF6347">setState只是覆盖原来的状态，不会减少原来的状态</font>。
-
-<font color="	#FF6347">replaceState只会保留nextState中的值，原来的state将被删除，相当于赋值</font>。
 
 ### 校验propTypes
 propTypes用来对传入的props数据进行验证，若props与propTypes定义的数据类型不符，控制台会报警告。可以避免随着程序越来越复杂出现的问题，还可以让程序变得更加易读。
@@ -5204,16 +5428,32 @@ const takeLatest = (pattern, saga, ...args) => fork(function*() {
 3. 监听Store tree变化：connect缓存了store tree中state的状态，通过当前state状态 和变更前 state 状态进行比较，从而确定是否调用 this.setState()方法触发Connect及其子组件的重新渲染。
 
 ## React事件机制
-## 合成事件
+React基于浏览器机制实现了一套事件机制，包括：`事件注册`、`事件合成`、`事件冒泡`、`事件派发`等。
+
+### **合成事件**
 合成事件是react模拟DOM原生事件的一个事件对象，其优点如下：
 1. 兼容所有浏览器，兼容性好
 2. 将事件统一放到一个数组，避免频繁的新增删除（垃圾回收）
-3. 方便react统一管理和事务机制
+3. 方便react统一管理和进行事件处理
+
+```js
+// 原生事件 事件处理函数写法
+<button onclick="handleClick()">按钮命名</button>
+      
+// React 合成事件 事件处理函数写法
+const button = <button onClick={handleClick}>按钮命名</button>
+```
+
+虽然看似合成事件被绑定到DOM上，React并不会把合成事件直接绑定到真实节点上，而是把所有的事件挂载到document上，使用一个统一的事件监听器去监听。
 
 ### **事件代理**
 React未将事件处理函数与对应的DOM节点直接关联，而是在顶层使用了一个<font color="	#FF6347">全局事件监听器</font>监听所有的事件。
 
 <font color="	#FF6347">React会在内部维护一个映射表记录事件与组件事件处理函数的对应关系</font>。当某个事件触发时，React根据映射表将事件分派给指定的事件处理函数。当一个组件挂载与卸载时，相应的事件处理函数会自动被添加到事件监听器的内部映射表中或从表中删除。
+
+<font color="	#FF6347">这个事件监听器维持了一个映射来保存所以组件内部的事件监听和处理函数。当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象</font>。
+
+<font color="	#FF6347">当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。这样做简化了事件处理和回收机制，效率也提升很大</font>。
 
 ### **合成事件**
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。<font color="	#FF6347">这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上</font>。当事件发生并冒泡到document时，React将事件内容封装并交由真正的处理函数运行，这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组件挂载销毁时统一订阅和移除事件</font>。  
@@ -5225,13 +5465,89 @@ React中的onClick、onChange等事件是**合成事件**，并不是浏览器�
  - 合成事件是一个跨浏览器的原生事件包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。
  - 对于原生浏览器事件来说，浏览器会给监听器创建一个事件对象，如果你有很多的事件监听，那么就需要分配很多的事件对象，造成高额的内存分配问题，但<font color="	#FF6347">对于合成事件来说，有一个事件池专门来管理它们的创建和销毁，当事件需要被使用时，就会从池子中复用对象，事件回调结束后，就会销毁事件对象上的属性，从而便于下次复用事件对象</font>。
 
-## React的事件和普通的HTML事件有什么不同？
+### **React的事件和普通的HTML事件有什么不同？**
 1. 事件的命名方式不同，原生事件为全小写，react事件为小驼峰
 2. 事件函数处理语法不同，原生事件为字符串，react事件为函数
 3. <font color="	#FF6347">react事件不能采用return false的方式来阻止浏览器的默认行为，而必须明确调用preventDefault()来阻止默认行为</font>
 
-## react事件执行顺序
+### **react事件执行顺序**
 事件的执行顺序为<font color="#FF6347">原生事件先执行，合成事件再执行</font>。合成事件会冒泡到document上，所以**尽量避免原生事件和合成事件混用**。<font color="	#FF6347">如果原生事件阻止冒泡，那么就会导致合成事件不执行</font>。
+
+### **事件绑定的方式**
+- 在render中使用bind()绑定
+- 在render中使用箭头函数
+- 在类组件的构造函数中使用bind()绑定
+- 在定义事件函数时使用箭头函数绑定
+
+**render方法中使用bind**
+```js
+class App extends React.Component {
+  handleClick() {
+    console.log('this > ', this);
+  }
+  render() {
+    return (
+      <div onClick={this.handleClick.bind(this)}>test</div>
+    )
+  }
+}
+```
+<font color="	#FF6347">这种方式在组件每次render的时候都会重新进行bind()操作，影响性能</font>
+
+**render方法中使用箭头函数**
+```js
+class App extends React.Component {
+  handleClick() {
+    console.log('this > ', this);
+  }
+  render() {
+    return (
+      <div onClick={e => this.handleClick(e)}>test</div>
+    )
+  }
+}
+```
+<font color="	#FF6347">同样在每次render时都要生成新的方法，影响性能</font>。
+
+**constructor中bind**
+```js
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick() {
+    console.log('this > ', this);
+  }
+  render() {
+    return (
+      <div onClick={this.handleClick}>test</div>
+    )
+  }
+}
+```
+<font color="	#FF6347">在constructor中预先bind当前组件，可以避免在render操作中重复绑定</font>。
+
+**定义阶段使用箭头函数绑定**
+```js
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  handleClick = () => {
+    console.log('this > ', this);
+  }
+  render() {
+    return (
+      <div onClick={this.handleClick}>test</div>
+    )
+  }
+}
+```
+<font color="	#FF6347">可以避免在render操作中重复绑定</font>。
+
+**区别**
+一、二的方式性能较差，三的写法过于冗余，因此<font color="	#FF6347">四是最优的事件绑定方式</font>。
 
 ## React 高阶组件
 **高阶组件**：高阶组件（HOC）就是一个函数，且该函数接受一个函数组件作为参数，并返回一个新的组件。
