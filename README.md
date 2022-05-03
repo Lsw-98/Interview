@@ -203,19 +203,18 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 # CSS篇
 
 ## 盒子模型
-盒子模型分为标准盒子模型和IE盒子模型，
+盒模型规定了网页元素如何显示以及元素之间的相互关系。盒子模型分为标准盒子模型和IE盒子模型，
  - 标准盒子模型包括4个部分：
      margin、border、padding、content
  - IE盒子模型包括2个部分：
      margin、content(padding、border、content)
 
-盒模型主要由padding、border和content组成，不包括margin，<font color="	#FF6347">margin是边框外的边距，可以理解为盒子与其他元素的边距</font>。
 
-### *如何转化盒子模型
+### **如何转化盒子模型**
     标准盒子模型：box-sizing: content-box  
     IE盒子模型： box-sizing:border-box  
 
-### *两者的区别
+### **两者的区别**
  - 标准盒子模型的宽度为border * 2 + padding * 2 + content(width)
  - IE盒子模型为border * 2 + padding * 2 > width ? border + padding : width
 
@@ -463,6 +462,12 @@ display:-webkit-box;         // 作为弹性伸缩盒子模型显示。
 -webkit-box-orient:vertical; // 设置伸缩盒子的子元素排列方式：从上到下垂直排列
 -webkit-line-clamp:3;        // 显示的行数
 ```
+
+### **css的弊端**
+1. CSS是一门非程序化语言，没有变量、函数、作用于等概念
+2. 不方便维护，不利于复用
+3. 冗余度高
+4. CSS没有很好的计算能力
 
 ### **Sass、Less**
 Sass、Less都是CSS预处理器，他们是一种特殊的语法编译成的CSS。
@@ -839,7 +844,15 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
     2. <font color="#FF6347">高度塌陷</font>
 
 ### **响应式布局**
-响应式布局就是一个网站同时能兼容多个终端。    
+响应式布局就是一个网站同时能兼容多个终端。通过对不同宽度进行布局和样式的设置，从而适配不同设备的目的。
+
+|  设备划分   | 尺寸区间  |
+|  ----  | ----  |
+| 超小屏幕（手机）  | <768px |
+| 小屏设备（平板）  | >=768 and <992px |
+| 中等屏幕（桌面显示器）  | >=992px and <1200px |
+| 宽屏设备（大桌面显示器）  | >=1200px |
+
 优点：
 1. 面对不同分辨率设备灵活性强
 2. 能够快捷解决多设备显示适应问题
@@ -861,6 +874,28 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
 3. 响应式布局：常见的响应式布局为两栏布局、三栏布局
 
 使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
+
+### **媒体查询**
+媒体查询可以针对不同的屏幕尺寸设置不同的样式，当浏览器大小发生变化时，页面也会根据浏览器的宽高重新渲染页面。
+
+语法规范：
+```css
+@media mediatype and|not|only (media feature){
+  css-Code
+}
+```
+- 用@media开头
+- mediatype媒体类型
+- 关键字：and、not、only
+- media feature媒体特性
+
+**mediatype**      
+媒体类型主要分为：all（用于所有设备）、print（打印设备）、screen（电脑屏幕、平板、手机等）
+
+**媒体特性**
+- width：定义输出设备中页面可见区域的宽度
+- min-width：定义输出设备中页面最小可见区域宽度
+- max-width：定义输出设备中页面最大可见区域宽度
 
 ### **Grid布局**
 Grid布局将网页划分为一个个网格，可以任意组合不同的网格，做出各种各样的布局。<font color="#FF6347">使用display: grid指定网格布局</font>。默认情况下，容器元素都为块级元素，也可以设置为行内元素。<font color="#FF6347">使用display: inline-grid指定行内网格布局</font>。
@@ -1987,6 +2022,16 @@ teacher.hanOwnProperty('name')
 
 ### 原型链的终点是什么？怎么打印出原型链的终点
 <font color="#FF6347">原型链的终点是Object.prototype.\_\_proto\_\_ === null</font>。因为原型链上所有的原型都是对象，所有对象都是由Oject构造的。
+<font color="#FF6347">通过原型来实现</font>。
+
+
+### **JS如何实现多重继承**
+1. 首先创建一个空的父类构造函数，通过prototype属性为该父类定义属性和方法；
+2. 然后创建一个空的子类构造函数，将子类的原型绑定在父类的实例上，再将子类原型的父类也绑定在父类的实例上，然后通过prototype属性定义子类的属性和方法；
+3. 然后创建一个空的孙类构造函数，将孙类的原型绑定在子类的实例上，再将孙类原型的子类也绑定在子类的实例上，然后通过prototype属性定义孙类的属性和方法；
+4. 这样，实例化孙类后，孙类可以调用自己的属性和方法，以及子类与父类的属性和方法，从而实现多继承。
+
+
 
 ## 函数柯里化
 函数柯里化是是把<font color="#FF6347">接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术</font>。
@@ -2360,6 +2405,7 @@ all()方法可以完成并行任务，它接收一个数组，数组的每一项
 **race()**
 race()方法和all()方法一样，区别是race()会返回最先执行完的promise对象。
 <font color="#FF6347">race()方法可以用来解决某一件事超过多久就不做了</font>。例如：  
+
 ```js
 Promise.race(promise1, timeOutPromise(5000)).then(res=>{})
 ```    
@@ -2645,6 +2691,18 @@ const res2 = arr2.slice(1)   // [2, 3, 4, 5, 6, 7, 8]
 
 
 ## Webpack
+### **对webpack的理解**
+webpack是一个用于现代JS应用程序的静态模块打包工具。webpack的目的是实现前端项目的模块化，皆在更高效的管理和维护项目中的每一个资源。
+
+- 模块化
+webpack解决了
+
+- 静态模块
+
+
+### **webpack解决了什么问题**
+
+
 ### **Webpack和grunt、gulp的区别**
 Grunt和Gulp是<font color="#FF6347">基于任务运行的工具
 </font>：他们会自动执行指定的任务，就像流水线，把资源放上去然后通过不同的插件进行加工。
@@ -3509,7 +3567,7 @@ Chrome浏览器包括：浏览器主进程、GOU进程、网络进程、多个�
 
 强缓存可以通过两种方式来设置：分别是htpp头信息中的Expires属性和Cache-Control属性。
 1. <font color="	#FF6347">服务器通过在响应头中添加 Expires 属性，来指定资源的过期时间</font>。在过期时间以内，该资源可以被缓存使用，不必再向服务器发送请求。这个时间是一个绝对时间，它是服务器时间。使用服务器时间有这个坏处：<font color="	#FF6347">客户端与服务器的时间可能会不一样并且用户可以对客户端时间进行修改，影响缓存命中的结果</font>。
-2. Cache-Control是HTTP1.1中提出的，提供了对资源更精确的控制。一般使用max-age设置缓存最大的有效期。
+2. Cache-Control是HTTP1.1中提出的，提供了对资源更精确的控制。一般使用max-age设置缓存最大的有效期；no-store设置不进行缓存，每次请求都向服务器发起请求；no-cache设置请求前先向服务器确认返回的资源是否发生变化，如果未发生变化，则直接使用本地缓存。
 
 Cache-Control的优先级比Expires高。
 
@@ -3778,7 +3836,19 @@ EventLoop的执行顺序如下：
 - 微任务：promise、
 - 宏任务：setTimeout、setInterval、I/O 操作、UI 渲染
 
+# Node.js
+### **对Node.js的理解**
+Node.js就是一个js运行时环境，让js运行在服务器端，利用事件驱动，非阻塞和异步输入输出模型等技术提高性能。
+
+- 非阻塞异步：Nodejs采用了非阻塞型I/O机制，在做I/O操作时不会造成任何阻塞，当完成之后，以时间的形式通知执行操作。例如在执行了访问数据库的代码之后，将立即转而知行其后面的代码，把数据库返回结果的处理代码放在回调函数中，从而提高了程序的执行效率。
+- 事件驱动：
+
+![image](https://user-images.githubusercontent.com/70066311/166232968-b5f10e7d-93c0-4595-ad8a-cee0041e7b1e.png)
+
+
 # 前端性能优化
+## CDN
+
 ## 懒加载
 ### *基本概念
 在长网页中，若每次都将所有图片都加载出来，而用户每次只能看到部分图片，这样浪费了性能，如果使用图片的懒加载就可以解决以上问题。使用懒加载使得可视化界面之外的图片不会被加载，只显示当前区域的图片，这样使得<font color="	#FF6347">网页加载速度更快，减少了服务器的负载</font>。
@@ -5038,7 +5108,7 @@ export default App;
 
 ## 路由
 ### **路由基本功能**
-1. <font color="	#FF6347">保证视图和url的同步</font>。
+1. <font color="	#FF6347">保证视图和url的同步</font>。路由描述了URL和UI之间的映射关系，这种映射是单向的，即URL变化引起UI的变化而不许刷新页面。
 
 ### **history**
 history可以用来兼容在不同浏览器、不同环境下对历史记录的管理。  
@@ -5050,14 +5120,14 @@ history分为三类，分别是browserHistory、hashHistory和menoryHistory。<f
 **hashHistory**通过区分history对象中的location属性中包含的hash字段来渲染不同的组件。
 
 ### **React-Router的实现原理**
-React-Router是建立在history之上的，<font color="	#FF6347">history会监听浏览器地址栏的变化，并解析url转化为location对象，然后router匹配到对应的路由，最后渲染对应的组件</font>。
+React-Router是建立在history之上的，<font color="	#FF6347">history会监听浏览器地址栏的变化，并解析url转化为location对象，然后router匹配到对应的路由，最后渲染对应的组件</font>。总结：<font color="	#FF6347">hash值改变，会触发全局window对象上的hashchange事件。React-Router就是通过hashchange事件监听URL的变化，从而进行DOM操作来模拟页面跳转的</font>。
 
 Router负责<font color="	#FF6347">根据当前的url来渲染相应的组件</font>。
 Route<font color="	#FF6347">根据当前的url与自身的path属性进行匹配，匹配成功就渲染对应的组件</font>。
 
-### 何如配置React-Router实现路由切换
+### 如何配置React-Router实现路由切换
 - 使用\<Route>组件  
-<font color="	#FF6347">路由匹配是通过比较<Route>的path属性与当前的pathname来实现的</font>。可以给\<Route>组件加上 **exact** 属性来实现路由精准匹配。
+<font color="	#FF6347">路由匹配是通过比较<Route>的path属性与当前URL中的pathname来实现的</font>。可以给\<Route>组件加上 **exact** 属性来实现路由精准匹配。
 
 ```js
 <Route path="/home" component={Home} />
@@ -5094,6 +5164,67 @@ Route<font color="	#FF6347">根据当前的url与自身的path属性进行匹配
 \<Route>使用，\<Link>的跳转行为只触发了相匹配的\<Route>对应的页面内容更新，而不会刷新整个页面。
 
 <font color="	#FF6347">我个人的理解</font>：因为React是一个单页面应用，在每次进行路由切换时都是在一个HTML文件中发生的，这个HTML文件在页面首次加载时就已经下载下来了，使用\<Link>在路由切换时不会重新去请求一个HTML文件；而\<a>在每次跳转时都会加载对应页面的HTML文件，在某些网速慢得情况下会出现空白页，导致用户体验不好。\<Link>在通过阻止\<a>标签的默认事件，然后根据href（即\<Link>的to属性）进行页面跳转。
+
+### **路由传参**
+路由传参主要有几种形式：
+1. params：
+    - 刷新页面后参数不消失
+    - 参数会在地址栏显示
+    - 需要在Route中配置参数名称
+    - 只能传递字符串
+    - 不适用参数传递太多的情况，因为不同的浏览器对URL的长度限制不同
+
+    **传递方法：**
+    1. 首先在\<Route>中声明传递参数的个数
+    ```js
+    <Route path='/Inbox/:id' component={Inbox} />
+    ```
+    2. 然后在\<Link>中进行参数传递
+    ```js
+    <NavLink to={'/Inbox/01008'} >铅笔</NavLink>
+    ```
+    3. 取值
+    ```js
+    this.props.match.params
+    ```
+2. query：
+    - 刷新页面后参数消失
+    - 不会在URL中显示
+
+    **传递方法：**
+    1. 直接在\<Link>中通过query属性进行传参，query属性接收一个对象
+    ```js
+    <Link to={{pathname:'/Inbox',query:{id:'01009'}}} >铅笔</Link>
+    ```
+    2. 取值
+    ```js
+    this.props.location.query
+    ```
+3. state：
+    - 刷新页面后参数不会消失
+    - 参数不会在URL中显示
+    
+    **传递方法：**
+    1. 直接在\<Link>中通过state属性进行传参，state属性接收一个对象
+    ```js
+    <Link to={{pathname:'/Inbox',state:{id:'01009'}}} >铅笔</Link>
+    ```
+    2. 取值
+    ```js
+    this.props.location.state
+    ```
+4. search：
+    - 取参得到的是字符串，如果需要其他类型的还需要进行进一步解析
+
+    **传递方法：**
+    1. 直接在\<Link>中通过to属性进行传参
+    ```js
+    <Link to='/Inbox?a=1&b=2' >铅笔</Link>  
+    ```
+    2. 取值
+    ```js
+    this.props.location.search
+    ```
 
 ### **Router如何获取URL的参数和历史对象**
 获取URL参数：
@@ -5257,6 +5388,11 @@ const value = useContext(TestContext);
 ### useMemo和useCallback的区别
 useCallback和useMemo都是优化性能的手段，类似于类组件中的<font color="	#FF6347">shouldComponentUpdate</font>，useCallback和useMemo都会判断props和state是否变化，从而避免每次父组件render时都去渲染子组件。     
 区别在于<font color="	#FF6347">useCallback返回一个函数，当这个函数被当作组件使用时，可以避免每次更新都重新渲染该组件；useMemo返回一个值，避免每次渲染都要对值进行不必要的计算</font>。
+
+### Memo、useMemo和useCallback的区别
+三者都是进行性能优化的：
+Memo针对的是一个组件是否重新渲染；而useMemo针对的是一段代码逻辑是否重新执行。
+而useCallback主要用来缓存函数，主要和state配合使用，如果useCallback中传入的state没有发生变化，就不会执行回调函数中缓存的函数，一次来提升性能。
 
 ### useEffect和useLayoutEffect的区别
 <font color="	#FF6347">useEffect是异步执行的，useLayoutEffect是同步执行的；useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前，和componentDidMount等价</font>。若在useEffect的回调函数中需要对DOM进行样式修改，可以使用useLayoutEffect，避免页面闪烁。<font color="	#FF6347">useLayoutEffect总是比useEffect先执行</font>。

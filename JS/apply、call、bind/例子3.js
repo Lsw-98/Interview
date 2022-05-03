@@ -14,4 +14,4 @@ const db = {
 
 obj.func.call(db)
 obj.func.apply(db)
-obj.func.bind(db)()
+obj.func.bind(db)
