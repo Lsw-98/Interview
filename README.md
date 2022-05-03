@@ -1259,6 +1259,28 @@ console.log((function() {}).constructor === Function); // true
 console.log(({}).constructor === Object); // true
 ```
 
+4. Object.prototype.toString.call()
+使用Object的原型方法`toString`来判断数据类型
+
+```js
+var a = Object.prototype.toString;
+ 
+console.log(a.call(2));
+console.log(a.call(true));
+console.log(a.call('str'));
+console.log(a.call([]));
+console.log(a.call(function(){}));
+console.log(a.call({}));
+console.log(a.call(undefined));
+console.log(a.call(null));
+```
+
+### **四种判断类型的区别**
+1. typeof方法存在判断类型不准确的情况，例如数组、对象、null都会被判断为object
+2. instanceof只能判断引用数据类型，不能判断基本数据类型
+3. 如果改变了一个对象的原型，那么constructor方法就不能用来判断数据类型了
+4. Object.prototype.toString可以准确的比较数据类型
+
 ### **<font color="#FF6347">数组的常用方法</font>**
 **增**     
 - push，会对数组产生影响
@@ -1553,7 +1575,7 @@ false + true // 1
 'a' < 'b' // true
 ```
 
-### **Object.assign和扩展运算符时深拷贝还是浅拷贝**
+### **Object.assign和扩展运算符是深拷贝还是浅拷贝**
 扩展运算符是浅拷贝：
 ```js
 let obj1 = {
@@ -2692,15 +2714,16 @@ const res2 = arr2.slice(1)   // [2, 3, 4, 5, 6, 7, 8]
 
 ## Webpack
 ### **对webpack的理解**
-webpack是一个用于现代JS应用程序的静态模块打包工具。webpack的目的是实现前端项目的模块化，皆在更高效的管理和维护项目中的每一个资源。
+webpack是一个用于现代JS应用程序的静态模块打包工具。webpack的目的是实现前端项目的模块化，皆在更高效的管理和维护项目中的每一个资源。<font color="#FF6347">webpack可以很好的管理、打包开发中使用的HTML、CSS、JS和静态文件（图片、字体）等，让开发更高效
+</font>。
 
-- 模块化
-webpack解决了
+### **webpack解决了什么问题（基本功能）**
+- 代码转化：可以把ts转化为js；less、scss转换为css
+- 文件优化：压缩HTML、CSS、JS文件，压缩图片等
+- 代码分割：提取首屏不需要执行的代码，让其异步执行，实现按需加载
+- 代码校验：会检查代码是否合规，检测单元测试是否通过
 
-- 静态模块
-
-
-### **webpack解决了什么问题**
+### **webpack的构建**
 
 
 ### **Webpack和grunt、gulp的区别**
@@ -2710,8 +2733,11 @@ Grunt和Gulp是<font color="#FF6347">基于任务运行的工具
 Webpack是<font color="#FF6347">基于模块化打包的工具</font>：自动化处理模块，webpack把一切都当作模块，当webpack处理应用程序时，他会递归地构建一个依赖关系图，其中包含应用程序需要的每个模块，然后将这些模块打包成一个或多个bundle。
 
 ### **loader**
-webpack只能理解JS和JSON文件，其他类型的文件都需要经过loader处理。<font color="#FF6347">loader可以做语言翻译（将TS转化为JS）、格式转换（将内联图像转换为data URL）、样式编译（允许直接在JS模块中import
+在遇到import或require加载模块时，webpack只能支持对js和json文件的打包，其他类型的文件都需要经过loader处理。<font color="#FF6347">loader可以做语言翻译（将TS转化为JS）、格式转换（将内联图像转换为data URL）、样式编译（允许直接在JS模块中import
 CSS文件）</font>。
+
+### **plugin**
+plugin的作用比loader更大，webpack在生命周期内会广播出许多事情，plugin可以监听这些事情，在合适的时机处理事务，例如打包优化和压缩、重新定义环境中的变量、按需加载等。
 
 ### **有哪些常见的loader**
 - file-loader：把文件输出到每一个文件夹中，在代码中通过相对URL去引用输出的文件
@@ -2722,6 +2748,9 @@ CSS文件）</font>。
 - css-loader：加载CSS，支持模块化、压缩、文件导入等特性
 - style-loader：把CSS代码注入到JS中，通过DOM操作去加载CSS
 - eslint-loader：通过ESlint检查JS代码
+
+通常css-loader配合style-loader使用，因为<font color="#FF6347">css-loader只是用来解析css，而不会将解析后的css文件插入到DOM中，这时要用style-loader将css挂载到\<head>中</font>
+
 
 ### **常见的plugin**
 - define-plugin：定义环境变量
