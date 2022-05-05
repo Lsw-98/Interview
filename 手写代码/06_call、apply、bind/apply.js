@@ -9,7 +9,7 @@
  * 7. 返回结果 
  */
 
-
+ 
 Function.prototype.myApply = function (context) {
   if (typeof this !== "function") {
     console.log("type error");
