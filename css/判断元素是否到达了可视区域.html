@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div {
+      height: 1500px;
+      width: 1000px;
+      background-color: orange;
+    }
+  </style>
+</head>
+
+<body>
+  <div>123</div>
+  <p id="hei">我到了吗？</p>
+
+  <script>
+    function isInViewPortOfOne(el) {
+      // const viewPortHeight = window.innerHeight
+      // const offsetTop = el.offsetTop
+      // const scrollTop = document.documentElement.scrollTop
+      // const top = viewPortHeight + scrollTop
+      // return offsetTop <= top
+
+      const viewPortHeight = window.innerHeight
+      const offsetTop = el.offsetTop
+      const scrollTop = document.documentElement.scrollTop
+      const top = offsetTop - scrollTop
+      return top <= viewPortHeight
+    }
+
+    const pDemo = document.getElementById("hei")
+
+    setInterval(() => {
+      console.log(isInViewPortOfOne(pDemo));
+    }, 2000);
+  </script>
+</body>
+
+</html>

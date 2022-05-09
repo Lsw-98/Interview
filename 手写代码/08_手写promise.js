@@ -28,10 +28,10 @@ Promise.all = function (promises) {
         count += 1
         arr[i] = res
         if (count === promises.length) {
-          resolve(res)
+          resolve(arr)
         }
       }).catch(err => {
-        this.reject(err)
+        reject(err)
       })
     }
   })
