@@ -2896,6 +2896,99 @@ UDP是不可靠的传输协议，不会管传输顺序，不管丢包，所以�
 HTTP 3.0基于UDP协议实现了类似于TCP的多路复用数据流、传输可靠性等功能。
 HTTP 3.0在UDP的基础上增加了一层用来保障数据传输的可靠性，提供了数据包重传、拥塞控制等特性。
 
+## 如何使用UDP实现可靠传输
+### **TCP协议的缺陷**
+- 升级TCP的工作很困难
+- TCP建立连接的延迟
+- TCP存在队头阻塞问题
+- 网络迁移需要重新建立TCP连接
+
+#### 1. 升级TCP工作困难
+TCP协议是现在内核中实现的，应用程序只能使用不能修改，如果想升级TCP协议，那么只能升级内核，但是升级内核涉及到计算机底层，比较复杂，并且升级后还要进行大量测试，所以内核的升级都十分保守和缓慢。
+
+#### 2. TCP建立连接的延迟
+TCP需要建立三次握手有才能进行数据传输，而如果使用了HTTPS协议还要经历TSL四次握手后才能进行TCP传输，这样就增加了传输的延迟。
+
+#### 3. TCP存在队头阻塞问题
+HTTP 2.0多个请求实在一个TCP连接中的，当发生丢包时，整个TCP都要等待重传，那么就会阻塞该TCP连接中的所有请求。
+
+#### 4. 网络迁移需要重新建立TCP连接
+TCP连接是通过（源IP、源端口、目标IP、目标端口）的一个四元组确定的。如果从4G网络切换到Wifi，那么IP地址就发生了变化，就意味着必须要重新建立连接。
+
+
+### UDP基于**QUIC协议**进行可靠传输
+![image](https://user-images.githubusercontent.com/70066311/167784542-46c90495-5baf-425b-a2ca-e27e6eb8bc35.png)
+
+#### QUIC是如何实现可靠传输的？
+在HTTP 3.0中，在UDP报文头部与HTTP消息之间，共有3层头部：
+![image](https://user-images.githubusercontent.com/70066311/167785000-3fee4127-5f9b-4e00-a2b8-893ec28482b0.png)
+
+整体看的视角是这样的：
+![image](https://user-images.githubusercontent.com/70066311/167785056-9b1aa542-2d8c-441e-a7f7-44e01b6dba9e.png)
+
+**Packet Header**：Packet Header在首次建立连接和日常传输数据时使用的Header是不同的。
+
+![image](https://user-images.githubusercontent.com/70066311/167785727-94f4165e-f277-4dee-91da-fbecdc2f80e6.png)
+
+- Long Packet Header 用于首次建立连接。
+- Short Packet Header 用于日常传输数据。
+
+QUIC也需要进行三次握手建立连接，目的是<font color="#FF6347">确定链接ID</font>。
+
+建立连接时，连接ID是由服务器根据客户端的 Source Connection ID 字段生成的，这样后续传输时，双方只需要固定住Destination Connection ID（连接 ID ）即可，从而实现连接迁移功能。所以可以看到日常传输数据的 Short Packet Header 不需要再传输 Source Connection ID 字段了。
+
+<font color="#FF6347">Short Packet Header 中的 Packet Number 是每个报文独一无二的编号，它是严格递增的，也就是说就算Packet N丢失了，重传是已经不是Packet N了，还是Packet N + M</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/167787163-375dd7c7-bdb0-4379-94c9-ab0bf7653036.png)
+
+对比TCP，<font color="#FF6347">TCP在重传的序号和丢包的序号是一样的，所以服务器返回的ACK也是一样的，这样的话客户端就无法判断出到底是哪一个报文的响应</font>。在计算RTT（往返时间）时应该选择从发送原始报文开始计算，还是重传原始报文开始计算？
+
+- 如果算成原始报文的响应，但实际上是重传报文的响应（上图右），会导致采样 RTT 变大；
+- 如果算成重传报文的响应，但实际上是原始报文的响应（上图左），又很容易导致采样 RTT 过小；
+
+RTT计算不准确的话，那么RTO（超时时间）也就不精确，因为RTO是基于RTT来计算的，RTO计算不准确可能导致重传的概率事件增大。
+
+<font color="#FF6347">在QUIC中，Packet Number是严格递增的，即使是重传报文，它的Packet Number也和原始报文不同，这样就能更加精确地计算出报文的RTT</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/167788451-12ccd95d-4d11-471e-b37d-f59a10d4a4e5.png)
+
+QUIC使用的Packet Number单调递增的设计，可以让数据包不再像TCP那样必须有序确认，QUIC支持乱序确认，当报文丢后，只要新的已接收的报文确认，当前窗口就会继续移动。
+
+<font color="#FF6347">待发送端超过一定时间没有收到Packet N的确认报文后，会将需要重传的数据包放到待发送的队列中，重新编号比如数据包Packet N + M后重新发送给接收端，对重传数据包的处理跟发送新的数据包类似，这样就不会因为丢包重传将当前窗口阻塞在原地，从而**解决了队头阻塞的问题**</font>。
+
+<font color="#FF6347">packet Number单调递增有两个好处：</font>
+
+- 可以更加精确的计算RTT，没有TCP重传的歧义
+- 可以支持乱序确认，防止因为丢包重传将当前窗口阻塞在原地，而TCP必须是顺序确认的，丢包时会导致窗口不滑动。
+
+**QUIC Frame Header：**一个Packet报文中可以放多个 QUIC Frame
+
+![image](https://user-images.githubusercontent.com/70066311/167790381-23421ebe-196f-412e-b9ba-a489c9200ba1.png)
+
+Packet Number 是严格递增，即使重传报文的 Packet Number 也是递增的，既然重传数据包的 Packet N+M 与丢失数据包的 Packet N 编号并不一致，我们怎么确定这两个数据包的内容一样呢？
+
+<font color="#FF6347">通过Stream类型的 Frame，来确认两个保温是否一致</font>。（还有很多其它类型的Frame）
+
+![image](https://user-images.githubusercontent.com/70066311/167791962-d52c6d71-b141-4cba-ad1d-618703cd7aea.png)
+
+- Stream ID：多个并发传输的HTTP消息，通过不同的Stream ID加以区别
+- Offset：类似于TCP中的Seq，保证数据传输的有序性和可靠性
+- Length：指明了Frame数据的长度
+
+<font color="#FF6347">通过Stream ID + Offset字段信息实现数据的有序性，通过比较两个数据包的Stream ID和Stream Offset，如果都一致，就说明这两个数据包的内容一致</font>。
+
+<font color="#FF6347">QUIC通过Packet Number配合Stream ID和Offset字段信息，可以乱序确认而不影响数据包的正确组装</font>。
+
+
+#### QUIC如何解决TCP队头阻塞问题的
+QUIC 也借鉴 HTTP/2 里的 Stream 的概念，在一条 QUIC 连接上可以并发发送多个 HTTP 请求 (Stream)。
+
+但是 QUIC 给每一个 Stream 都分配了一个独立的滑动窗口，这样使得一个连接上的多个 Stream 之间没有依赖关系，都是相互独立的，各自控制的滑动窗口。
+
+假如 Stream2 丢了一个 UDP 包，也只会影响 Stream2 的处理，不会影响其他 Stream，与 HTTP/2 不同，HTTP/2 只要某个流中的数据包丢失了，其他流也会因此受影响。
+
+![image](https://user-images.githubusercontent.com/70066311/167795213-7c3cc780-c38d-46aa-847e-65e7528eaf8b.png)
+
 ## HTTP的性能
 ### **长连接**
 HTTP有两种连接方式，一种是持久连接，另一种是非持久连接。
