@@ -1,0 +1,16 @@
+span {
+  list-style: none;
+  border: 2px solid #ddd;
+  float: left;
+  padding: 5px;
+  margin: 2px;
+  background-color: #ddd;
+}
+
+span:hover {
+  background-color: rgb(244, 165, 82);
+}
+
+/* div {
+  overflow: hidden;
+} */
