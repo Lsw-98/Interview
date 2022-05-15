@@ -1,0 +1,52 @@
+/* reset */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* list style */
+section {
+  width: 700px;
+  margin: 50px auto;
+}
+
+.list-view {
+  background: #fff;
+  color: #555;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+
+  li {
+    border-bottom: 1px solid #eee;
+    padding: 10px 20px;
+
+    &:last-child {
+      border-width: 0;
+    }
+  }
+}
+
+.input-box {
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  &:hover {
+    border-color: #bbb;
+  }
+
+  input {
+    outline: none;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    font-size: 16px;
+
+    &::placeholder {
+      color: #ddd;
+    }
+  }
+}

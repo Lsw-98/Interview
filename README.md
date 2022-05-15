@@ -2186,6 +2186,12 @@ console.log(nameList1.map(name_mid))
 console.log(nameList2.map(name_adc))
 ```
 
+## 内存溢出的场景
+- 闭包
+- 意外的全局变量
+- 被遗忘的计时器或回调函数：设置了setInterval，忘记取消。如果循环中有对外部变量的引用的话，会被一直留在内存中，而无法被回收
+- 脱离DOM的引用：获取一个 DOM 元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以它也无法被回收。
+
  
 ## 执行上下文/作用域链/闭包
 ### **1. 对闭包的理解**
@@ -2876,6 +2882,35 @@ HTTP（超文本传输协议）是客户端与服务器之间交换报文的方�
 3. 没有进行身份认证。
 4. 无法验证报文的完整性。
 
+## **HTTP常见的字段**
+- Host：客户端发送请求时，用来指定服务器的域名。<font color="#FF6347">有了Host字段，就可以将请求发往对应的网站</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/168030943-d6fe8874-dc5c-49d6-813b-ddcf2e520b53.png)
+
+
+- Content-Length：服务器返回数据时，表明返回数据的长度。
+```
+Content-Length
+```
+
+- Connection：最常用于客户端要求服务器使用TCP连接。
+```
+Connection: keep-alive
+```
+
+- Content-Type：用于服务器回应时，告诉客户端，本次数据是什么格式。
+```
+Content-Type: text/html; charset=utf-8
+```
+上面的类型表明，发送的是网页，而且编码是UTF-8。
+
+- Accept：客户端请求时，使用Accept字段声明自己可以接受哪些数据格式
+```
+Accept: */*
+```
+上面代码中，客户端声明自己可以接受任何格式的数据。
+ 
+
 ##  <font color="#FF6347">HTTP 1.0 和 HTTP 1.1之间的区别</font>
 - 连接方面：HTTP 1.0使用非持久连接；HTTP 1.1使用持久连接。持久连接可使多个HTTP请求复用同一个TCP连接，以此来避免使用非持久连接时每次需要建立连接的时延。
 - 资源请求方面：HTTP 1.0存在浪费带宽的现象，当只想请求数据的某个部分时，HTTP 1.0会将整个数据返回；而HTTP 1.1允许返回部分数据。
@@ -3110,7 +3145,7 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 - 应用场景：GET请求用于对服务器资源不会产生影响的场景；POST请求用于对服务器资源会产生影响的情景。
 - 是否缓存：浏览器一般会对GET请求进行缓存，POST请求很少缓存
 - 发送报文格式：GET请求的报文中实体部分为空，POST请求的报文中实体部分一般为向服务器发送的数据
-- 安全性：GET请求会将请求的参数放入到url中，这样不太安全，因为请求的url会被保留在历史记录中
+- 安全性：<font color="#FF6347">对于用户信息来说：</font>GET请求会将请求的参数放入到url中，这样不太安全，因为请求的url会被保留在历史记录中；<font color="#FF6347">对于资源来说：</font>Get是安全的，因为Get只进行读操作，无论进行多少次操作，都不会对数据产生影响。
 - 参数类型：POST请求支持传递更多的参数
 - 浏览器回退：GET在浏览器进行回退时是无害的，POST会再次提交请求
 - URL长度
@@ -3125,30 +3160,31 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 | 1xx  | 信息性状态码 | 接受的请求正在处理 |
 | 2xx  | 成功状态码 | 请求正常处理完成 |
 | 3xx  | 重定向状态码 | 需要进行附加操作完成请求 |
-| 4xx  | 客户错误状态码 | 服务器无法处理请求 |
+| 4xx  | 客户端错误状态码 | 服务器无法处理请求 |
 | 5xx  | 服务器错误状态码 | 服务器处理请求错误 |
 
 ### **状态码**
 1. 2XX（成功状态码）
-- 200 OK：请求被服务器正常处理了
+- 200 OK：请求被服务器正常处理了。
 - 204 No Content：该状态码表示<font color="#FF6347">请求已被服务器正常处理但没有返回内容。例如：需要从客户端向服务器发送请求但服务器不需要向客户端发送内容的情况</font>。
-- 206 Partial Content：表示<font color="#FF6347">客户端进行了范围请求，而服务器执行了这部分的GET请求</font>。
+- 206 Partial Content：表示<font color="#FF6347">响应返回的数据并不是资源的全部，而是其中的一部分</font>。应用于HTTP分块下载或断点续传。
 
 2. 3XX（重定向状态码）
 3XX表明浏览器需要执行某些特殊的处理以正确处理请求。
-1. 301 永久重定向：表示<font color="#FF6347">请求的资源已经被分配了新的URL，当用户向旧的URL发起请求时会被重新定向到新的URL</font>。若用户已经把旧的URL保存为书签，此时会将新的URL替换为该书签。
+- 301 永久重定向：表示<font color="#FF6347">请求的资源已经被分配了新的URL，当用户向旧的URL发起请求时会被重新定向到新的URL</font>。若用户已经把旧的URL保存为书签，此时会将新的URL替换为该书签。使用场景：<font color="#FF6347">更换域名</font>。
+- 302 临时重定向：与301状态码相似，<font color="#FF6347">302表示新的URL在未来还可能会改变，</font>若用户把URL保存为书签，不会像301状态码那样更新URL，而还会将请求保存到旧的URL中。使用场景：1)访问404重定向到首页；2)未登陆的用户跳转到登录页。
+- 303 See Other：表示<font color="#FF6347">由于请求对应的资源存在着另一个URL，应使用GET方法定向获取请求的资源</font>。303状态码通常作为PUT或POST操作的返回结果，他表示重定向链接指向的不是新上传的资源，而是另外一个页面，比如消息确认页面或上传进度页面，而请求重定向页面的方法总是要用GET。
+- 304 Not Modified：资源未修改，重定向到缓存文件。
 
-使用场景：<font color="#FF6347">更换域名</font>。
+3. 4XX（客户端错误状态码）
+- 400 Bed Request：客户端请求的报文有错。
+- 403 Forbidden：服务器禁止访问该资源。
+- 404 Not Found：请求的资源未在服务器上找到。
 
-2. 302 临时重定向：与301状态码相似，<font color="#FF6347">302表示新的URL在未来还可能会改变，</font>若用户把URL保存为书签，不会像301状态码那样更新URL，而还会将请求保存到旧的URL中。
-
-使用场景：      
-- 访问404重定向到首页
-- 未登陆的用户
-
-3. 303 See Other：表示<font color="#FF6347">由于请求对应的资源存在着另一个URL，应使用GET方法定向获取请求的资源</font>。
-
-303状态码通常作为PUT或POST操作的返回结果，他表示重定向链接指向的不是新上传的资源，而是另外一个页面，比如消息确认页面或上传进度页面，而请求重定向页面的方法总是要用GET。
+4. 5XX（服务器错误状态码）
+- 500 Internal Server Error：服务器内部错误。
+- 501 Not Implemented：客户端请求的功能还不支持。
+- 502 Bad Gateway：服务器自身工作正常，访问后端服务器发生了错误。
 
 ### **常见的状态码**
 - 100：客户端在发送POST数据给服务器前，征询服务器情况，看服务器是否处理POST的数据，如果不处理，客户端则不上传POST数据，如果处理，则POST上传数据。常用于POST大数据传输
@@ -3812,7 +3848,11 @@ Cache-Control的优先级比Expires高。
 
 ![image](https://user-images.githubusercontent.com/70066311/164454205-0c23d922-41b3-45b6-933e-16db887a7b00.png)
 
-很多网站的资源后面都加了**版本号**，这么做是因为：<font color="	#FF6347">每次升级了JS或CSS文件后，为了防止浏览器进行缓存，强制改变版本号，客户端浏览器就会重新下载新的JS或CSS文件，以保证用户能够及时获得网站的最新更新</font>。
+很多网站的资源后面都加了**版本号**，这么做是因为：<font color="	#FF6347">每次升级了JS或CSS文件后，为了防止浏览器进行缓存，强制改变版本号，让浏览器放弃缓存，重新下载新的JS或CSS文件，以保证用户能够及时获得网站的最新更新</font>。
+
+```html
+<link ref="stylesheet" href="a.css?v=1.0.0" />
+```
 
 ### **点击刷新按钮或者按 F5、按 Ctrl+F5 （强制刷新）、地址栏回车有什么区别？**
 - 点击刷新按钮或者按F5：浏览器直接对本地缓存的文件过期，但是会带上If-Modifed-Since，If-None-Match，这就意味着服务，返回结果可能是 304，也有可能是 200。
@@ -3821,8 +3861,42 @@ Cache-Control的优先级比Expires高。
 
 ## 浏览器渲染原理
 ### **浏览器的渲染过程**
-1. 首先解析收到的文档，根据文档构建一颗DOM树，DOM树是由DOM元素及属性节点组成的
-2. 
+1. 文档解析：首先解析收到的文档，根据文档构建一颗DOM树，DOM树是由DOM元素及属性节点组成的
+2. CSS文件解析：然后对CSS进行解析，生成CSSOM规则树
+3. 生成渲染树：根据DOM树与CSSOM规则树构建渲染树。渲染树的节点被称为渲染对象，渲染对象和DOM元素相对应。<font color="	#FF6347">渲染对象和DOM元素的对应关系不是一对一的，不可见的DOM元素不会被插入到渲染树，还有一些DOM元素对应几个可见对象</font>
+4. 页面布局：浏览器根据渲染树进行布局，确定各个节点在页面中的大小和位置
+5. 绘制页面：浏览器调用接口绘制页面
+
+![image](https://user-images.githubusercontent.com/70066311/167817006-de92fd8a-c6b6-40e5-8515-3e7fb300bc5c.png)
+
+<font color="	#FF6347">为了更好的用户体验，渲染引擎将尽可能早的将内容呈现在屏幕上，并不会等到所有的html解析完成后再去构建和布局render树，它是解析完一部分内容就显示一部分内容，同时，还可能通过网络下载其余内容</font>。
+
+### **浏览器渲染优化**
+- 针对JS：JS既会阻塞HTML的解析，也会阻塞CSS的解析。因此我们可以对JS的加载方式进行改变，从而达到优化的效果：
+    1. 将JS引用放到文档底部
+    2. body中尽量不要写Script标签
+    3. 使用defer引入JS
+- 针对CSS：使用link代替@import，如果样式少，写成内联样式
+- 针对DOM树、CSSOM树：
+    1. HTML标签的深度不要太深
+    2. 使用语义化标签
+    3. 减少CSS代码层级，因为选择器是从右向左进行解析的
+- 减少重排和重绘
+
+### **什么是文档的预解析**
+<font color="	#FF6347">预解析就是分一个线程加载接下来需要使用到的资源（图片、脚本等）</font>。预解析不会改变DOM树，它只解析外部资源的引用，比如图片、脚本、样式等。
+
+### **如何优化关键渲染路径**
+为了尽快完成首次渲染，我们要最大限度减小以下三种可变因素：
+- 关键资源的数量：可能阻止网页首次渲染的资源。这些资源越少，浏览器的工作量也就越小，对CPU和其他资源的占用也就越少。
+- 关键路径长度：关键路径长度受所有关键资源与其字节大小之间依赖关系图的影响。某些资源只能在上一资源处理完后才能开始下载，并且资源越大，下载所需的往返次数就越多、
+- 关键字节的数量：浏览器需要下载的关键字节数量越少，处理内容并让其在页面上展示的速度就越快。<font color="	#FF6347">要减少字节数，可以减少资源数，把它们设为非关键资源或删除</font>。
+
+优化关键渲染路径的常规步骤：
+1. 对关键路径进行分析和特性描述：资源数、字节数、长度
+2. 最大限度减少关键资源的数量：延迟它们的加载，将它们标记为异步等
+3. 优化关键字节数以缩短下载时间（往返次数）
+4. 优化其余关键资源的加载顺序：您需要尽早下载所有关键资产，以缩短关键路径长度
  
 ## 浏览器本地存储
 ### 浏览器本地存储方式及使用场景
@@ -4007,6 +4081,8 @@ JSONP的缺点：
 ### **事件冒泡**
 事件冒泡就是<font color="	#FF6347">元素自身的事件被触发后，如果父元素有相同的事件，如onclick 事件，那么元素本身的触发状态就会传递，也就是冒泡到父元素，父元素的相同事件也会一级一级根据嵌套关系向外触发，直到 document/window，冒泡过程结束</font>。
 
+![image](https://user-images.githubusercontent.com/70066311/168251514-1e11c64f-668e-4909-8ec1-ea866fb5a71c.png)
+
 ### **如何阻止事件冒泡**
 - 普通浏览器：event.stopPropagation()
 - IE浏览器：event.cancelBubble = true
@@ -4017,7 +4093,7 @@ JSONP的缺点：
 事件委托的局限性：对于一些事件没有事件冒泡机制，无法实现事件委托。
 
 ### **事件委托的使用场景**
-场景：给页面的所有的a标签添加click事件，代码如下：
+**场景一**：给页面的所有的a标签添加click事件，代码如下：
 ```js
 document.addEventListener("click", function(e) {
 	if (e.target.nodeName == "A")
@@ -4042,6 +4118,45 @@ document.addEventListener("click", function(e) {
 }, false);
 ```
 
+**场景二**：动态绑定事件。在很多情况下我们会进行动态的删除或添加元素，需要给这些元素解绑或绑定事件。如果有了事件委托，那么事件绑定到父层，那么子元素的添加或删除就不会涉及到动态添加或删除事件，就可以减少很多工作。
+
+**局限性**：事件委托也有局限性，例如：<font color="#FF6347">focus、blur之类的事件没有事件冒泡机制；mousemove、mouseout 这样的事件需要进行定位，对性能的消耗比较高，不适合事件委托</font>。
+
+**缺点**：事件委托会影响页面性能：
+- 对于最底层元素，如果点击了最底层元素，那么到绑定元素之间的`DOM层数`如果太多就会影响性能。
+- 对于元素，绑定事件委托的次数太多也会影响性能。
+
+### **event.target 和 event.currentTarget 的区别**
+我们为一个元素绑定一个点击事件的时候，可以指定是要在捕获阶段绑定或者换在冒泡阶段绑定。 <font color="#FF6347">当addEventListener的第三个参数为true的时候，代表是在捕获阶段绑定，当第三个参数为false或者为空的时候，代表在冒泡阶段绑定</font>。
+
+<font color="#FF6347">event.target指向引起触发事件的元素，而event.currentTarget则是事件绑定的元素，只有被点击的那个目标元素的event.target才会等于event.currentTarget</font>。
+
+结合下面的例子，就可以很好来理解event.target和event.currentTarget：
+```html
+<div id="a">
+    <div id="b">
+      <div id="c">
+        <div id="d"></div>
+      </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('a').addEventListener('click', function(e) {
+      console.log('target:' + e.target.id + '&currentTarget:' + e.currentTarget.id);
+    });    
+    document.getElementById('b').addEventListener('click', function(e) {
+      console.log('target:' + e.target.id + '&currentTarget:' + e.currentTarget.id);
+    });    
+    document.getElementById('c').addEventListener('click', function(e) {
+      console.log('target:' + e.target.id + '&currentTarget:' + e.currentTarget.id);
+    });    
+    document.getElementById('d').addEventListener('click', function(e) {
+      console.log('target:' + e.target.id + '&currentTarget:' + e.currentTarget.id);
+    });
+</script>
+```
+
 ### **同步和异步的区别**
 - 同步指的是当一个进程在执行某个请求时，如果这个请求需要等待一段时间才能返回，那么这个进程会一直等待下去，直到消息返回为止再继续向下执行。
 - 异步指的是当一个进程在执行某个请求时，如果这个请求需要等待一段时间才能返回，这个时候进程会继续往下执行，不会阻塞等待消息的返回，当消息返回时系统再通知进程进行处理。
@@ -4060,7 +4175,9 @@ EventLoop的执行顺序如下：
 
 ### **宏任务和微任务有哪些**
 - 微任务：promise、
-- 宏任务：setTimeout、setInterval、I/O 操作、UI 渲染
+- 宏任务：setTimeout、setInterval、I/O 操作、UI 渲染   
+
+![image](https://user-images.githubusercontent.com/70066311/168248924-b90e2dd9-f8d4-41ef-81a8-71bc10b4ada1.png)
 
 # Node.js
 ### **对Node.js的理解**
@@ -4103,13 +4220,44 @@ Node.js就是一个js运行时环境，让js运行在服务器端，利用事件
 
 ## CDN
 ### **什么是CDN**
-<font color="	#FF6347">CDN是一种通过互联网相连接的电脑网络系统，利用最靠近每位用户的服务器，更快、更可靠的将音乐、图片、视频、应用程序等其它文件发送给用户，来提高性能，可扩展性及低成本的网络内容传递给用户</font>。
+<font color="	#FF6347">CDN是一种通过互联网相连接的电脑网络系统，利用最靠近每位用户的服务器，更快、更可靠的将音乐、图片、视频、应用程序等其它静态资源发送给用户，来提高性能，可扩展性及低成本的网络内容传递给用户</font>。
 
 CDN分为以下三部分：
 -  分发服务系统：最基本的工作单元就是cache设备。<font color="	#FF6347">cache负责直接响应最终用户的访问请求，把缓存在本地的内容快速地提供给用户。同时cache还负责与原站点进行内容同步，从源站点获取本地还未更新的数据并保存在本地</font>。
 - 负载均衡系统：主要负责<font color="	#FF6347">对所有发起服务器请求的用户进行访问调度，确定提供给用户的实际访问地址</font>。调度体系又分为<font color="	#FF6347">全局负载均衡</font>和<font color="	#FF6347">本地负载均衡</font>。<font color="	#FF6347">**全局负载均衡**主要根据用户就近性原则，通过对每个服务器节点进行最优判断，确定向用户提供服务的cache物理地址</font>。<font color="	#FF6347">本地负载均衡</font>主要负责节点内部的设备负载均衡。
-- 运营管理系统：
+- 运营管理系统：运营管理系统分为运营管理和网络管理子系统，负责处理业务层面与外界系统交互所必须的收集、整理、交付工作，包含客户管理、产品管理、计费管理、统计分析等功能。
 
+### **CDN的作用**
+CDN一般会用来托管静态资源（包括文本、图片、视频、音频、脚本）、可供下载的资源、应用程序。使用CDN来加速这些资源的访问。
+
+1. 在性能方面，引入CDN的作用是：
+    - 用户收到的内容来自最近的数据中心，延迟更低，内容加载更快
+    - 部分资源请求分配给了CDN，减少了服务器的负载
+2. 在安全方面，CDN有助于防御DDoS、MITM等网络攻击：
+    - 针对DDoS：通过监控异常流量，限制其请求频率
+    - 针对MITM，从源服务器到CDN节点再到ISP（网络业务提供商），全链路使用HTTPS通信
+
+### **CDN的原理**
+<font color="	#FF6347">CDN与DNS有着密不可分的联系，因为要确定与用户较近的CDN服务器，需要知道CDN服务器的ip地址，这时就需要使用DNS服务器来查询ip地址。
+
+为了访问CDN中的静态资源，通过URL来进行访问，URL就是常见的描述的网络资源位置的方式。有了URL之后，通过DNS服务器去查询URL对应的ip地址，然后http才能与该ip地址建立连接（因为TCP连接需要知道源IP、源端口、目的URL、目的IP）</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/167798841-29dd8a30-8883-43ea-bfe5-645f63780485.png)
+
+- 用户未使用CDN缓存资源的过程：
+    1. 浏览器通过DNS对域名进行解析，得到域名对应的ip地址
+    2. 浏览器根据得到的ip地址，像域名的服务主机发送数据请求
+    3. 服务器向浏览器返回响应的数据
+- 用户使用CDN缓存资源的过程：
+    1. 对于点击的数据的URL，经过本地的DNS系统的解析，发现该URL对应的是一个CDN专用的DNS服务器，DNS服务器就会将域名解析权交给CNAME指定的CND专用的DNS服务器
+    2. CDN专用DNS服务器将CDN的全局负载设备IP地址返回给用户
+    3. 用户向CDN的全局负载均衡设备发起数据请求
+    4. CDN全局负载均衡设备根据用户的IP地址，以及用户请求内容的URL，选择一台用户所属区域的区域负载均衡设备
+    5. 区域负载均衡设备选择一台合适的缓存服务器来提供服务，将该缓存服务器的IP地址返回给全局负载均衡设备
+    6. 全局负载均衡设备把服务器的IP地址返回给用户
+    7. 用户向该缓存服务器发起请求，缓存服务器响应用户的请求，将用户所需内容发送至用户终端
+
+![image](https://user-images.githubusercontent.com/70066311/167806433-483f0661-230f-46cb-8ac5-c8518f13566b.png)
 
 ## 懒加载
 ### *基本概念
@@ -4190,11 +4338,13 @@ CDN分为以下三部分：
 <font color="	#FF6347">当触发回流时，一定会触发重绘；但触发了重绘，不一定会重排</font>。
 
 ### **如何避免重排和重绘**
-1. 在操作DOM时，尽量在底层的DOM节点进行操作
-2. 不要使用table布局
+1. 避免频繁操作DOM。在操作DOM时，尽量在底层的DOM节点进行操作
+2. 不要使用table布局，因为一个小改动都可能会引起table进行重新布局
 3. 不要频繁操作元素样式
 4. 避免频繁操作DOM
 5. 使用absolute和fixed，使元素脱离文档流，这样他们的变化会不会影响其他元素
+6. 可以使用display: none，操作结束后再把它显示出来，因为在display: none的元素上进行操作不会引起重绘和重排
+7. 将DOM的多个读操作或写操作放在一起，而不是多个读写操作穿插着写。这得益于浏览器的渲染队列机制
 
 **渲染队列**：浏览器会将多次的重排、重绘操作放入一个渲染队列中，等队列到一定长度后，会对队列进行批处理，这样就会让多次重排和重绘变为一次重排和重绘。
 
@@ -4206,10 +4356,63 @@ DocumentFragment是一个文档片段，是一个没有父对象的最小文档�
 
 
 ## 防抖和节流
-### *防抖
+### **防抖**
 防抖是指<font color="	#FF6347">事件被触发n秒后再执行回调，如果在这n秒内事件又被触发，则重新计时</font>。这可以使用在一些点击请求上，避免因为用户的多次点击向后端发送多次请求。
-### *节流
+
+### **防抖的场景应用**
+- 防止多次按钮提交，只执行最后一次的提交
+- 只执行输入框连续输入事件的最后一次
+
+### **节流**
 节流是指<font color="	#FF6347">在规定的一个时间单位内，只能触发一次该事件的回调函数，如果在同一个单位时间内某事件被触发多次，只能有一次生效</font>。节流可以使用在scroll函数的事件监听上。通过事件节流来降低事件调用的频率。
+
+### **节流的场景应用**
+- 拖拽场景：固定时间只执行一次，防止超高频次出发位置变动
+- 缩放场景：浏览器resize
+- 动画场景：避免短时间内多次出发动画引起性能问题
+
+### **手写防抖与节流**
+```js
+// 防抖
+function debounce(fn, delay){
+  let timer = null
+  return function(){
+    if(timer){
+      clearTimeout(timer)
+    }
+    timer = setTimeout(()=>{
+      fn()
+    }, delay)
+  }
+}
+```
+
+```js
+// 节流，时间戳版
+function throttleTimeStamp(fn, delay){
+  let preTimer = Date.now()
+  return function(){
+    let nowTimer = Date.now()
+    if(nowTimer - preTimer >= delay){
+      preTimer = Date.now()
+      return fn()
+    }
+  }
+}
+
+// 节流，定时器版
+function throttleTime(fn, delay){
+  let timer = null
+  return function(){
+    if(!timer){
+      timer = setTimeout(()=>{
+        fn()
+        timer = null
+      }, delay)      
+    }
+  }
+}
+```
 
 # ES6
 ## 箭头函数
@@ -4446,6 +4649,154 @@ const element = <h1>Hello, world!</h1>
 JSX其实是`React.createElement(component, props, ...children)`的语法糖，所以在组件中没有看到使用react却需要引入react就是因为使用了JSX。
 
 <font color="#FF6347">React使用JSX后会使代码变得更简洁，结构层次更清晰</font>。但在实际运行时，会使用babel插件将JSX语法的代码转化为React.createElement的代码。
+
+
+## React设计模式
+### **常见的React设计模式**
+1. 提供者模式    
+**场景一**：在一个项目中，全局有一个状态，可以称之为 theme （主题），那么有很多 UI 功能组件需要这个主题，而且这个主题是可以切换的，就像 github 切换暗黑模式一样，那么如何优雅的实现这个功能呢？
+
+这个场景就用到了<font color="#FF6347">提供者模式</font>。通过`context`保存全局变量的主题，然后将`theme`通过`Provider`形式传递下去，需要`theme`的时候，就使用`context`获取。这样做的好处是：<font color="#FF6347">当`theme`发生改变时，使用了`context`的组件就会重新更新，达到了切换主题的目的</font>。
+
+2. 组合模式
+组合模式适合一些容器组件场景，通过外层组件包裹内层组件，外层组件可以轻松获取内层组件的`props`（<font color="#FF6347">通过`props.children`获得子组件，通过`props.children.props`获得子组件的`props`</font>），还可以控制内层组件的渲染，组合模式可以直观地反映出`父子`组件的包含关系。
+
+**场景二**：如下的Tabs和TabItem组合，构成切换tab功能，那么Tabs和TabItem的分工如下：
+- Tabs负责展示和控制对应的`TabItem`，绑定切换`tab`回调方法`onChange`。当`tab`切换的时候，执行回调。
+- TabItem负责展示对应的`tab`项，向Tabs传递props相关信息。
+
+```js
+<Tabs onChange={ (type)=> console.log(type)  } >
+    <TabItem name="react"  label="react" >React</TabItem>
+    <TabItem name="vue" label="vue" >Vue</TabItem>
+    <TabItem name="angular" label="angular"  >Angular</TabItem>
+</Tabs>
+```
+
+#### 组合模式原理
+首先我们看一个简单的组合结构：
+```js
+<Groups>
+    <Item  name="《React进阶实践指南》" />
+</Groups>
+```
+
+**item在Groups中的形态**      
+首先如果如上组合模式的写法，会被 jsx 编译成 React element 形态，Item 可以通过 Groups 的  props.children 访问到。
+```js
+function Groups (props){
+    console.log( props.children  ) // Groups element
+    console.log( props.children.props ) // { name : 'React进阶实践指南》' }
+    return  props.children
+}
+```
+
+但是这是针对单一节点的情况，事实情况下，外层容器可能有多个子组件的情况。
+
+```js
+<Groups>
+    <Item  name="《React进阶实践指南》" />
+    <Item name="《Nodejs深度学习手册》" />
+</Groups>
+```
+
+这种情况下，props.children 就是一个数组结构，如果想要访问每一个的 props ，那么需要通过 React.Children.forEach 遍历 props.children。
+
+```js
+function Groups (props){
+    console.log( props.children  ) // Groups element
+    React.Children.forEach(props.children,item=>{
+        console.log( item.props )  //依次打印 props
+    })
+    return  props.children
+}
+```
+
+**隐式混入props**     
+这个是组合模式的精髓所在，就是可以通过 React.cloneElement 向 children 中混入其他的 props，那么子组件就可以使用容器父组件提供的特有的 props 。我们来看一下具体实现：
+```js
+function Item (props){
+    console.log(props) // {name: "《React进阶实践指南》", author: "alien"}
+    return <div> 名称： {props.name} </div>
+}
+ 
+function Groups (props){
+    const newChilren = React.cloneElement(props.children,{ author:'alien' })
+    return  newChilren
+}
+```
+
+- 用 React.cloneElement 创建一个新的 element，然后混入其他的 props -> author 属性，React.cloneElement 的第二个参数，会和之前的 props 进行合并 （ merge ）。
+
+**控制渲染**    
+组合模式可以通过 children 方式获取内层组件，也可以根据内层组件的状态来控制其渲染。比如如下的情况：
+```js
+export default ()=>{
+    return <Groups>
+    <Item  isShow name="《React进阶实践指南》" />
+    <Item  isShow={false} name="《Nodejs深度学习手册》" />
+    <div>hello,world</div>
+    { null }
+</Groups>
+}
+```
+
+- 如上这种情况组合模式，只渲染 isShow = true 的 Item 组件。那么外层组件是如何处理的呢？
+
+实际处理这个很简单，也是通过遍历 children ，然后通过对比 props ，选择需要渲染的 children 。接下来一起看一下如何控制：
+
+```js
+function Item (props){
+    return <div> 名称： {props.name} </div>
+}
+/* Groups 组件 */
+function Groups (props){
+    const newChildren = []
+    React.Children.forEach(props.children,(item)=>{
+        const { type ,props } = item || {}
+        if(isValidElement(item) && type === Item && props.isShow  ){
+            newChildren.push(item)
+        }
+    })
+    return  newChildren
+}
+```
+
+- 通过 newChildren 存放满足要求的 React Element ，通过 Children.forEach 遍历 children 。
+- 通过 isValidElement 排除非 element 节点；type指向 Item函数内存，排除非 Item 元素；获取 isShow 属性，只展示 isShow = true 的 Item，最终效果满足要求。
+
+**内外层通信**    
+
+![image](https://user-images.githubusercontent.com/70066311/168095865-3c59dee8-96aa-46bb-b5e9-92ac2b936413.png)
+
+
+3. HOC设计模式
+高阶组件时React中用于复用组件逻辑的一种方式。是一种基于React的组合特性而形成的设计模式。
+
+<font color="#FF6347">HOC使用函数包裹组件</font>
+
+```js
+// 假设 checkUserAccess 已经在 utils 文件中被封装为了一段独立的逻辑
+import checkUserAccess from './utils'
+// 用高阶组件包裹目标组件
+const withCheckAccess = (WrappedComponent) => {
+    // 这部分是通用的逻辑：判断用户身份是否合法
+    const isAccessible = checkUserAccess()  
+    // 将 isAccessible（是否合法） 这个信息传递给目标组件
+    const targetComponent = (props) => (
+        <div className="wrapper-container">
+            <WrappedComponent {...props} isAccessible={isAccessible} />
+        </div>
+    );
+    return targetComponent;
+};
+
+/* 使用 */
+const EnhancedAComponent = withCheckAccess(Acomponent);
+
+```
+
+4. props
 
 ## 类组件与函数式组件
 - 类组件
