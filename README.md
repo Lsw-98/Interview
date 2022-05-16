@@ -411,6 +411,72 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
 - 线性渐变：linear-gradient
 - CSS动画：animation
 
+### **CSS动画**
+<font color="	#FF6347">CSS动画就是元素从一种样式过渡到另一种样式的过程</font>。常见的动画效果很多，比如：平移、缩放、旋转等。CSS实现动画的方式有以下几种：
+
+1. transition：实现渐变动画
+2. transform：实现缩放、平移等效果
+3. animation：实现自定义动画
+
+#### transition
+- property：填写需要变化的CSS属性
+- duration：完成过渡效果需要的时间单位(s或者ms)
+- timing-function：完成效果的速度曲线，比如：linear（匀速变化）、ease（从慢到快再到慢）、ease-in(慢慢变快)、esae-out（慢慢变慢）等
+- delay：动画效果的延迟触发时间
+
+<font color="	#FF6347">并不是所有属性都能过渡，比如display: none 到 display: block</font>。
+
+#### transform
+- translate：位移
+- scale：缩放
+- rotate：旋转
+- skew：倾斜
+
+一般配合`transition`过度使用。<font color="	#FF6347">transform不支持inline元素，使用之前把它变为block</font>。
+
+#### animation
+|  属性   | 描述  |  属性值 |
+|  ----  | ----  | ---- |
+| animation-duration  | 指定动画完成的一个周期所需要的时间，单位s或ms，默认为0| |
+| animation-timing-function  | 完成动画的速度曲线 | linear、ease、ease-in、ease-out、ease-in-out |
+| animation-delay  | 指定动画的延迟时间，即动画何时开始，默认为0| |
+| animation-iteration-count  | 指定动画的次数，默认为1 | |
+| animation-direction  | 指定动画播放的方向，默认为normal | normal、reverse、alternate、alternate-reverse |
+| animation-fill-mode  | 指定动画的填充模式，默认为none | forwards、backwards、both |
+| animation-play-state  | 指定动画播放状态，正在运行或暂停。默认是 running | running、pauser |
+| animation-name  | 指定动画的名称 | |
+
+CSS动画只需要定义一些关键帧，其余的帧由浏览器根据计时函数插值计算出来。使用`@ketframes`定义关键帧，例如我们想要让元素旋转一圈，只需要定义开始和结束两帧即可：
+
+```css
+@keyframes rotate{
+  from{
+    transform: rotate(0deg)
+  }
+
+  to{
+    transform: rotate(360deg)
+  }
+}
+```
+
+也可以使用`百分比`来刻画帧
+```css
+@keyframes rotate{
+    0%{
+        transform: rotate(0deg);
+    }
+    50%{
+        transform: rotate(180deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+```
+
+
+
 ### **CSSSprites（精灵图）**
 CSSSprites（精灵图），<font color="	#FF6347">将一个页面涉及到的所有图片都包含到一张大图中去，然后利用CSS的 background-image，background-repeat，background-position属性的组合进行背景定位</font>。
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .base {
+      width: 500px;
+      height: 500px;
+      background-color: orange;
+      display: inline-block;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #5daf34;
+      transition-property: width, height, background-color, border-width;
+      transition-duration: 2s;
+      transition-timing-function: ease-in;
+      transition-delay: 500ms;
+    }
+
+    .base:hover {
+      width: 200px;
+      height: 200px;
+      background-color: #5daf34;
+      border-width: 10px;
+      border-color: orange;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="base"></div>
+</body>
+
+</html>

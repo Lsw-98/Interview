@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .base {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      background-color: #0EA9FF;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #5daf34;
+      transition-property: width, height, background-color, border-color;
+      transition-duration: 2s;
+      transition-timing-function: ease-in;
+      transition-delay: 500ms;
+    }
+
+    .base2 {
+      transform: none;
+      transition-property: transform;
+      transition-delay: 5ms;
+    }
+
+    .base2:hover {
+      transform: scale(0.8, 1.5) rotate(35deg) skew(5deg) translate(15px, 25px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="base base2"></div>
+</body>
+
+</html>
