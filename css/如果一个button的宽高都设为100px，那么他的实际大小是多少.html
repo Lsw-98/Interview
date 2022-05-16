@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    button {
+      box-sizing: border-box;
+      /* box-sizing: content-box; */
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    如果使用IE盒子模型，那么button的实际大小就是100px，因为没有指定button的border和padding，指定了content的宽高，而button自带的border和padding
+    没有width大，所以最后button的宽高就是100px。
+
+    而是用标准盒子模型，button的实际大小就略大于100px，因为标准盒子模型为border * 2 + padding * 2 + content
+   -->
+  <button>点我</button>
+</body>
+
+</html>

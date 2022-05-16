@@ -328,6 +328,7 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
 3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="	#FF6347">会响应绑定的事件</font>。  
 4. z-index:负值是其他元素覆盖该元素，实现隐藏  
+5. 将height设为0
 
 ### **display:none与visibility:hidden的区别**
 - 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生回流，造成文档重排；而visibility切换时不会引起回流，只会引起本元素重绘</font>。
@@ -354,6 +355,25 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
   <li>2</li>
   <li>3</li>
 </ul>
+```
+
+### **opacity和rgba的区别**
+opacity和rgba都可以给元素设置透明度，但不同之处在于：
+1. **opacity作用于元素以及元素内的所有内容的透明度**，而**rgba()只作用于元素的颜色和其背景色**
+2. **opacity可以被继承，rgba()不会被继承**
+```html
+<style>
+  div {
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 0, 0, 0.5);
+    /* opacity: 0.5; */
+  }
+</style>
+
+<div>
+  你好，css
+</div>
 ```
 
 ## link和@import的区别
@@ -647,9 +667,9 @@ BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面
  ``` 
 
 ## position有哪些值，分别根据什么定位
-
+- position: static; - 默认值，没有定位，遵循正常的文档流对象
 - position: fixed;   - 固定定位，相对于窗口定位，不管浏览器怎么滚动
-- position: relative;   - 相对于自身的位置进行定位，不脱离文档流
+- position: relative;   - 相对于自身原本的位置进行定位，不脱离文档流
 - position: absolute;   - 相对第一个有relative的父元素进行定位，脱离文档流
 
 ### **absolute和fixed的区别**
@@ -667,25 +687,6 @@ reset是一个css文件，可以重置css样式
 
 ## Normalize.css
 Normalize.css：可以增强跨浏览器渲染的一致性
-
-## opacity和rgba的区别
-opacity和rgba都可以给元素设置透明度，但不同之处在于：
-1. **opacity作用于元素以及元素内的所有内容的透明度**，而**rgba()只作用于元素的颜色和其背景色**
-2. **opacity可以被继承，rgba()不会被继承**
-```html
-<style>
-  div {
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 0, 0, 0.5);
-    /* opacity: 0.5; */
-  }
-</style>
-
-<div>
-  你好，css
-</div>
-```
 
 ## 重绘与重排
 ### **重排**
@@ -1283,7 +1284,9 @@ console.log(typeof null);            // object
 ```
 
 2. instacneof
-instacneof可以正确判断对象的类型，<font color="#FF6347">其内部运行机制是判断变量的原型链中是否能找到该类型的原型</font>。
+instacneof可以正确判断对象的类型，<font color="#FF6347">其内部运行机制是判断实例的原型链中是否能找到该类型的原型</font>。
+
+也就是<font color="#FF6347">右边变量的prototype在左边变量的原型链上即可。因此instanceof会依次遍历左边变量的原型链，知道找到右边变量的prototype属性为止</font>。
 
 instacneof只能判断引用数据类型，不能判断原始数据类型。
 ```js
@@ -3561,6 +3564,42 @@ TIME_WAIT 需要等待 2MSL，在大量短连接的情况下，TIME_WAIT会太�
 - TCP是面向流的协议，UDP是面向消息的协议。UDP段是一条消息，必须以消息为单位接收数据，不能以字节为单位接收数据。
 - 每个UDP包中都有消息头，这样对于接收端来说就很容易区别UDP包了。
 
+
+### **TCP的keep-alive**
+keep-alive就是<font color="	#FF6347">定义一个时间段，如果在这个时间段内没有报文传输，那么服务器就会每隔一个时间间隔发送一个探测报文，如果连续几个探测报文没有收到响应，那么就会认为当前的TCP链接已经断开，服务器就会断开连接</font>。
+
+### **TCP保活机制**
+#### 为什么需要保活机制
+TCP建立连接后，在一段时间内双方没有发送任何数据，那么：
+1. <font color="#FF6347">怎么判断对方是否还处于连接状态。这是因为，TCP的非正常断开的连接系统并不能侦测到（比如网线断掉）</font>。
+2. <font color="#FF6347">长时间没有任何数据发送，连接可能被中断</font>。网络连接会经过路由器、防火墙等设备，这些设备可能会断掉长时间没有活动的连接。
+
+#### TCP保活机制的实现
+<font color="	#FF6347">保活机制由一个定时器实现的，当计时器被激发，一端将发送一个保活探测报文，另一端收到报文会返回一个ACK报文作出响应</font>。
+
+过程描述：
+在开启了keep-alive后，连接的一段会向另一端发送一个探测报文，如果收到响应则重置计时器，如果没有收到响应，则经过一段时间间隔后再次发送探测报文，当达到一定次数还没有收到响应后，则认为连接不可到达，则断开连接。
+
+
+#### 保活机制的弊端
+1. 会占用不必要的带宽
+2. 出现短暂的网络错误时，保活机制会把正常的TCP连接断开
+
+### **拔掉网线后几秒，再插回去，原本的TCP连接还会存在嘛？**
+<font color="#FF6347">客户端拔掉网线后，并不会直接影响到TCP连接的状态</font>。所以，拔掉网线后，TCP链接还会存在。
+
+- 在传输数据的情况下：
+    - 在客户端拔掉网线后，如果服务器发送了数据报文，那么服务器在没有收到确认报文就会进行重传，如果重传次数没有达到最大值之前，客户端将网线，那么双方的TCP连接还是正常存在的
+    - 如果重传次数达到了最大值，那么服务器就会断开TCP连接，等到客户端插回网线并重新发送数据时，服务器会返回一个RST报文，表示TCP连接已经断开了，客户端收到这个报文后就知道了TCP连接已经断开了
+- 在不传输数据的情况下：
+    - 如果双方没有开启keep-alive机制，那么在客户端拔掉网线后没有插回，那么客户端和服务器的TCP连接状态还是会一直存在
+    - 如果开启了keep-alive机制，那么客户端拔掉网线后，如果客户端一直不插回网线，那么服务器就会认为客户端已经断开了连接，那么服务器也会断开连接。如果在TCP探测期间客户端插回了网线，那么双方原本的TCP连接还是能正常存在。
+
+除了客户端拔掉网线后，还有客户端`宕机`和`杀死进程`两种场景
+1. 宕机。客户端宕机和拔掉网线是一样无法被服务器感知的，所以如果在没有数据传输并没有开启TCP的keep-alive机制的情况下，服务器的TCP连接会一直处于ESTABLISHED连接状态，知道服务器重启进程。
+2. 杀死进程。杀死客户端进程后，客户端会向服务器进行四次握手。
+
+
 ### **URL各个组成部分详解**
 `http://www.aspxfans.com:8080/news/index.asp?boardID=5&ID=24618&page=1#r_70732423`
 
@@ -3858,6 +3897,12 @@ Cache-Control的优先级比Expires高。
 - 点击刷新按钮或者按F5：浏览器直接对本地缓存的文件过期，但是会带上If-Modifed-Since，If-None-Match，这就意味着服务，返回结果可能是 304，也有可能是 200。
 - 按Ctrl+F5 （强制刷新）：浏览器不仅对本地缓存文件过期，还不会带上If-Modifed-Since，If-None-Match，相当于之前没有请求过，返回200状态。
 - 地址栏回车：浏览器发起请求，按正常的强缓存 -> 协商缓存 -> 请求资源的过程执行。
+
+### **浏览器资源缓存的位置有哪些**
+浏览器缓存为止一共有三个，优先级从低到高分别是：
+1. Disk Cache。缓存在硬盘中， <font color="	#FF6347">存储时间久，容量大，但读取速度慢</font>。Disk Cache根据HTTP Header中的字段判断哪些资源需要缓存，哪些资源可以不请求直接使用，哪些资源需要重新请求。
+2. Memory Cache。内存缓存<font color="	#FF6347">效率最快，但内存缓存虽然读取效率高，但是持续性很短，会随着进程的释放而释放</font>。一旦我们关闭了Tab页面，内存中的缓存就被释放掉了。
+3. Service Worker。<font color="	#FF6347">Service Worker就是服务器与浏览器之间的中间人角色。它会拦截当前网站所有的请求，进行判断，可以让我们自由控制缓存哪些文件，并且缓存是持久的，如果需要向服务器发起请求就转发给服务器，如果可以直接使用缓存就返回缓存而不转发给服务器，从而提高浏览体验</font>。
 
 ## 浏览器渲染原理
 ### **浏览器的渲染过程**
@@ -6238,6 +6283,66 @@ const takeLatest = (pattern, saga, ...args) => fork(function*() {
 1. 获取State：connect通过context获取Provider中store，通过store.getState()获取整个store tree上所有state。
 2. 包装原组件
 3. 监听Store tree变化：connect缓存了store tree中state的状态，通过当前state状态 和变更前 state 状态进行比较，从而确定是否调用 this.setState()方法触发Connect及其子组件的重新渲染。
+
+## react-redux源码解析
+![image](https://user-images.githubusercontent.com/70066311/168463150-ea397238-5119-49dc-ae80-3aa86b4d148d.png)
+
+
+### **为什么要在`root`根组件上使用`react-redux`的`Provider`组件包裹**
+#### `Provider`到底做了什么
+1. Provider创建subscription，context保存上下文
+首先看Provider的源码
+```js
+/* provider 组件代码 */
+function Provider({ store, context, children }) {
+  /* 利用useMemo，跟据store变化创建出一个contextValue 包含一个根元素订阅器和当前store  */
+  const contextValue = useMemo(() => {
+    /* 创建了一个根 Subscription 订阅器 */
+    const subscription = new Subscription(store)
+    /* subscription 的 notifyNestedSubs 方法 ，赋值给  onStateChange方法 */
+    subscription.onStateChange = subscription.notifyNestedSubs
+    return {
+      store,
+      subscription
+    } /*  store 改变创建新的contextValue */
+  }, [store])
+  /*  获取更新之前的state值 ，函数组件里面的上下文要优先于组件更新渲染  */
+  const previousState = useMemo(() => store.getState(), [store])
+
+  useEffect(() => {
+    const { subscription } = contextValue
+    /* 触发trySubscribe方法执行，创建listens */
+    subscription.trySubscribe() // 发起订阅
+    if (previousState !== store.getState()) {
+      /* 组件更新渲染之后，如果此时state发生改变，那么立即触发 subscription.notifyNestedSubs 方法  */
+      subscription.notifyNestedSubs()
+    }
+    /*   */
+    return () => {
+      subscription.tryUnsubscribe()  // 卸载订阅
+      subscription.onStateChange = null
+    }
+    /*  contextValue state 改变触发新的 effect */
+  }, [contextValue, previousState])
++
+  const Context = context || ReactReduxContext
+  /*  context 存在用跟元素传进来的context ，如果不存在 createContext创建一个context  ，这里的ReactReduxContext就是由createContext创建出的context */
+  return <Context.Provider value={contextValue}>{children}</Context.Provider>
+}
+```
+`provider`的作用是：
+- 创建一个contextValue，里面包含一个创建出来的父级`Subscription`和`redux`提供的`store`
+- 通过react上下文`context`和`contextValue`传递给子孙组件
+
+### **react-redux是怎么和redux契合，做到state改变更新视图的呢**
+
+### **`provider`用什么方式存放当前的redux的store，又是怎么传递给每一个需要管理`state`的组件的？**
+
+### **`connect`是怎么连接业务组件，然后传递组件更新函数的**
+
+### **`connect`怎么通过第一个参数，来订阅与之对应的`state`的**
+
+### **`connect`怎么样将props和redux的state合并的**
 
 ## React事件机制
 React基于浏览器机制实现了一套事件机制，包括：`事件注册`、`事件合成`、`事件冒泡`、`事件派发`等。
