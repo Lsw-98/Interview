@@ -2002,7 +2002,7 @@ call、bind、apply这三个函数的第一个参数都是this的指向对象，
 <font color="#FF6347">bind除了返回的是函数外，其余都和call是一样的</font>。
 
 ### **this原理**
-
+[阮一峰this原理](https://www.ruanyifeng.com/blog/2018/06/javascript-this.html)
 
 ### **this指向问题**
 this是执行上下文的一个属性，它指向最后一次调用这个方法的对象。可以通过下面四种方法来判断：
@@ -2030,8 +2030,8 @@ obj.b.c()
 ### **判断this指向的七种方法**
 1. obj.fun()   <font color="#FF6347">this指向obj</font>
 2. fun() 或 (function(){ ... })() 或 多数回调函数 或 定时器函数   <font color="#FF6347">this指向window</font>
-3. new Fun()   <font color="#FF6347">this指向new正在创建的新对象</font>
-4. 类型名.prototype.共有方法=function(){ ... }   <font color="#FF6347">this指向将来谁调用指谁，同第一种情况</font>
+3. new Fun()   <font color="#FF6347">this指向new正在创建的实例</font>
+4. 类型名.prototype.共有方法=function(){ ... }   <font color="#FF6347">将来谁调用this就指向谁，同第一种情况</font>
 5. DOM或jq中事件处理函数中的this  <font color="#FF6347">当前正在触发事件的DOM元素对象</font>，如果需要使用简化版函数，必须$(this)
 6. 箭头函数中的this  <font color="#FF6347">箭头函数外部作用域中的this</font>
 7. jQuery.fn.自定义函数=function(){ ... }   <font color="#FF6347">this指向将来调用这个自定义函数的 . 前的jQuery子对象</font>

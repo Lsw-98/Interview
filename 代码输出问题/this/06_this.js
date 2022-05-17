@@ -4,6 +4,7 @@ var obj = {
       console.log("1111", this);
     }
     f1();
+
   },
   pro: {
     getPro: () => {
