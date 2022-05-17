@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      background-color: black;
+    }
+
+    .father {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border-radius: 20%;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex-basis: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .item {
+      width: 13px;
+      height: 13px;
+      background-color: black;
+      border-radius: 100%;
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="column">
+      <span class="item"></span>
+      <span class="item"></span>
+    </div>
+    <div class="column">
+      <span class="item"></span>
+      <span class="item"></span>
+    </div>
+  </div>
+</body>
+
+</html>

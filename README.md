@@ -904,7 +904,12 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
 
 - flex-grow：定义项目放大的比例，默认为0。<font color="#FF6347">如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍</font>。
 
+![image](https://user-images.githubusercontent.com/70066311/168708588-49f9e071-0ec1-4767-b585-55f3248fd7b0.png)
+
+
 - flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小</font>。负值对该属性无效。
+
+![image](https://user-images.githubusercontent.com/70066311/168708630-d9261625-12a6-43d8-8b92-d934a8d2e78c.png)
 
 - flex-basis：在计算剩余空间之前设置子项的基础宽度。
 

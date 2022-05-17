@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .Grid {
+      display: flex;
+    }
+
+    .Grid-cell {
+      border: 2px solid #ddd;
+      flex: 1;
+    }
+
+    .Grid:nth-child(1) .Grid-cell:nth-child(1) {
+      flex: 50% 0 0;
+    }
+
+    .Grid:nth-child(2) .Grid-cell:nth-child(2) {
+      flex: 0 0 33.3%;
+    }
+
+    .Grid:nth-child(3) .Grid-cell:nth-child(1) {
+      flex: 25% 0 0;
+    }
+
+    .Grid:nth-child(3) .Grid-cell:nth-child(3) {
+      flex: 0 0 33.3%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="Grid">
+    <div class="Grid-cell">1/2</div>
+    <div class="Grid-cell">auto</div>
+    <div class="Grid-cell">auto</div>
+  </div>
+  <div class="Grid">
+    <div class="Grid-cell">auto</div>
+    <div class="Grid-cell">1/3</div>
+  </div>
+  <div class="Grid">
+    <div class="Grid-cell">1/4</div>
+    <div class="Grid-cell">auto</div>
+    <div class="Grid-cell">1/3</div>
+  </div>
+</body>
+
+</html>
