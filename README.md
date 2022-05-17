@@ -1643,6 +1643,166 @@ console.log(Number.isNaN(b));    // false
 - "==="：如果两边类型不一致，直接返回false
 - Object.is()：与 "===" 判断相同，但<font color="#FF6347">-0与+0不再相等，两个NaN是相等的</font>。
 
+### **JS中的设计模式**
+#### 工厂模式
+先来理解一个概念 —— **构造器模式**
+
+假如有一个动物园，有两只动物，你可能会这样录入系统：
+```js
+const monkey = {
+    name: '悟空'，
+    age: '1'
+}
+​
+const tiger = {
+    name: '泰格伍兹'，
+    age: '3'
+}
+```
+
+如果你的动物越来越多，对象字面量也会越来越多，这个时候可以使用<font color="#FF6347">构造函数</font>来自动创建动物对象，比如：
+```js
+function Animal(name, age){
+  this.name = name
+  this.age = age
+}
+
+const animal = new Animal(name, age)
+```
+
+像Animal这样当新建对象的内存被分配后，用来初始化对象的特殊函数，就是构造函数。在JS中，我们使用构造函数去舒适化对象，就是应用了<font color="#FF6347">构造器模式</font>。
+
+可以看出每个实例化后 对象（ animal ）属性的key (name,age) 是不变的，对应的value（悟空，泰格伍兹）是变的。所以构造器将赋值过程封装，确保了每个对象属性固定，开放了取值确保个性灵活。
+
+1. 简单工厂模式
+重新封装构造函数，增加新的属性或方法。
+```js
+function Animal(name, age){
+  this.name = name
+  this.age = age
+  this.favorite = 'fruit'
+  this.food = [apple, banaba]
+}
+```
+
+2. 复杂工厂模式
+比如输入框可以设置为，文本框、密码框、邮箱框等；按钮可以设置主要的、危险的和普通按钮。
+
+#### 装饰器模式
+比如给一个类添加属性或者方法，装饰器模式不关心类或对象是如何创建的，只专注于怎么扩展它们的功能。
+```js
+var Car = function() {}
+Car.prototype.drive = function() {
+    console.log('乞丐版');
+}
+
+var AutopilotDecorator = function(car) {
+    this.car = car;
+}
+
+AutopilotDecorator.prototype.drive = function() {
+    this.car.drive();
+    console.log('启动自动驾驶模式');
+}
+
+var car = new Car();
+car = new AutopilotDecorator(car);
+car.drive();    
+// 乞丐版
+// 启动自动驾驶模式
+```
+
+#### 单例模式
+<font color="#FF6347">一个类只有一个实例，可以供全局访问</font>。全局对象就是最简单的单例模式。还有例如登陆弹出框只需要实例化一次，就可以反复使用了。
+
+```js
+// 实现单例模式弹窗
+var createWindow = (function(){
+    var div;
+    return function(){
+        if(!div) {
+            div = document.createElement("div");
+            div.innerHTML = "我是弹窗内容";
+            div.style.display = 'none';
+            document.body.appendChild(div);
+        }
+        return div;
+    }
+})()
+
+document.getElementById("Id").onclick = function(){
+    // 点击后先创建一个div元素
+    var win = createWindow();
+    win.style.display = "block";
+}
+```
+
+- 优点：适用于单一对象，只生成一个对象实例，避免频繁创建和销毁实例，减少内存占用。
+- 缺点：不适用于动态扩展对象，或需要创建多个相似对象的场景。
+
+
+#### 适配器模式
+点外卖的时候有美团、饿了么可以选择，但对于同一家店我们进行价格比较，需要来回切换，十分不便。
+
+```js
+class Eleme() {
+    getElePice() {
+        console.log('在饿了么上商品的价格')
+        return {elePrice:xx}
+    }
+} 
+
+class Meituan() {
+    getMeiPice() {
+        console.log('在美团上商品的价格')
+        return {meiPrice:xx}
+    }
+}
+```
+
+如果再多增加一些其他平台，前端渲染的时候要写多少个if else去判断来源。这个时候我们可以通过引入**适配器**。
+
+```js
+class ElemeAdapter() {
+  getPrice () {
+    const e =  new Eleme()
+    return { price:e.elePrice}
+  }
+}
+​
+class MeituanAdapter() {
+  getPrice () {
+    const m =  new Meituan()
+    return { price:m.meiPrice}
+  }
+}
+​
+//通过适配器拿到的数据格式都是统一的 {price:xx}
+//同样，入参也可以在适配器中统一处理
+```
+<font color="#FF6347">适配器主要用来解决两个已有接口之间不匹配的问题，它不考虑这些接口是如何实现的，也不考虑他们将来可能如何演化</font>。
+
+
+#### 代理模式
+
+#### 发布订阅模式
+发布-订阅模式是一种一对多的依赖关系，让多个观察者对象同时监听某一个目标对象，当这个目标对象的状态发生变化时，会通知所有观察者对象，使他们自动更新。
+
+
+#### 策略模式
+策略模式定义了一系列算法，把每个算法分别封装起来，让它们可以相互替换。例如：年终奖是薪水的几倍，是按等级来划分的，A级别是3倍，B级别是2倍，C级别是1倍，那么我们就可以写三个等级方法，然后封装在一个方法中，传入等级和薪水就好了。
+
+#### 迭代模式
+迭代模式就是用来遍历集合对象的，主要作用是解耦容器代码和遍历代码。
+```js
+// jQuery 中的迭代器模式
+$.each([1, 2, 3], function(i, n) {
+ console.log('当前下标为:' + i)
+ console.log('当前的值为：' + n)
+})
+```
+
+
 ### **JS中的包装类**
 在JS中，三大基本类型String、Number、Boolean没有属性和方法，JS为了方便开发者使用这三个基本类型进行快速开发，实现了包装类，使String、Number、Boolean变为String对象、Number对象、Boolean对象，是他们可以添加属性并使用某些方法。
 
@@ -1862,7 +2022,7 @@ const map = [
 ]
 ```
 
-WeakMap 对象也是一组键值对的集合，其中的键是弱引用的。<font color="#FF6347">**其键必须是对象**，原始数据类型不能作为key值，而值可以是任意的</font>。
+WeakMap 对象也是一组键值对的集合，其中的键是弱引用的。<font color="#FF6347">**其键必须是对象**，原始数据类型不能作为key值，而值可以是任意类型的</font>。
 
 WeakMap的API：
 - set(key,value)：设置键名key对应的键值value，然后返回整个Map结构，如果key已经有值，则键值会被更新，否则就新生成该键。（因为返回的是当前Map对象，所以可以链式调用）
@@ -1871,11 +2031,60 @@ WeakMap的API：
 - delete(key)：该方法删除某个键，返回true，如果删除失败，返回false。
 - 其clear()方法已经被弃用，所以<font color="#FF6347">可以通过创建一个空的WeakMap并替换原对象来实现清除</font>。
 
-有时想在某个对象上面存放一些数据，但是这会形成对于这个对象的引用。一旦不再需要这两个对象，就必须手动删除这个引用，否则垃圾回收机制就不会释放对象占用的内存。而weakMap设计的目的在于<font color="#FF6347">**WeakMap的键名所引用的对象都是弱引用**，垃圾回收机制不将弱引用考虑在内</font>。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就是说，一旦不再需要，<font color="#FF6347">**WeakMap 里面的键名对象和所对应的键值对会自动消失，不用手动删除引用**</font>。
+**WeakMap设计的目的在于**：有时想在某个对象上面存放一些数据，但是这会形成对于这个对象的引用。一旦不再需要这两个对象，就必须手动删除这个引用，否则垃圾回收机制就不会释放对象占用的内存。而weakMap设计的目的在于<font color="#FF6347">**WeakMap的键名所引用的对象都是弱引用**，垃圾回收机制不将弱引用考虑在内</font>。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就是说，一旦不再需要，<font color="#FF6347">**WeakMap 里面的键名对象和所对应的键值对会自动消失，不用手动删除引用**</font>。
 
 **总结：**
 - Map 数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
 - WeakMap 结构与 Map 结构类似，也是用于生成键值对的集合。但是 WeakMap 只接受对象作为键名（ null 除外），不接受其他类型的值作为键名。而且 WeakMap 的键名所指向的对象，不计入垃圾回收机制。
+
+### **WeakMap详解**
+先来看一个例子：
+```js
+let obj = { name: 'toto' }
+
+// { name: 'toto' }这个对象能够被读取到，因为obj这个变量名有对它的引用
+
+// 将引用覆盖掉
+obj = null
+
+// 这个对象将会被从内存中移除，因为我们已经失去了对它所有的引用
+```
+
+再来看另一个例子：
+```js
+let obj = { name: 'toto' }
+let arr = [ obj ]
+
+obj = null
+```
+在这个例子中，对象`{ name: 'toto' }`不会被`内存`中移除，因为数组arr保存了对它的引用。
+
+#### 强引用和弱引用之间的区别是什么？
+JS中大多数变量都保存着对一个对象的强引用，比如上面这个数组保存着对对象`{ name: 'toto' }`的强引用。
+
+<font color="#FF6347">如果一个变量保存着对一个对象的强引用，那么这个对象将不会被垃圾回收，但如果一个变量只保存这对这个对象的弱引用，那么这个对象会在不使用后被垃圾回收</font>。
+
+#### Map与WeakMap的对比
+使用map，对象会占用内存，可能不会被垃圾回收。Map对一个对象时强引用。
+```js
+let obj = { name: 'toto' }
+let mapObj = new Map()
+mapObj.set(obj, 'any value')
+
+obj = null
+mapObj.size() // 1
+```
+
+使用weakMap，他直接收`Object`作为`key`，并且对`Object`的引用为`弱引用`。
+```js
+let obj = { name: 'toto' }
+let weakmapObj = new WeakMap()
+weakmapObj.set(obj, 'any value')
+
+obj = null
+weakmapObj .size() // 0
+```
+
 
 
 ### **JS中的内置对象**
@@ -2262,13 +2471,6 @@ const name_adc = curring('adc')
 console.log(nameList1.map(name_mid))
 console.log(nameList2.map(name_adc))
 ```
-
-## 内存溢出的场景
-- 闭包
-- 意外的全局变量
-- 被遗忘的计时器或回调函数：设置了setInterval，忘记取消。如果循环中有对外部变量的引用的话，会被一直留在内存中，而无法被回收
-- 脱离DOM的引用：获取一个 DOM 元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以它也无法被回收。
-
  
 ## 执行上下文/作用域链/闭包
 ### **1. 对闭包的理解**
@@ -2772,22 +2974,183 @@ axios.patch('apiURL', {
 ### **对象继承的方式**
 继承就是<font color="#FF6347">使子类可以使用父类的属性和方式而不必编写相同的代码，子类也可以重写父类的属性和方法，这样会覆盖父类的属性和方法，使其获得与父类不同的功能</font>。
 
+![image](https://user-images.githubusercontent.com/70066311/168773972-1d6ebe86-30e1-4bbc-940a-abd1acc62387.png)
+
 实现方式：
 1. 属性拷贝
 将对象的所有成员复制一份给需要继承的对象。<font color="#FF6347">因为**浅拷贝**，对于引用类型，如果子类修改会对父类产生影响</font>
+
 2. 原型继承
 利用构造函数的原型对象实现继承(X.prototype)。<font color="#FF6347">只能继承父构造函数的原型对象上的成员，不能继承父构造函数的实例对象的成员</font>
+
+使用Object.create方法实现继承
+
+```js
+let parent4 = {
+    name: "parent4",
+    friends: ["p1", "p2", "p3"],
+    getName: function() {
+      return this.name;
+    }
+  };
+
+  let person4 = Object.create(parent4);
+  person4.name = "tom";
+  person4.friends.push("jerry");
+
+  let person5 = Object.create(parent4);
+  person5.friends.push("lucy");
+
+  console.log(person4.name); // tom
+  console.log(person4.name === person4.getName()); // true
+  console.log(person5.name); // parent4
+  console.log(person4.friends); // ["p1", "p2", "p3","jerry","lucy"]
+  console.log(person5.friends); // ["p1", "p2", "p3","jerry","lucy"]
+```
+
+因为Object.create实现的是浅拷贝，所以对于引用类型，存在修改数据混乱的问题。
+
 3. 原型链继承
-子类.prototype = new 父类()。<font color="#FF6347">不能向父构造函数传递参数。如果包含引用类型，会被所有的实例对象共享，容易造成修改混乱</font>
+原型链继承涉及构造函数、原型和实例。
+```js
+function Parent() {
+  this.name = 'parent1';
+  this.play = [1, 2, 3]
+}
+function Child() {
+  this.type = 'child2';
+}
+Child.prototype = new Parent()
+console.log(new Child())
+```
+<font color="#FF6347">不能向父构造函数传递参数。如果包含引用类型，会被所有的实例对象共享，容易造成修改混乱</font>
+
+```js
+const s1 = new Child()
+const s2 = new Child()
+s1.play.push(4)
+console.log(s1.play, s2.play)   // [1, 2, 3, 4]
+```
+
 4. 借助构造函数
-使用call或apply继承。<font color="#FF6347">可以解决向父构造函数传参的问题，但是不能获取父构造函数原型上的属性和方法</font>
+使用call或apply继承。<font color="#FF6347">可以解决向父构造函数传参的问题，可以继承父类的实例属性和方法，但是不能获取父构造函数原型上的属性和方法</font>
+
+```js
+function Parent(){
+  this.name = "parent"
+}
+
+Parent.prototype.getName = function(){
+  return this.name
+}
+
+function Child(){
+  Parent.call(this)
+  this.type = "Child"
+}
+
+let child = new Child()
+
+console.log(child)
+console.log(child.getName())
+```
+
 5. 组合继承
 使用call或apply和原型继承。<font color="#FF6347">父类构造函数的属性和方法继承到了子类构造函数的实例中，并且继承了父类构造函数原型对象上的成员，但会给子类添加很多不必要的属性和方法</font>
+
+```js
+function Parent() {
+  this.name = "parent"
+  this.play = [1, 2, 3]
+}
+
+Parent.prototype.getName = function () {
+  return this.name
+}
+
+function Child() {
+  // 第一次调用父类
+  Parent.call(this)
+  this.type = "child"
+}
+
+// 第二次调用父类
+Child.prototype = new Parent()
+Child.prototype.constructor = Child
+const child1 = new Child()
+const child2 = new Child()
+child1.play.push(4)
+
+console.log(child1)
+console.log(child2)
+console.log(child1.getName())
+```
+
+<font color="#FF6347">组合继承解决了构造函数继承和原型链继承的缺点，但是却调用了两次父类，造成了额外的性能开销</font>。
+
 6. 构造函数 + 深拷贝
-7. 寄生组合式继承
+
+7. 寄生式继承
+在原型继承的基础上增加一些方法。
+
+```js
+let parent5 = {
+    name: "parent5",
+    friends: ["p1", "p2", "p3"],
+    getName: function() {
+        return this.name;
+    }
+};
+
+function clone(original) {
+    let clone = Object.create(original);
+    clone.getFriends = function() {
+        return this.friends;
+    };
+    return clone;
+}
+
+let person5 = clone(parent5);
+
+console.log(person5.getName()); // parent5
+console.log(person5.getFriends()); // ["p1", "p2", "p3"]
+```
+
+8. 寄生组合式继承
 <font color="#FF6347">寄生式组合继承的方式是使用父类型的原型的副本来作为子类型的原型，这样就避免了创建不必要的属性</font>
 
-8. es6 extends
+```js
+function clone (parent, child) {
+    // 这里改用 Object.create 就可以减少组合继承中多进行一次构造的过程
+    child.prototype = Object.create(parent.prototype);
+    child.prototype.constructor = child;
+}
+
+function Parent6() {
+    this.name = 'parent6';
+    this.play = [1, 2, 3];
+}
+Parent6.prototype.getName = function () {
+    return this.name;
+}
+function Child6() {
+    Parent6.call(this);
+    this.friends = 'child5';
+}
+
+clone(Parent6, Child6);
+
+Child6.prototype.getFriends = function () {
+    return this.friends;
+}
+
+let person6 = new Child6();
+console.log(person6); //{friends:"child5",name:"child5",play:[1,2,3],__proto__:Parent6}
+console.log(person6.getName()); // parent6
+console.log(person6.getFriends()); // child5
+```
+
+9. es6 extends
 
 ## 垃圾回收机制
 ### **垃圾回收的概念**
@@ -3687,7 +4050,7 @@ TCP建立连接后，在一段时间内双方没有发送任何数据，那么�
 
 除了客户端拔掉网线后，还有客户端`宕机`和`杀死进程`两种场景
 1. 宕机。客户端宕机和拔掉网线是一样无法被服务器感知的，所以如果在没有数据传输并没有开启TCP的keep-alive机制的情况下，服务器的TCP连接会一直处于ESTABLISHED连接状态，知道服务器重启进程。
-2. 杀死进程。杀死客户端进程后，客户端会向服务器进行四次握手。
+2. 杀死进程。杀死客户端进程后，客户端会向服务器进行四次挥手。
 
 
 ### **URL各个组成部分详解**
@@ -4032,7 +4395,34 @@ Cache-Control的优先级比Expires高。
 2. 最大限度减少关键资源的数量：延迟它们的加载，将它们标记为异步等
 3. 优化关键字节数以缩短下载时间（往返次数）
 4. 优化其余关键资源的加载顺序：您需要尽早下载所有关键资产，以缩短关键路径长度
- 
+
+## Cookie和Session
+### **什么是Cookie**
+Cookie的本质就是一段文本，它是浏览器第一次向服务器发起请求后浏览器返回给客户端的，在以后发送时浏览器都会写带上这个Cookie，用于<font color="	#FF6347">服务器判断前后请求是否由同一个用户发起，起到保持用户登录状态的作用</font>。
+
+#### Cookie的作用
+- 会话状态管理：如用户登陆状态、购物车、游戏分数等
+- 个性化设置：主题、用户自定义设置等
+- 浏览器行为跟踪：分析用户行为
+
+### **什么是Session**
+Session是服务器和客户端一次会话的过程。<font color="	#FF6347">Session对象存储特定用户会话所需的属性及配置信息，这样用户在应用程序的Web页之间跳转时，存储在Session对象中的变量将不会丢失，而是在整个用户会话中一直存在下去。当客户端关闭会话或者Session超时失效时会话结束</font>。
+
+### Cookie和Session是如何配合的
+用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session ，请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器，浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名。
+
+当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+
+根据以上流程可知，SessionID 是连接 Cookie 和 Session 的一道桥梁，大部分系统也是根据此原理来验证用户登录状态。
+
+### **Cookie和Session的区别**
+- 作用范围不同：Cookie保存在客户端；Session保存在服务器
+- 存储方式不同：Cookie只能保存二进制；Session可以存放任意类型的数据
+- 有效期不同：Cookie可以长时间保持；而Session一般时效较短
+- 安全性不同：Cookie存储在客户端，容易被劫持；Session存储在服务器，更加安全
+- 存储大小不同：Cookie存储空间不超过4K；Session可存储数据远大于Cookie
+
+
 ## 浏览器本地存储
 ### 浏览器本地存储方式及使用场景
 (1) Cookie    
@@ -4131,7 +4521,7 @@ SessionStorage的适用场景：
 - LocalStorage：是浏览器本地存储的方法，<font color="	#FF6347">除非手动删除，不然会被永久保存在本地，可以用来存储主题颜色、用户一些补偿修改的信息等</font>，只能被同源的页面访问。
 - SessionStorage：是浏览器本地存储方法，<font color="	#FF6347">刷新不会删除存储，在关闭页面时会删除存储</font>，SessionStorage只能被同一个窗口的同源页面访问。
 
-### **：IndexedDB**
+### **IndexedDB**
 当本地存储大量数据时，就可以使用：IndexedDB。<font color="#FF6347">：IndexedDB是浏览器提供的一种本地的数据库存储机制，他不是关系型数据库，它内部采用对象仓库的形式存储数据</font>。
 
 ![image](https://user-images.githubusercontent.com/70066311/164193620-422d47c0-c81f-4286-9f9f-775ab98cf5a8.png)
@@ -4208,10 +4598,49 @@ JSONP的缺点：
 ### **事件流**
 事件流就是<font color="	#FF6347">事件的流向，先捕获，再到事件源，最后再冒泡，在DOM2级事件模型中，事件流分为三个阶段：事件捕获、事件处理、事件冒泡</font>。
 
+![image](https://user-images.githubusercontent.com/70066311/168778692-6ce7250c-132c-460a-9f4c-0faf6c1c86a0.png)
+
 ### **事件模型**
 - DOM0级事件模型：可以在网页中直接定义监听函数，也可以通过js来指定监听函数，直接在DOM对象上注册事件。
+
+HTML代码中直接绑定
+```html
+<input type="button" onclick="fun()">    
+```
+
+通过JS代码绑定
+```js
+var btn = document.getElementById('.btn');
+btn.onclick = fun;
+```
+
+**特性**：   
+  1. 绑定速度快。但由于绑定速度太快，有可能页面还未加载出来就已经完成绑定，导致绑定事件不可用。
+  2. 只支持冒泡，不支持捕获。   
+  3. 同一个类型的事件只能绑定一次。
+```html
+<input type="button" id="btn" onclick="fun1()">
+
+var btn = document.getElementById('.btn');
+btn.onclick = fun2;
+```
+
 - IE事件模型：该事件模型共有两个过程：事件处理阶段和事件冒泡阶段。事件处理阶段会首先执行目标元素绑定的监听事件。然后是事件冒泡阶段，冒泡指的是事件从目标元素冒泡到document，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。
-- DOM2级事件模型：一共三个过程：<font color="	#FF6347">事件捕获阶段：事件从document一直向下传播到目标元素，依次检查经过的结点是否绑定了事件监听函数，如果绑定则执行</font>。后两个阶段与IE事件模型相同。
+
+- DOM2级事件模型：一共三个过程：
+1. <font color="	#FF6347">事件捕获阶段：事件从document一直向下传播到目标元素，依次检查经过的结点是否绑定了事件监听函数，如果绑定则执行</font>。
+2. 事件处理阶段：事件到达目标元素，出发目标元素的监听函数。
+3. 事件冒泡阶段：事件从目标元素冒泡到`document`，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。
+
+**特性**：
+1. 一个DOM元素可以绑定多个事件，并不会冲突。
+```js
+btn.addEventListener(‘click’, showMessage1, false);
+btn.addEventListener(‘click’, showMessage2, false);
+btn.addEventListener(‘click’, showMessage3, false);
+```
+2. 执行时机：如果第三个参数设置为true时，会在事件捕获阶段执行，如果为false会在事件冒泡中执行。
+
 
 ### **事件冒泡**
 事件冒泡就是<font color="	#FF6347">元素自身的事件被触发后，如果父元素有相同的事件，如onclick 事件，那么元素本身的触发状态就会传递，也就是冒泡到父元素，父元素的相同事件也会一级一级根据嵌套关系向外触发，直到 document/window，冒泡过程结束</font>。
@@ -4224,6 +4653,29 @@ JSONP的缺点：
 
 ### **事件委托**
 事件委托就是<font color="	#FF6347">把子元素响应事件的函数委托到父元素，由父元素统一处理多个子元素的事件</font>。事件委托的优点是<font color="	#FF6347">内存消耗少，效率较高、可以动态绑定事件</font>。
+
+```html
+<ul id="list">
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+  ......
+  <li>item n</li>
+</ul>
+
+<script>
+  // 给父层元素绑定事件
+  document.getElementById('list').addEventListener('click', function (e) {
+    // 兼容性处理
+    var event = e || window.event;
+    var target = event.target || event.srcElement;
+    // 判断是否匹配目标元素
+    if (target.nodeName.toLocaleLowerCase() === 'li') {
+      console.log('the content is: ', target.innerHTML);
+    }
+  });
+</script>
+```
 
 事件委托的局限性：对于一些事件没有事件冒泡机制，无法实现事件委托。
 
@@ -6705,3 +7157,96 @@ class TodoItem extends React.Component{
 | 特点 | 是类组件、可以使用this、可以使用生命周期函数、根据外部传入的props和自身的state进行渲染、若频繁触发生命周期函数会影响性能 | 不依赖自身state、可以避免使用this、性能更高、只根据props进行渲染 |
 | 使用场景 | 需要使用状态或需要使用状态操作组件时时 | 组件不需要管理state，纯展示 |
 | 总结 | 类组件可以维护自身的状态变量，让开发者在组件的不同阶段对组件进行更多的控制  | 视图与数据解耦分离、专注于render |
+
+
+# 场景题
+## 如何实现登录
+### **登录设计**
+#### Cookie+Session
+
+HTTP 是一种无状态的协议，客户端每次发送请求时，首先要和服务器端建立一个连接，在请求完成后又会断开这个连接。这种方式可以节省传输时占用的连接资源，但同时也存在一个问题：每次请求都是独立的，服务器端无法判断本次请求和上一次请求是否来自同一个用户，进而也就无法判断用户的登录状态。
+
+```
+Cookie 是服务器端发送给客户端的一段特殊信息，
+这些信息以文本的方式存放在客户端，
+客户端每次向服务器端发送请求时都会带上这些特殊信息。
+```
+
+有了 Cookie 之后，服务器端就能够获取到客户端传递过来的信息了，如果需要对信息进行验证，还需要通过 Session。
+
+```
+客户端请求服务端，服务端会为这次请求开辟一块内存空间，
+这个便是 Session 对象。
+```
+
+**Cookie + Session  实现流程 ：**      
+用户首次登录时：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/29eff433af81485d87f83f9888ef8f7f.png)
+1. 用户访问 a.com/pageA，并输入密码登录。
+2. 服务器验证密码无误后，会创建 SessionId，并将它保存起来。
+3. 服务器端响应这个 HTTP 请求，并通过 Set-Cookie 头信息，将 SessionId 写入 Cookie 中。
+
+第一次登录完成之后，后续的访问就可以直接使用 Cookie 进行身份验证了：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7d41f6d86dd04255b15801ed91c44717.png)
+1. 用户访问 a.com/pageB 页面时，会自动带上第一次登录时写入的 Cookie。
+2. 服务器端比对 Cookie 中的 SessionId 和保存在服务器端的 SessionId 是否一致。
+3. 如果一致，则身份验证成功。
+
+Cookie+Session存在的问题
+- 由于服务器端需要对接大量的客户端，也就需要存放大量的 SessionId，这样会导致服务器压力过大。
+- 如果服务器端是一个集群，为了同步登录态，需要将 SessionId 同步到每一台机器上，无形中增加了服务器端维护成本。
+- 由于 SessionId 存放在 Cookie 中，所以无法避免 CSRF 攻击。
+- Cookie无法跨域，难以实现单点登录
+
+
+#### Token登录
+
+Token 是服务端生成的一串字符串，以作为客户端请求的一个令牌。当第一次登录后，服务器会生成一个 Token 并返回给客户端，客户端后续访问时，只需带上这个 Token 即可完成身份认证。
+
+
+**token的实现流程：**      
+用户首次登录时：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/54d6b9b14eba476fae3b1d7ed5ff5fc9.png)
+1. 用户输入账号密码，并点击登录。
+2. 服务器端验证账号密码无误，创建 Token。
+3. 服务器将 Token 返回给客户端，由***客户端自由保存***。
+
+后续页面访问时：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7ffb8dbb2d2245ae9c7f2223d2c919f8.png)
+1. 用户访问 a.com/pageB 时，带上第一次登录时获取的 Token。
+2. 服务器端验证 Token ，有效则身份验证成功。
+
+**Token 机制的特点**：      
+- 服务器端不需要存放 Token，所以不会对服务器端造成压力，即使是服务器集群，也不需要增加维护成本。
+- Token 可以存放在前端任何地方，可以不用保存在 Cookie 中，提升了页面的安全性。
+- Token 下发之后，只要在生效时间之内，就一直有效，如果服务器端想收回此 Token 的权限，并不容易。
+- Token在跨域后不会存在信息丢失的问题。
+- 不会遭受CSRF攻击
+
+#### Token的生成方式
+最常见的 Token 生成方式是使用 JWT（Json Web Token），JWT的本质就是一个字符串，它将用户的信息保存到一个JSON字符串中，然后编码得到一个Token，并且这个Token带有签名信息，在接收后可以校验是否被篡改。
+
+#### JWT的结构
+JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组成。
+
+- Header中存储着一些描述信息
+- Payload中存放着需要传递的数据，一般会把用户信息数据放在payload中
+- Signature：签名部分，确保数据不被篡改
+
+#### JWT的认证流程如下：
+1. 首先，前端通过Web表单将自己的用户名和密码发送到后端的接口，这个过程一般是一个POST请求。建议的方式是通过SSL加密的传输(HTTPS)，从而避免敏感信息被嗅探
+2. 后端核对用户名和密码成功后，将包含用户信息的数据作为JWT的Payload，将其与JWT Header分别进行Base64编码拼接后签名，形成一个JWT Token，形成的JWT Token就是一个如同lll.zzz.xxx的字符串
+3. 后端将JWT Token字符串作为登录成功的结果返回给前端。前端可以将返回的结果保存在浏览器中，退出登录时删除保存的JWT Token即可
+4. 前端在每次请求时将JWT Token放入HTTP请求头中的Authorization属性中(解决XSS和XSRF问题)
+5. 后端检查前端传过来的JWT Token，验证其有效性，比如检查签名是否正确、是否过期、token的接收方是否是自己等等
+6. 验证通过后，后端解析出JWT Token中包含的用户信息，进行其他逻辑操作(一般是根据用户信息得到权限等)，返回结果
+
+#### 如何增加JWT的安全性
+- 将JWT Token放在请求头中传输，避免网络劫持
+- 使用HTTPS传输
+- JWT可以使用暴力穷举破解，所以应该定期更换服务器的哈希签名密钥
+
+### **单点登录**
+单点登录就是公司在内部搭建一个认证中心，公司下的所有产品都在认证中心进行登录，当一个产品在认证中心登录后，那么该公司的其他产品也会保留这个登录状态，使用其他产品时就不需要在登录了。
+### **第三方登录**
+第三方账号进行登录，比如抖音可以使用今日头条的帐号登录。
