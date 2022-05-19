@@ -53,7 +53,7 @@ href指向网络资源所在的位置，建立与当前元素或当前文档之�
 1. charset：执行编码类型
 ```html
 <meta charset="UTF-8" >
-```
+``` 
 
 2. keywords：页面关键词
 ```html
@@ -179,7 +179,7 @@ SPA为单页面应用，它将所有活动局限于一个Web页面中，仅在�
 
 缺点：
 1. 初次加载耗时多。SPA应用需要在页面初次加载时就将JS、CSS同一加载，可以通过路由懒加载实现部分页面按需加载
-2. 兼容性差
+2. 兼容性差，并不是所有浏览器都支持hash
 3. 不利于SEO
 
 ### **BOM对象**
@@ -2870,7 +2870,7 @@ xhr.onreadystatechange = () => {
 <font color="#FF6347">axios是使用promise封装的ajax，它内部有两个拦截器，分别是request拦截器和response拦截器</font>。
 
 - 请求拦截器的作用是<font color="#FF6347">在请求发送之前进行一些操作，例如在每个请求体上加入token</font>
-- 响应拦截器的作用是<font color="#FF6347">接收到响应后做的一些操作，例如登录失败后需要重新登录跳转到登录页</font>
+- 响应拦截器的作用是<font color="#FF6347">接收到响应后做的一些操作，例如登录失效后需要重新登录跳转到登录页</font>
 
 **axios的特点**
 - 由浏览器端发起请求
@@ -2969,6 +2969,16 @@ axios.patch('apiURL', {
 
 ### **Fetch和Ajax比有什么优点**
 `Fetch`使用的是`promise`，方便使用异步，没有回调地狱的问题。
+
+### **总结**
+
+![image](https://user-images.githubusercontent.com/70066311/168945541-08ae4f16-0796-49cb-b31a-1585cfc4a813.png)
+
+`Ajax`是一种web数据交互的方式，它可以使页面在不重新加载的情况下请求数据并进行局部更新，它内部使用了`XHR`来进行异步请求。<font color="#FF6347">`Ajax`在使用`XHR`发起异步请求时得到的是`XML`格式的数据，如果想要JSON格式，需要进行额外的转换；`Ajax`本身针对的是`MVC框架`，不符合现在的`MVVM架构`；`Ajax`有回调地狱问题；`Ajax`的配置复杂</font>
+
+而`Fetch`是XHR的代替品，它基于`Promise`实现的，并且不使用回调函数，它<font color="#FF6347">采用模块化结构设计，并使用数据流进行传输，对于大文件和网速慢的情况非常友好。但是`Fetch`不会对请求和响应进行监听；不能阻断请求；过于底层，对一些状态码没有封装；兼容性差</font>。
+
+`axios`是基于`Promise`对`XHR`进行封装，它内部封装了两个拦截器，分别是请求拦截器和响应拦截器。请求拦截器用于在请求发出之前进行一些操作，比如：设置请求体，携带Cookie、token等；响应拦截器用于在得到响应后进行一些操作，比如：登录失效后跳转到登录页面重新登录。`axios`有get、post、put、patch、delete等方法。<font color="#FF6347">axios可以对请求和响应进行监听；返回`Promise`对象，可以使用`Promise`的API；返回`JSON`格式的数据；由浏览器发起请求；安全性更高，可以抵御CSRF攻击</font>。
 
 ## 面向对象
 ### **对象继承的方式**
@@ -3253,6 +3263,7 @@ webpack是一个用于现代JS应用程序的静态模块打包工具。webpack�
 - 代码校验：会检查代码是否合规，检测单元测试是否通过
 
 ### **webpack的构建**
+1. 
 
 
 ### **Webpack和grunt、gulp的区别**
@@ -3321,6 +3332,11 @@ loader运行在打包文件之前；plugin在整个webpack生命周期都起作�
 - Code Splitting：将代码按组件分块、做到按需加载，同时充分利用浏览器缓存
 - 提取公共第三方库：将公共模块抽取，利用浏览器缓存可以长期缓存这些无需变动的代码
 
+### **Babel**
+Babel可以让我们在开发中使用TS、JSX、ES6语法而不用担心浏览器兼容性问题，它可以将这些语法特性转换为浏览器可以识别的语言。
+
+Babel的原理是<font color="#FF6347">将代码转换为AST，对AST应用各种插件进行处理，最终输出编译后的JS代码</font>。
+
 # 计算机网络
 ## 什么是HTTP协议
 HTTP（超文本传输协议）是客户端与服务器之间交换报文的方式，默认使用80端口，是应用层协议，它使用TCP作为传输层协议，保证了数据传输的可靠性。 
@@ -3379,6 +3395,11 @@ Accept: */*
 - 头部数据压缩：HTTP 2.0对头部信息进行了压缩。因为头部信息中例如cookie等字段都是重复，每次请求都会带上这些字段造成带宽的浪费。
 - 服务器推送：HTTP 2.0允许未经服务器允许，向客户端推送资源（静态资源），这样可以减少延迟。
 - HTTP2.0使用数据流进行传输，因为HTTP2.0不按顺序发送，
+
+## HTTP协议是什么工作模式
+- http 1.0：单工。因为是短连接，客户端发起请求之后，服务器处理完请求并收到客户端的响应后才断开连接。
+- http 1.1：半双工。默认开启长连接`keep-alive`，开启一个连接可以发送多个请求。
+- http 2.0：全双工。允许服务器主动向客户端发送数据。
 
 ## HTTP 3.0
 在HTTP 2.0中多个HTTP请求会复用一个TCP，一旦发生丢包，会阻塞所有的HTTP请求，这时基于TCP传输可能出现的问题，所以HTTP 3.0把TCP换成了UDP。
@@ -4052,6 +4073,23 @@ TCP建立连接后，在一段时间内双方没有发送任何数据，那么�
 1. 宕机。客户端宕机和拔掉网线是一样无法被服务器感知的，所以如果在没有数据传输并没有开启TCP的keep-alive机制的情况下，服务器的TCP连接会一直处于ESTABLISHED连接状态，知道服务器重启进程。
 2. 杀死进程。杀死客户端进程后，客户端会向服务器进行四次挥手。
 
+### **WebSocket**
+WebSocket是HTML5提供的一种浏览器与服务器进行全双工通讯的网络技术，属于应用层协议，它是基于TCP传输协议的。<font color="	#FF6347">WebSocket的出现就解决了半双工通信的弊端。服务器可以主动向客户端推送数据，客户端也可以主动向服务器推送消息</font>。
+
+**WebSocket的原理**：客户端向WebSocket服务器发送通知，带有所有接收者ID的事件，服务器会立即通知所有活跃的客户端，只有ID在接收者ID序列中的客户端才会处理这个事件。
+
+**WebSocket的特点**：
+- 支持双向通信，实时性更强
+- 可以发送文本，也可以发送二进制数据
+- 建立在TCP协议之上
+- 数据格式轻量，性能开销小，通信高效
+- 没有同源限制，客户端可以和任意服务器通信
+
+### **短轮询、长轮询、SSE和WebSocket的区别**
+- 短轮询：客户端每隔一段时间就像服务器发送一次http请求，服务器收到请求后不管数据是否更新，都直接进行响应，通过客户端不断的发送请求，客户端可以收到服务器端的数据变化。<font color="	#FF6347">这种方式简单、易于理解。缺点就是建立http请求频繁，浪费了服务器和客户端的资源</font>。
+- 长轮询：客户端向服务器发送请求后，服务器不会立即响应，而是判断服务器数据是否有更新，如果有更新，则进行响应；如果没有更新，则到达一定时间限制才返回。客户端 JS 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接。长轮询和短轮询比起来，它的优点是明显减少了很多不必要的 http 请求次数，相比之下节约了资源。长轮询的缺点在于，连接挂起也会导致资源的浪费。
+- SSE：服务器使用流信息向客户端推送信息。严格地说，http 协议无法做到服务器主动推送信息。但是，有一种变通方法，就是服务器向客户端声明，接下来要发送的是流信息。也就是说，发送的不是一次性的数据包，而是一个数据流，会连续不断地发送过来。这时，客户端不会关闭连接，会一直等着服务器发过来的新的数据流，视频播放就是这样的例子。SSE 就是利用这种机制，使用流信息向浏览器推送信息。它基于 http 协议，目前除了 IE/Edge，其他浏览器都支持。它相对于前面两种方式来说，不需要建立过多的 http 请求，相比之下节约了资源。
+- WebSocket：是 HTML5 定义的一个新协议议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。使用 WebSocket 协议的缺点是在服务器端的配置比较复杂。WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息，而 SSE 的方式是单向通信的，只能由服务器端向客户端推送信息，如果客户端需要发送信息就是属于下一个 http 请求了。
 
 ### **URL各个组成部分详解**
 `http://www.aspxfans.com:8080/news/index.asp?boardID=5&ID=24618&page=1#r_70732423`
@@ -5500,7 +5538,7 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 
 ### **受控组件与非受控组件**
 1. 受控组件
-在使用表单来收集用户输入时，例如\<input>、\<select>、\<textarea>等元素都要绑定一个`change`事件，当表单状态发生变化时，就会触发`onChange`事件，更新组件的state。这种组件为<font color="#FF6347">受控组件</font>，在受控组件中，组件渲染出的状态与它的value或checked属性相对应，react通过这种方法消息组件的局部状态，是整个状态可控。
+在使用表单来收集用户输入时，例如\<input>、\<select>、\<textarea>等元素都要绑定一个`onChange`事件，当表单状态发生变化时，就会触发`onChange`事件，更新组件的state。这种组件为<font color="#FF6347">受控组件</font>，在受控组件中，组件渲染出的状态与它的value或checked属性相对应，react通过这种方法消息组件的局部状态，使整个状态可控。
 
 受控组件更新state的流程：
 - 可以通过初始state中设置表单的默认值
@@ -6117,7 +6155,7 @@ componentDidUpdate()会在更新后被立即调用，首次渲染不会执行此
 ### React废弃了三个生命周期函数是为什么？
 被废弃的三个函数分别是：<font color="	#FF6347">componentWillMount()、componentWillUpdate()、componentWillReceiveProps()</font>。
 
-componentWillMount()的功能完全可以被constructor()和componentDidMount()代替，比如异步请求、消息订阅的操作。如果使用服务端渲染的话，componentWillMount()会在服务器和客户端各执行一次，这会导致请求两次，增加服务器负担；而componentDidMount()只会在客户端执行一次。如果我们在componentWillMount()中订阅事件，但服务端并不会执行componentWillUnMount()，这会导致服务器端内存泄漏。
+componentWillMount()的功能完全可以被constructor()和componentDidMount()代替，比如异步请求、消息订阅的操作。如果使用服务端渲染的话，componentWillMount()会在服务器和客户端各执行一次，这会导致请求两次，增加服务器负担；而componentDidMount()只会在客户端执行一次。如果我们在componentWillMount()中订阅事件，但服务端并不会执行componentWillUnMount()，这会导致服务器端内存泄漏。<font color="	#FF6347">如果在componentWillMount()中进行异步请求，可以使数据返回的更快。但componentWillMount()执行结束后会立即执行render()，这时可能请求的结果还没有返回，当请求结果返回后，又会执行一次render()，所以第一次的render()是没有必要的，造成性能开销大</font>。
 
 componentWillReceiveProps()中主要做的事是<font color="	#FF6347">比较更新前后的两个props是否一致，如果不一致，再将props更新到state</font>。这么做有两个问题：
 1. <font color="	#FF6347">破坏了state单一数据源，导致组件的状态变得不可预测</font>
@@ -6132,8 +6170,18 @@ componentWillUpdate()不管更没更新，都会执行回调函数，而我们�
 <font color="	#FF6347">shouldComponentUpdate()</font>。如果父组件重新渲染，子组件会跟着重新渲染，大多数情况下，子组件的这种重新渲染是没有必要的，所以可以在shouldComponentUpdate()方法中取消子组件的更新，提升性能。
 
 ### 网络请求在哪个生命周期函数中处理
-<font color="	#FF6347">componentDidMount()</font>。在该生命周期函数中组件已被完全挂载到网页上了，可以保证数据的加载。
+<font color="	#FF6347">componentDidMount()和componentDidUpdate()</font>。在该生命周期函数中组件已被完全挂载到网页上了，可以保证数据的加载。
 
+### Component和PureComponent的区别
+Component和PureComponent几乎完全相同，但<font color="	#FF6347">PureComponent通过props和state的浅比较来实现shouldComponentUpdate()，在PureComponent中如果包含深层次的数据结构，那么会因为深层的数据不一致而导致更新错误，导致界面不更新</font>。
+
+PureComponent可以通过props和state的浅比较来实现shouldComponentUpdate()，而Component。
+
+#### PureComponent缺点
+可能会因深层的数据不一致而产生错误的否定判断，从而shouldComponentUpdate结果返回false，界面得不到更新。
+
+#### PureComponent优点
+不需要开发者自己实现shouldComponentUpdate，就可以进行简单的判断来提升性能。
 
 ## 数据管理
 ### React setState调用的原理
@@ -6646,6 +6694,64 @@ const value = useContext(TestContext);
 
 - useRef：获得组件的实例，多用于\<input>、\<form>等带有输入的DOM标签。
 
+**什么是闭包陷阱**：在hooks里面的函数，如果是useEffect(()=>(),[])这种写法，即只组件`挂载阶段`执行，那么在这里面的函数，拿到的值始终都只是初始化时候的值，就算你在其他地方修改了值之后，也是获取不到最新值的。
+
+React Hooks在渲染时维护了一个链表，来记录useState和useEffect等Hooks的位置和值。
+
+```js
+function App(){
+    const [count, setCount] = useState(1)
+    const [name, setName] = useState('chechengyi')
+    useEffect(()=>{
+        
+    }, [])
+    const text = useMemo(()=>{
+        return 'ddd'
+    }, [])
+}
+```
+
+在组件第一次渲染时，为每个hooks都创建了一个对象：
+```ts
+type Hook = {
+  memoizedState: any,
+  baseState: any,
+  baseUpdate: Update<any, any> | null,
+  queue: UpdateQueue<any, any> | null,
+  next: Hook | null,
+};
+```
+
+最终形成了一个链表：
+
+![image](https://user-images.githubusercontent.com/70066311/169180124-dcd9231a-ebc0-464f-8e19-0c17712978f4.png)
+
+
+```js
+const [count, setCount] = useState(1)
+useEffect(() => {
+    setInterval(() => {
+        console.log(count)
+    }, 1000)
+        //闭包陷阱
+}, [])
+
+const handleClick = () => {
+    setCount(count+1)
+}
+
+return (
+        <div onClick={handleClick}>
+            click to add, count: {count}
+        </div>
+)
+```
+
+在每次state更新时, 链表从头开始重新渲染，但是由于上面示例中useEffect没有依赖任何state，所以只有在第一次渲染的时候才会触发，setCount渲染更新时，useEffect里面的回调函数并没有触发，因此里面的setInterval里面的count还是初始化时的值，并没有获取到最新的. 这就是**闭包陷阱**。
+
+**使用useRef解决闭包陷阱**     
+<font color="	#FF6347">使用useRef每次拿到的都是这个对象本身，是同一个内存空间的数据，所以可以获取到最新的值</font>。
+
 - useMemo：与useEffect类似，区别在于<font color="	#FF6347">传入useMemo的函数会在页面渲染的时候执行，而useEffect是在页面渲染后才执行</font>。只有在数组中存储的变量发生变化时，useMemo()才会执行回调函数，可以减少局部页面渲染，提升性能。
 
 ### useMemo和useCallback的区别
@@ -6712,7 +6818,7 @@ Redux专门用于管理数据状态（容器组件），而React用于处理视�
 Redux主要解决的问题是将Redux的状态与React的UI绑定到一起，当使用dispatch(action)改变state时可以自动更新页面。
 
 ### Redux的工作原理
-<font color="	#FF6347">当组件想要更新状态时，Redux会创建一个action对象，action对象包含两个数据，一个是必备的type，表示action类型，第二个state，在action不会修改state的值，而是等待store调用dispatch()方法将action对象传递给reducer，reducer才是真正更新state值的对象。reducer接收两个参数，一个是preState，一个是action，通过匹配不同的action.type来执行不同的逻辑，然后返回一个新的state。store在组件挂载到页面后(componentDidmount)通过subscribe()方法一直监听reducer，一旦reducer改变完状态，就可以通过getState()方法得到新的经过reducer处理后的state</font>。
+<font color="	#FF6347">当组件想要更新状态时，Redux会创建一个action对象，action对象包含两个数据，一个是必备的type，表示action类型，第二个state，在action不会修改state的值，而是等待store调用dispatch()方法将action对象传递给reducer，reducer才是真正更新state值的对象。reducer接收两个参数，一个是preState，一个是action，通过匹配不同的action.type来执行不同的逻辑，然后返回一个新的state。store在组件挂载到页面后(componentDidmount)通过subscribe()方法一直监听reducer，一旦reducer改变完状态，就可以通过getState()方法得到新的经过reducer处理后的state。</font>
 
 ### **Redux深入理解**
 Redux源码主要分为以下几个模块文件：
@@ -6752,7 +6858,7 @@ Redux中间件是对dispatch的扩展，位于action -> reducer之间，使用�
 - 功能少，在开发中有些功能需要自己封装
 
 2. redux-saga
-redux-saga是一个管理redux应用异步操作的中间件，它通过创建Sagas将所有异步操作逻辑存放在一个文件进行集中处理，一次将同步与异步操作分离，以便于管理与维护。      
+redux-saga是一个管理redux应用异步操作的中间件，它通过创建Saga将所有异步操作逻辑存放在一个文件进行集中处理，一次将同步与异步操作分离，以便于管理与维护。      
 优点：     
 - 异步解耦：异步操作放在单独的文件中，降低耦合性
 - 异常可以直接使用try/catch捕获
