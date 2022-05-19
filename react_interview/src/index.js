@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Tabs from './View/Tabs';
+import App from './App';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <Tabs />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
