@@ -1,6 +1,13 @@
-const arr = [1, 2, 3, 4, 5]
-arr.forEach((item) => {
-  item += 1
-})
-
-console.log(arr);
+function timer(time) {
+  const startTime = new Date
+  console.log(startTime);
+  while (true) {
+    const now = new Date
+    console.log(now);
+    if (now - startTime >= time) {
+      console.log('误差', now - startTime - time);
+      return;
+    }
+  }
+}
+timer(1000);
