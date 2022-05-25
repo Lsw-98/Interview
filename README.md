@@ -19,6 +19,17 @@ href指向网络资源所在的位置，建立与当前元素或当前文档之�
 2. src在解析外部资源时会暂停其他资源的下载和处理；href会并行处理下载资源和处理当前文档
 3. src用于替换当前元素；href用于在当前文档和引用资源之间建立连接
 
+### a标签
+`a`标签定义超链接，用于从一个页面链接到另一个页面。
+
+`href`属性，指定链接的目标URL。
+
+`target`属性，规定在何处打开目标URL
+- _blank：新窗口打开
+- _parent：在父窗口打开链接
+- _self：当前页面跳转
+- _top：在当前窗体打开链接，替换当前的整个窗体
+
 ### **对HTML语义化的理解**
 语义化就是根据内容选择合适的标签。
 
@@ -182,8 +193,20 @@ SPA为单页面应用，它将所有活动局限于一个Web页面中，仅在�
 2. 兼容性差，并不是所有浏览器都支持hash
 3. 不利于SEO
 
-### **BOM对象**
-BOM是浏览器对象，常用的BOM属性：
+### 什么是DOM，什么是BOM
+#### DOM对象
+DOM是指文档对象模型，它指的是把文档当作一个对象，这个对象主要定义了处理网页内容的方法和接口。在js中提供了`document`对象来对`DOM`操作，js认为网页中的每个标签就是一个对象，使用`面向对象`的思想来操作DOM。
+
+**DOM常见的API**：
+- document.getElementById("id");
+- document.getElementsByTagName("p");
+- document.getElementsByClassName("p");
+- document.getELementsByName("name")
+
+#### BOM对象
+BOM是浏览器对象，主要定义了和浏览器进行交互的方法和接口。`BOM`的核心是`window`，而`window`对象具有双重角色，<font color="	#FF6347">它既是通过js访问浏览器窗口的一个接口，又是一个全局对象</font>。这意味着在网页中定义的任何对象、变量和函数，都作为`window`的一个属性或者方法存在。
+
+**常用的BOM属性**：
 - location对象
     - location.href：返回或设置当前文档的url
     - location.search：返回URL中的查询字符串部分
@@ -953,6 +976,28 @@ stretch（默认值）：如果项目未设置高度或设为auto，将占满整
 - 对父元素影响：
     1. <font color="#FF6347">从布局上“消失”</font>
     2. <font color="#FF6347">高度塌陷</font>
+
+### CSS如何针对不同浏览器做适应
+
+
+### CSS哪些属性不被IE兼容
+
+
+### font-size在不同浏览器中兼容性问题
+<font color="#FF6347">CSS在浏览器表现的运用，例如font-size、盒模型</font>
+在css中使用font-size设定字体大小，不同浏览器的字体`height`是一样的，但是`width`不同，比如在火狐和谷歌中，`font-size: 20px`字体中的高度为20px，但是谷歌的字体宽度比火狐长。
+
+解决方法如下：
+1. 将浏览器的基准字号设置为`62.5%`，也就是`10px`，现在`1rem=10px`。然后在`body`上应用`font-size: 2rem`，那么现在`body`的字体大小就是`20px`。
+```css
+html{
+  font-size: 62.5%
+}
+
+body{
+  font-size: 2rem
+}
+```
 
 ### **响应式布局**
 响应式布局就是一个网站同时能兼容多个终端。通过对不同宽度进行布局和样式的设置，从而适配不同设备的目的。
@@ -2853,8 +2898,30 @@ Offset = 现在的时间（67ms）- 执行一个定时器消耗的时间（50ms�
 
 **3. 使用web worker**：在HTML页面，如果在执行脚本时，页面状态是不可响应的，直到脚本执行完成后，页面才变得可响应。<font color="#FF6347">web Worker是运行在后台的js，独立于其他脚本，不会影响页面的性能</font>。
 
+**4. 使用requestAnimationFrame**
+`requestAnimationFrame`告诉浏览器你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行，回调函数执行次数通常是每秒60次，也就是每16.7ms 执行一次，但是并不一定保证为 16.7 ms。
+```js
+function setTimeout2 (cb, delay) {
+    let startTime = Date.now()
+    loop()
+  
+    function loop () {
+      const now = Date.now()
+      if (now - startTime >= delay) {
+        cb();
+        return;
+      }
+      requestAnimationFrame(loop)
+    }
+}
+```
+
+![1653490945(1)](https://user-images.githubusercontent.com/70066311/170294373-02f61a88-5ca7-4a7f-8b68-65f59a37a3d7.jpg)
+
+
 ### **AJAX、Fetch、axios**
-**AJAX**      
+**AJAX**
+
 <font color="#FF6347">AJAX可以在不更新全局的情况下更新局部页面。通过在与服务器进行数据交换，可以使网页实现异步更新</font>。
 
 **创建AJAX**     
@@ -4114,7 +4181,7 @@ WebSocket是HTML5提供的一种浏览器与服务器进行全双工通讯的网
 - 可以发送文本，也可以发送二进制数据
 - 建立在TCP协议之上
 - 数据格式轻量，性能开销小，通信高效
-- 没有同源限制，客户端可以和任意服务器通信
+- <font color="	#FF6347">没有同源限制，客户端可以和任意服务器通信</font>
 
 ### **短轮询、长轮询、SSE和WebSocket的区别**
 - 短轮询：客户端每隔一段时间就像服务器发送一次http请求，服务器收到请求后不管数据是否更新，都直接进行响应，通过客户端不断的发送请求，客户端可以收到服务器端的数据变化。<font color="	#FF6347">这种方式简单、易于理解。缺点就是建立http请求频繁，浪费了服务器和客户端的资源</font>。
@@ -5208,6 +5275,13 @@ console.log(obj2.c(1));    // 11
 3. var声明的变量为全局变量，并会将该变量添加为全局对象的属性。let和const不会
 4. 初始值设置：var和let可以不设置初始值，const必须设置初始值
 5. let创建的变量可以修改指针指向（可重新赋值）
+
+## var、let、const分别在什么时候使用？
+- let限制了变量的作用域，保证不去污染全局变量，一般用于基本数据类型
+- const一般在定义一些全局的常量或使用`require`来导入模块时使用，一般用于引用数据类型。
+- 因为使用var可能会造成变量提升，全局变量污染等问题，应该尽可能少的使用var
+
+使用优先级：<font color="	#FF6347">const > let > var</font>
 
 ## const对象可以修改吗？
 const保证的并不是值不变，而是const变量指向的内存地址不变，<font color="	#FF6347">对于基本数据类型</font>，其值就永远保存在变量指向的那个内存地址，因此等同于常量。但<font color="#FF6347">对于引用类型的数据（对象和数组）</font>，变量指向数据的内存地址，const只能保证这个指针是固定不变的，至于它指向的数据结构是不是可变的，就完全不能控制了。

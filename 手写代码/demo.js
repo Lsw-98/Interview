@@ -1,13 +1,15 @@
-function timer(time) {
-  const startTime = new Date
-  console.log(startTime);
-  while (true) {
-    const now = new Date
-    console.log(now);
-    if (now - startTime >= time) {
-      console.log('误差', now - startTime - time);
-      return;
-    }
+function addBigNumber(a, b) {
+  let res = ""
+  let temp = 0
+
+  a = a.split("")
+  b = b.split("")
+
+  while (a.length || b.length || temp) {
+    temp += ~~a.pop() + ~~b.pop()
+    res = (temp % 10) + res
+    temp = temp > 9
   }
+
+  return parseInt(res.replace(/^0+/, ""))
 }
-timer(1000);
