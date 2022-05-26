@@ -7,20 +7,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
     .father {
       width: 500px;
       height: 500px;
-      background-color: #ddd;
-      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .child {
       width: 100px;
       height: 100px;
       background-color: orange;
-      position: absolute;
-      left: calc(50% - 50px);
-      top: calc(50% - 50px);
+      transition: all 1s;
+    }
+
+    .child:hover {
+      transform: scale(0.8, 0.8);
+      box-shadow: 5px 5px 10px black;
     }
   </style>
 </head>

@@ -7,27 +7,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
     .father {
       width: 500px;
       height: 500px;
-      background-color: #ddd;
       position: relative;
+      background-color: orange;
     }
 
     .child {
-      width: 100px;
+      width: 200px;
       height: 100px;
-      background-color: orange;
       position: absolute;
-      left: calc(50% - 50px);
-      top: calc(50% - 50px);
+      margin: auto;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
   <div class="father">
-    <div class="child"></div>
+    <div class="child">你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好</div>
   </div>
 </body>
 

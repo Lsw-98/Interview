@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #box {
+      width: 200px;
+      height: 200px;
+      background-color: orange;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="box"></div>
+  <script>
+    let d = document.querySelector("#box")
+    let dX = null
+    let dY = null
+    let startX = null
+    let startY = null
+
+    const mouseMoveFn = (e) => {
+      // 记录移动的距离
+      let moveX = e.pageX - startX
+      let moveY = e.pageY - startY
+
+      if (moveX > 0) {  // 向右移动
+        moveX = moveX
+      } else {  // 向左移动
+        moveX = -Math.abs(moveX)
+      }
+
+      if (moveY > 0) {  // 向下移动
+        moveY = moveY
+      } else {  // 向上移动
+        moveY = -Math.abs(moveY)
+      }
+
+      d.style.left = (dX + moveX) + 'px';
+      d.style.top = (dY + moveY) + 'px';
+    }
+
+    d.addEventListener('mousedown', (e) => {
+      // 记录盒子的初始位置
+      dX = d.offsetLeft
+      dY = d.offsetTop
+
+      startX = e.pageX
+      startY = e.pageY
+
+      // 按下时调用移动条件
+      d.addEventListener('mousemove', mouseMoveFn)
+    })
+
+    // 鼠标抬起事件
+    d.addEventListener('mouseup', (e) => {
+      d.removeEventListener('mousemove', mouseMoveFn)
+    })
+  </script>
+</body>
+
+</html>
