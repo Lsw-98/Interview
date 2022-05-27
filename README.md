@@ -2969,6 +2969,9 @@ function setTimeout2 (cb, delay) {
 
 
 ### **AJAX、Fetch、axios**
+
+![image](https://user-images.githubusercontent.com/70066311/170616707-82743a2d-f866-4526-89e2-5464f66e88d6.png)
+
 **AJAX**
 
 <font color="#FF6347">AJAX可以在不更新全局的情况下更新局部页面。通过在与服务器进行数据交换，可以使网页实现异步更新</font>。
@@ -3009,7 +3012,7 @@ xhr.onreadystatechange = () => {
 - 响应拦截器的作用是<font color="#FF6347">接收到响应后做的一些操作，例如登录失效后需要重新登录跳转到登录页</font>
 
 **axios的特点**
-- 由浏览器端发起请求
+- 由浏览器端发起请求，在浏览器中创建XHR
 - 支持promise API
 - 监听请求和返回
 - 更好的格式化，自动将数据转换为json数据
@@ -3084,6 +3087,72 @@ axios.patch('apiURL', {
 - proxy：用于配置代理
 - transformRequest：允许在服务器发送请求之前修改请求数据
 
+**axios拦截器执行顺序问题** 
+
+- 请求拦截：axios的请求拦截器会先执行最后指定的回调函数，再依次向前执行
+- 响应拦截：axios的响应拦截器会先执行最先执行的回调函数，再依次向前执行
+例如：
+
+```js
+axios.interceptors.request.use(config => {
+  console.log(`请求拦截1`);
+  return config;
+});
+axios.interceptors.request.use(config => {
+  // 在发送请求之前做些什么 
+  console.log(`请求拦截2`);
+  return config;
+});
+
+// 添加响应拦截器 
+axios.interceptors.response.use(response => {
+  // 对响应数据做点什么 
+  console.log(`成功的响应拦截1`);
+  return response.data;
+});
+
+// 添加响应拦截器 
+axios.interceptors.response.use(response => {
+  // 对响应数据做点什么 
+  console.log(`成功的响应拦截2`);
+  return response;
+});
+
+// 发送请求 
+axios.get('/posts')
+  .then(response => {
+    console.log('成功了');
+  }) 
+```
+
+执行结果为
+```js
+console.log("请求拦截2");
+console.log("请求拦截1");
+console.log("成功的响应拦截1");
+console.log("成功的响应拦截2");
+console.log("成功了");
+```
+
+**为什么axios中需要拦截器**
+
+在SPA应用中，通常会使用token进行用户身份认证，这就要求每次请求必须携带用户的身份信息，针对这个需求，为了避免在每个请求中单独处理，我们可以通过封装统一的request函数来为每隔请求统一添加token信息。
+
+但如果想为某些请求添加缓存时间或者控制某些请求的调用频率的话，我们就需要不断地修改request函数来扩展对应的功能。此时，如果在考虑对响应进行统一处理，我们的request函数将变得越来越庞大，也越来越难维护。<font color="#FF6347">所以axios为我们提供了拦截器</font>。
+
+**为什么请求拦截2会在请求拦截1之前执行呢？**
+
+在`axios`源码中将发送请求分为了<font color="#FF6347">请求拦截器、发送请求、响应拦截器、相应回调</font>，通过Promise的链式调用将这些部分结合起来了，这样就得到了发送请求拿到数据的全部过程。
+
+下面分析源码：
+1. 代码开始构建了一个`config配置对象`，用于第一次执行Promise返回一个成功的Promise
+2. 最核心的数组`chain`，这个数组中保存了`请求拦截器`、`响应拦截器`和`发送请求函数`。该数组中间放的是`发送请求的函数`，左边放的是`请求拦截器`，右边放的是`响应拦截器`。在第一步中返回的Promise对象，将遍历`chain`数组逐一执行里面的函数，并返回新的Promise对象
+3. 往数组中添加请求拦截函数，<font color="#FF6347">依照axios请求的执行顺序，请求拦截器应该在发送请求之前执行，故应该添加在发送请求函数的前面</font>，使用`unshift`方法
+4. 往数组中添加响应拦截器函数，<font color="#FF6347">依照axios请求的执行顺序，响应拦截器应该在发送请求之后执行，故应该添加在发送请求函数的后面</font>，所以使用的是数组的push方法
+5. Promise遍历执行，每次从`chain`中取出两个 函数执行（一个成功回调，一个失败回调）
+6. 最后返回一个Promise对象，用于执行响应数据的回调
+
+![image](https://user-images.githubusercontent.com/70066311/170620867-41f6a9ca-da44-4805-870c-fd7b62e5d42f.png)
 
 **fetch**    
 `fetch`是http请求数据的方式，它使用Promise，但不使用回调函数。`fetch`采用模块化设计，<font color="#FF6347">通过数据流处理数据，对于请求大文件或网速慢的情况相当有用</font>。默认情况下fetch不会接收或发送cookies。
@@ -3115,6 +3184,151 @@ axios.patch('apiURL', {
 而`Fetch`是XHR的代替品，它基于`Promise`实现的，并且不使用回调函数，它<font color="#FF6347">采用模块化结构设计，并使用数据流进行传输，对于大文件和网速慢的情况非常友好。但是`Fetch`不会对请求和响应进行监听；不能阻断请求；过于底层，对一些状态码没有封装；兼容性差</font>。
 
 `axios`是基于`Promise`对`XHR`进行封装，它内部封装了两个拦截器，分别是请求拦截器和响应拦截器。请求拦截器用于在请求发出之前进行一些操作，比如：设置请求体，携带Cookie、token等；响应拦截器用于在得到响应后进行一些操作，比如：登录失效后跳转到登录页面重新登录。`axios`有get、post、put、patch、delete等方法。<font color="#FF6347">axios可以对请求和响应进行监听；返回`Promise`对象，可以使用`Promise`的API；返回`JSON`格式的数据；由浏览器发起请求；安全性更高，可以抵御CSRF攻击</font>。
+
+### axios源码分析
+#### axios的执行流程
+
+1. 使用axios.create创建单独的实例，或直接使用axios实例
+2. 对于axios调用进入到request()中进行处理
+3. 执行请求拦截器
+4. 请求数据转换器，将传入的数据进行处理，比如`JSON.stringify(data)`
+5. 执行适配器，判断是浏览器端还是node端，以执行不同的方法
+6. 响应数据转换器，对服务器端的数据进行处理，比如`JSON.parse(data)`
+7. 执行响应拦截器，对服务器端数据进行处理，比如token失效跳转到登录页
+8. 返回数据
+
+![image](https://user-images.githubusercontent.com/70066311/170621660-20811d2b-f1bb-4510-9e8e-df47a7c7af3b.png)
+
+**入口文件(lib/axios.js)**
+
+导出的axios就是 实例化后的对象，还在其上挂载`create`方法，以供创建独立的实例，实现实例之间互不影响。
+
+```js
+// 创建实例过程的方法
+function createInstance(defaultConfig) {
+  return instance;
+}
+// 实例化
+var axios = createInstance(defaults);
+ 
+// 创建独立的实例，隔离作用域
+axios.create = function create(instanceConfig) {
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
+};
+// 导出实例
+module.exports = axios;
+```
+
+**createInstance()**
+
+```js
+function createInstance(defaultConfig) {
+  // 实例化，创建一个上下文
+  var context = new Axios(defaultConfig);
+ 
+  // 平时调用的 get/post 等等请求，底层都是调用 request 方法
+  // 将 request 方法的 this 指向 context(上下文)，形成新的实例
+  var instance = bind(Axios.prototype.request, context);
+ 
+  // Axios.prototype 上的方法 (get/post...)挂载到新的实例 instance 上，
+  // 并且将原型方法中 this 指向 context
+  utils.extend(instance, Axios.prototype, context);
+ 
+  // Axios 属性值挂载到新的实例 instance 上
+  // 开发中才能使用 axios.default/interceptors
+  utils.extend(instance, context);
+ 
+  return instance;
+}
+```
+
+`createInstance`执行流程：
+1. 通过构造函数`Axios`创建实例`context`，作为下面`request`方法的上下文(this指向)
+2. 将`Axios.prototype.request`方法作为实例使用，并把`this`指向`context`，形成新的实例`instance`
+3. 将构造函数`Axios.prototype`上的方法挂载到新的实例`instance`上，然后将原型各个方法中的`this`指向`context`，这样才能使用`get、post`等方法
+4. 将`Axios`的属性挂载到`instance`上
+
+可以看到axios不是简单的创建实例context，而是在context上进行this绑定形成新的实例，然后将Axios属性和请求方法挂载到新的实例上
+
+**拦截器(lib/core/InterceptorManager.js)**
+
+拦截器涉及一个属性和三个方法：
+- handler：存放use注册的回调函数
+- use：注册成功和失败的回调函数
+- eject：删除注册过的函数
+- forEach：遍历回调函数
+
+```js
+function InterceptorManager() {
+  // 存放 use 注册的回调函数
+  this.handlers = [];
+}
+
+InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
+  // 注册成功和失败的回调函数
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected,
+    ...
+  });
+  return this.handlers.length - 1;
+};
+
+InterceptorManager.prototype.eject = function eject(id) {
+  // 删除注册过的函数
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  // 遍历回调函数，一般内部使用多
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+```
+
+**dispatchRequest(lib/core/dispatchRequest.js)**
+
+dispatchRequest主要做了以下操作：
+1. transformRequest: 对 config 中的 data 进行加工，比如对 post 请求的 data 进行字符串化(JSON.stringify(data))
+2. adapter：适配器，包含浏览器端 xhr 和 node 端的 http
+3. transformResponse: 对服务端响应的数据进行加工，比如 JSON.parse(data)
+
+![image](https://user-images.githubusercontent.com/70066311/170645763-15c13090-7aeb-425e-abd7-8ca4dabcbd71.png)
+
+**取消请求(lib/cancel/CancelToken.js)**
+
+```js
+var CancelToken = axios.CancelToken;
+var source = CancelToken.source();
+axios.get('/user/12345', {
+  cancelToken: source.token
+}).catch(function(thrown) {
+  if (axios.isCancel(thrown)) {
+    console.log('Request canceled', thrown.message);
+  } else {
+    // 处理错误
+  }
+});
+// 取消请求（message 参数是可选的）
+source.cancel('Operation canceled by the user.');
+```
+
+1. CancelToken 挂载 source 方法用于创建自身实例，并且返回 {token, cancel}
+2. token 是构造函数 CancelToken 的实例，cancel 方法接收构造函数 CancelToken 内部的一个 cancel 函数，用于取消请求
+3. 创建实例中，有一步是创建处于 pengding 状态的 promise，并挂在实例方法上，外部通过参数 cancelToken 将实例传递进 axios 内部，内部调用 cancelToken.promise.then 等待状态改变
+4. 当外部调用方法 cancel 取消请求，pendding 状态就变为 resolve，即取消请求并且抛出 reject(message)
+
+**总结**
+1. 为了支持 axios() 简洁写法，内部使用 request 函数作为新实例
+2. 使用 promsie 链式调用的巧妙方法，解决顺序调用问题
+3. 数据转换器方法使用数组存放，支持数据的多次传输与加工
+4. 适配器通过兼容浏览器端和 node 端，对外提供统一 api
+5. 取消请求这块，通过外部保留 pendding 状态，控制 promise 的执行时机
 
 ## 面向对象
 ### **对象继承的方式**
@@ -4353,6 +4567,8 @@ DOM型跟前两种的区别在于：<font color="	#FF6347">DOM型XSS攻击取出
 ### **CSRF攻击**
 CSRF攻击是指<font color="	#FF6347">跨站请求伪造攻击</font>。攻击者诱导用户进入一个第三方网站，然后该第三方网站向被攻击网站发送跨站请求。如果用户在被攻击网站中保存了登录状态，那么攻击者就可以利用这个登录状态，绕过后台用户验证，冒充用户向服务器执行一些操作。  
 
+![image](https://user-images.githubusercontent.com/70066311/170649553-759fe345-3128-41cd-b3e9-59508a8ea53b.png)
+
 CSRF的本质是<font color="	#FF6347">**在同源请求中cookie会携带发送给服务器的数据的特点，以此来实现冒充用户**</font>。
 
 ### **攻击类型**
@@ -4362,7 +4578,7 @@ CSRF的本质是<font color="	#FF6347">**在同源请求中cookie会携带发送
 - 链接类型。比如在a标签的href属性里构建一个请求，然后诱导用户去点击。
 
 ### **如何防御CSRF攻击**
-- <font color="	#FF6347">进行同源检测</font>。服务器根据 http 请求头中 origin 或者 referer 信息来判断请求是否为允许访问的站点，从而对请求进行过滤。当 origin 或者 referer 信息都不存在的时候，直接阻止请求。
+- <font color="	#FF6347">检查请求头中的Referer字段，进行同源检测</font>。`Referer`字段用于表明请求来源于哪个地址，`Referer`字段应和请求的地址位于同一域名下。这种方法有局限性，例如：依赖于浏览器发送`Referer`字段，这可能会有攻击者篡改`Referer`字段的可能性。
 - <font color="	#FF6347">使用CSRF Token进行验证</font>。服务器向用户返回一个随机数token，当用户再次发起请求时，在请求参数中加入服务器端返回的token，然后服务器对这个token进行验证。
 - 显示验证方法。<font color="	#FF6347">添加验证码、密码</font>等。
 
@@ -4793,7 +5009,6 @@ JSONP的缺点：
 - 反向代理：服务器为了能够将工作负载分不到多个服务器来提高网站性能 (负载均衡)等目的，当其受到请求后，会首先根据转发规则来确定请求应该被转发到哪个服务器上，然后将请求转发到对应的真实服务器上。这样本质上起到了对客户端隐藏真实服务器的作用。一般使用反向代理后，需要通过修改 DNS 让域名解析到代理服务器 IP，这时浏览器无法察觉到真正服务器的存在，当然也就不需要修改配置了。
 
 ![image](https://user-images.githubusercontent.com/70066311/166883613-da84da5f-e248-4dea-9a02-514469a3414f.png)
-
 
 ## 浏览器事件机制
 ### **什么是事件**
@@ -5751,6 +5966,28 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 
 ### **React-Fiber**
 在进行虚拟DOM向真实DOM更新时，React会占据浏览器资源，导致用户触发的事件无法得到响应，给用户一种卡顿的感觉。<font color="#FF6347">React-Fiber可以暂停页面的渲染，让浏览器先执行更高级的任务，等浏览器空闲后再恢复渲染。可以提高浏览器的用户响应速度，并兼顾任务执行效率；延时对DOM的操作，避免一次性操作大量DOM节点</font>
+
+### Fiber的双缓冲技术
+双缓冲指的是<font color="#FF6347">将需要变化的部分，现在内存中计算改变，计算完成后一次性展示给用户，这样用户就不会感知到明显的计算变化</font>。双缓冲共有两颗`Fiber树`，一颗为`current树`，展示到页面上的；另一颗是`WorkInProgress树`，存在于内存中，用来计算变化，然后直接替换`c urrent树`。
+
+### React的渲染过程
+- 对于首次渲染，`React`主要的工作就是将`React.render`接收到的`VNode`转化为`Fiber`树，并根据`Fiber`树的层级关系，构建生成出`DOM`树并渲染至屏幕中
+- 对于更新渲染时，`Fiber`树已经存在于内存中了，所以`React`更关心的是计算出`Fiber`树中各个节点的差异，并更新到屏幕中
+
+#### 两个阶段
+- render阶段：利用`Fiber`双缓冲技术，在内存中构造一颗`Fiber`树，在其上进行调和计算，找到需要更新的节点并记录，这个过程会被重复中断恢复执行（时间片、主线程让给浏览器执行更高级的任务）。
+- commit阶段：根据render阶段的计算结果，执行更新操作，这个过程是同步执行的。
+
+
+React中有三个部分协助渲染，分别是：
+- Scheduler（调度器）：排序优先级，让优先级高的任务进行reconcile(调和)
+- Reconciler（调和器）：找出哪些节点发生了变化，并大小标签
+- Renderer（渲染器）：将Reconciler中打好标签的节点渲染到页面上
+
+1. 首先`jsx`经过babel的ast词法解析后调用`React.createElement`，`React.createElement`执行后生成jsx对象，也就是VDOM
+2. 不管是在首次渲染还是更新状态的时候，这些渲染的任务都会经过`Scheduler`的调度，`Scheduler`会根据任务的优先级来决定将哪些任务优先进入render阶段。`Scheduler`会分配一个时间片给需要渲染的任务，如果是一个非常耗时的任务，如果在一个时间片之内没有执行完成，则会从当前渲染到的`Fiber`节点暂停计算，让出执行权给浏览器，在之后浏览器空闲的时候从之前暂停的那个`Fiber`节点继续后面的计算，这个计算的过程就是计算`Fiber`的差异，并标记副作用。
+3. 在render阶段：render阶段的主角是`Reconciler`，在mount阶段和update阶段，它会比较jsx和当前Fiber节点的差异（diff算法指的就是这个比较的过程），将带有副作用的Fiber节点标记出来，这些`副作用有Placement（插入）、Update（更新）、Deletetion（删除）`等，而这些带有副作用Fiber节点会加入一条`EffectList`中，在commit阶段就会遍历这条`EffectList`，处理相应的副作用，并且应用到真实节点上。而Scheduler和Reconciler都是在内存中工作的，所以他们不影响最后的呈现。
+4. 在commit阶段：会遍历`EffectList`，处理相应的生命周期，将这些副作用应用到真实节点，这个过程会对应不同的渲染器
 
 
 ### **受控组件与非受控组件**
@@ -7335,6 +7572,29 @@ class App extends React.Component {
 
 **区别**
 一、二的方式性能较差，三的写法过于冗余，因此<font color="	#FF6347">四是最优的事件绑定方式</font>。
+
+### 重新学习React事件机制
+#### 事件注册
+
+![image](https://user-images.githubusercontent.com/70066311/170669506-b457c072-0114-4428-97b0-36387efede29.png)
+
+
+- document上注册：在React组件挂在阶段，根据组件内的声明的事件类型（onclick、onchange等），在document上注册事件（通过addEventListener），并指定统一的回调函数dispatchEvent。换句话说，<font color="	#FF6347">document 上不管注册的是什么事件，都具有统一的回调函数 dispatchEvent</font>。所以对于同一种事件类型，不论在document上注册了几次，最终也会保留一个有效实例，这样可以减少内存消耗。<font color="	#FF6347">并不是所有的事件都被挂载到了document上，例如：``</font>
+- 存储事件回调：React为了在触发事件时可以查找到对应的回调去执行，会把组件内的所有事件统一的存放到一个对象中（映射表）。首先根据事件类型分类存储，例如click事件相关的统一存储在一个对象中，回调函数的存储采用键值对（key/value）的方式存储在对象中，key时组件的唯一标识id，value对应的就是事件的回调函数。
+
+React这样做有两个好处：
+1. 避免每次都要创建事件对象，减少了内存的消耗
+2. 组件在挂载或销毁时统一订阅和移除事件
+
+#### 事件触发
+React事件触发只会发生在DOM事件流的冒泡阶段，因为在document上注册时就默认是在冒泡阶段被触发执行。
+
+![image](https://user-images.githubusercontent.com/70066311/170670596-83c5432c-89bb-4eef-9286-fc7cb3d2f013.png)
+
+1. 触发事件，开始DOM事件流，先后经过三个阶段：事件捕获阶段、处于目标阶段、事件冒泡阶段
+2. 当事件冒泡到document时，触发统一的事件分发函数ReactEventListener.dispatchEvent()
+3. 根据原生事件对象(nativeEvent)找到当前节点对应的组件
+4. 执行合成事件中的回调函数
 
 ## React 高阶组件
 **高阶组件**：高阶组件（HOC）就是一个函数，接收一个函数组件作为参数，并返回一个新的组件。通常来说高阶组件会将额外的数据或功能添加到原本的数组中。
