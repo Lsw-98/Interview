@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text" id="first" oninput="handleInput()" />
+  <p id="second"></p>
+
+  <script>
+    let input = document.getElementById('first')
+    let p = document.getElementById('second')
+    let data = {}
+
+    Object.defineProperty(data, 'val', {
+      get: function () {
+        return val
+      },
+
+      set: function (newVal) {
+        val = newVal
+        input.value = val
+        p.innerHTML = val
+      }
+    })
+
+    function handleInput() {
+      data.val = input.value
+    }
+  </script>
+</body>
+
+</html>

@@ -16,6 +16,6 @@ console.log('script end')
  * script start
  * async1 start
  * async2
- * async1 end
  * script end
+ * async1 end 
  */

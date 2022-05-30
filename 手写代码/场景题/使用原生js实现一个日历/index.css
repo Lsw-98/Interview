@@ -1,0 +1,18 @@
+ul li {
+  text-align: center;
+  color: rgb(218, 96, 96);
+  font-weight: 800;
+  line-height: 40px;
+  float: left;
+  width: 14.28571428571429%;
+  height: 40px;
+  border: 1px solid #ccc;
+}
+
+ul li:nth-child(1) {
+  border-top-left-radius: 10px;
+}
+
+ul li:nth-child(7) {
+  border-top-right-radius: 10px;
+}

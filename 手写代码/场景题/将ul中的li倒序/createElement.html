@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    var ul = document.createElement("ul");
+    var inner = "";
+    for (var i = 0; i < 1000; i++) {
+      inner += "<li>" + i + "</li>"
+    }
+    ul.innerHTML = inner;
+    document.body.appendChild(ul);
+
+    function reverseULNode(ul) {
+      var nul = document.createElement("ul")
+      var cs = ul.children
+      for (let i = cs.length - 1; i >= 0; i--) {
+        nul.appendChild(cs[i])
+      }
+
+      document.body.removeChild(ul)
+      document.body.appendChild(nul)
+    }
+
+    reverseULNode(ul)
+  </script>
+</body>
+
+</html>

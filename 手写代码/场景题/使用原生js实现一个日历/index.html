@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日历</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body style="padding: 20px">
+  <div class="panel panel-primary">
+    <div class="panel-heading">日历</div>
+
+    <div class="panel-body">
+      <button type="button" class="btn s btn-primary">上个月</button>
+      <button type="button" class="btn x btn-success">下个月</button>
+
+      <table class="table table-bordered">
+        <tr style="text-align: center">
+          <td colspan="7">
+            <span id="year">2021</span> - <span id="month">五月</span>
+          </td>
+        </tr>
+        <tr style="text-align: center">
+          <td class="active">日</td>
+          <td class="success">一</td>
+          <td class="warning">二</td>
+          <td class="danger">三</td>
+          <td class="info">四</td>
+          <td class="info">五</td>
+          <td class="info">六</td>
+        </tr>
+      </table>
+      <ul id="data" style="margin: 0; padding: 0; width: 100%; list-style: none"></ul>
+    </div>
+  </div>
+  <script type="module">
+    import { Calendar } from "./index.js";
+    new Calendar();
+  </script>
+</body>
+
+</html>

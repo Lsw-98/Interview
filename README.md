@@ -30,6 +30,113 @@ href指向网络资源所在的位置，建立与当前元素或当前文档之�
 - _self：当前页面跳转
 - _top：在当前窗体打开链接，替换当前的整个窗体
 
+### form标签
+在`form`标签中添加Action（提交的地址）和method（post方法），且有一个submit按钮，就可以实现数据的提交。
+
+form标签分为三部分：表单标签、表单域、表单按钮。
+
+**表单标签**：
+
+```html
+<FORM ACTION="URL" METHOD="GET|POST" ENCTYPE="MIME" TARGET="...">
+  ...
+</FORM>
+```
+
+- action = url：用来指定处理提交表单的格式，可以是一个`URL`，或一个电子邮件地址。
+- method = get | post：指明提交表单的方法
+- enctype=cdata
+- target：指明结果页面显示的位置，类似于`a`标签的target
+
+**表单域**：包含文本框、多行文本框、密码框、单选框等。
+
+**表单按钮**：用于将输入的内容提交到服务器。
+
+### 一个ul里有若干个li，如何实现li倒序？
+共有三种方法：innerHTML, createElement(), createDocumentFragment()
+
+首先初始化1000个li。
+
+```js
+var ul = document.createElement("ul");
+var inner = "";
+for (var i = 0; i < 1000; i++) {
+  inner += "<li>" + i + "</li>"
+}
+ul.innerHTML = inner;
+document.body.appendChild(ul);
+```
+
+#### innerHTML
+
+```js
+function reverseULStr(ul) {
+  var nul = document.createElement("ul");
+  var cs = ul.children;
+  var results = [];
+  for (var i = cs.length - 1; i >= 0; i--) {    
+    results.push(cs[i].outerHTML);
+  }
+  nul.innerHTML = results.join("");
+  document.body.removeChild(ul);
+  document.body.appendChild(nul);
+  return nul;
+}
+```
+
+该方法的基本思路就是：首先创建一个新的ul，一个数组，然后将旧的ul中的li倒序添加到数组中，最后将数组添加到新的ul中。<font color="	#FF6347">该方法是将**string类型**的标签添加到数组中，然后在将string添加到新的ul中</font>
+
+#### createElement
+
+```js
+function reverseULNode(ul) {
+  var nul = document.createElement("ul")
+  var cs = ul.children
+  for (let i = cs.length - 1; i >= 0; i--) {
+    nul.appendChild(cs[i])
+  }
+  document.body.removeChild(ul)
+  document.body.appendChild(nul)
+}
+```
+
+该方法<font color="	#FF6347">直接将Node节点添加到新的ul中</font>。
+
+#### createDocumentFragment
+- createDocumentFragment用来创建一个虚拟的节点对象，可以包含任何类型的节点，在创建之初是空的。
+- 他创建出的节点不属于文档树，当将DocumentFragment插入到文档树中，插入的不是DocumentFragment自身，而是它的孩子节点。<font color="	#FF6347">当需要添加多个DOM元素时，首先将这些元素添加到DocumentFragment中，再将DocumentFragment添加到页面，会减少页面渲染的次数，效率会得到明显的提升</font>。
+- <font color="	#FF6347">如果使用appendChid方法将原DOM树中的节点添加到DocumentFragment中，会删除原来的节点</font>。
+
+```js
+function reverseULFragment(ul) {
+  const nul = document.createElement("ul")
+  const frag = document.createDocumentFragment()
+  const cs = ul.children
+
+  for (let i = cs.length - 1; i >= 0; i--) {
+    frag.appendChild(cs[i])
+  }
+
+  nul.appendChild(frag)
+  document.body.removeChild(ul)
+  document.body.appendChild(nul)
+}
+```
+
+#### 总结
+
+![image](https://user-images.githubusercontent.com/70066311/170901468-17100a50-e094-49c4-9adc-0ec5da3336b4.png)
+
+- 当进行多次的插入和删除DOM操作时，如果使用`innerHTML`，在每一次插入删除时都会引起页面的重新渲染（重绘和重排），效率很低。所以在第一种方法中进行了优化：<font color="	#FF6347">将多次的插入的节点写到一个字符串中，然后将字符串一次性的写入innerHTML中。这种方法的效率也是最高的</font>。
+- createDocumentFragment创建的是虚拟的DOM节点，存在于内存中，对其进行添加或删除操作不会引起重绘和重排，可以做到性能优化的作用。
+
+**createElement和createDocumentFragment方法比较**
+- createElement创建的元素可以进行重复操作；createDocumentFragment创建的元素是一次性的，添加后就不能再继续操作了
+- createElement创建的元素直接添加到DOM树上；createDocumentFragment创建的元素存在于内存中，只能使用js进行操作。
+- 节点类型必须为Node类型，不能为文本
+- 都可以使用appendChild添加子元素
+- 若添加的子元素是文档中存在的元素，通过appendChild在为其添加子元素时，会从文档中删除之前存在的元素。
+
 ### **对HTML语义化的理解**
 语义化就是根据内容选择合适的标签。
 
@@ -1048,6 +1155,26 @@ body{
 }
 ```
 
+2. 在html中使用calc()函数
+
+场景：在大小为360px的设计稿中放一个宽度为100px的元素
+```css
+html{
+    font-size:calc((100vw / 360) * 100);
+}
+```
+
+- 100vw：是浏览器视口宽度
+- 360：ui设计图的宽度
+
+加入现在有一个`button`，宽度为180px，那么在任何尺寸的移动设备上，宽度都要占一半。所以`button`的`width`不能写死，要使用`rem`来动态设置`width`。默认情况下根元素的`font-size`大小是`16px`，我们要根据html设置的`font-size`的大小，利用`rem`动态设置元素的宽度。
+
+例如：
+```
+在1080px的界面上，按钮宽度为：180rem = (1080 / 360) * 180（这个180是button的宽度） = 540px
+在750px的界面上，按钮宽度为：180rem = (750 / 360) * 180 = 375px
+```
+
 ### **响应式布局**
 响应式布局就是一个网站同时能兼容多个终端。通过对不同宽度进行布局和样式的设置，从而适配不同设备的目的。
 
@@ -1650,6 +1777,57 @@ console.log(newArray) // [1, 2, 4]
 const arr = [1,2,3]
 const sum = arr.reduce((acc,current)=>acc + current,0)
 console.log(sum)
+```
+
+### JS原生实现双向绑定
+JS实现双向绑定使用：Object.defineProperty()方法。
+
+Object.defineProperty()用于在一个对象上定义一个新属性，或者修改一个已经存在的属性。
+
+Object.defineProperty(obj, prop. desc)
+- obj：需要定义属性的对象
+- prop：需要定义的属性名
+- desc：具体的改变方法
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text" id="first" oninput="handleInput()" />
+  <p id="second"></p>
+
+  <script>
+    let input = document.getElementById('first')
+    let p = document.getElementById('second')
+    let data = {}
+
+    Object.defineProperty(data, 'val', {
+      get: function () {
+        return val
+      },
+
+      set: function (newVal) {
+        val = newVal
+        input.value = val
+        p.innerHTML = val
+      }
+    })
+
+    function handleInput() {
+      data.val = input.value
+    }
+  </script>
+</body>
+
+</html>
 ```
 
 ### **null和undefined的区别**
@@ -2976,6 +3154,12 @@ function setTimeout2 (cb, delay) {
 
 <font color="#FF6347">AJAX可以在不更新全局的情况下更新局部页面。通过在与服务器进行数据交换，可以使网页实现异步更新</font>。
 
+AJAX的原理就是通过XHR对象来向服务器发起异步请求，从服务器获得数据，然后用JS来操作DOM更新页面。领导想找小李汇报一下工作，就委托秘书去叫小李，自己就接着做其他事情，直到秘书告诉他小李已经到了，最后小李跟领导汇报工作。Ajax请求数据流程与“领导想找小李汇报一下工作”类似，上述秘书就相当于XMLHttpRequest对象，领导相当于浏览器，响应数据相当于小李。浏览器可以发送HTTP请求后，接着做其他事情，等收到XHR返回来的数据再进行操作。
+
+![image](https://user-images.githubusercontent.com/70066311/170992029-bdde0af0-20a0-4de2-b694-976fc9020b76.png)
+
+
+
 **创建AJAX**     
 ```js
 // 1. 创建 XMLHttpRequest 实例
@@ -2997,8 +3181,11 @@ xhr.onreadystatechange = () => {
     - `url`：想服务器请求的路径
     - `async`：是否为异步请求
     - `userName`、`userPass`：用户名与密码
-3. 发送请求：`XMLHttpRequest.send()` 方法中如果 Ajax 请求是异步的则这个方法发送请求后就会返回，如果Ajax请求是同步的，那么请求必须知道响应后才会返回。
-4. 接收数据
+3. 通过`XMLHttpRequest.open()`方法与服务器建立连接
+4. 发送请求：`XMLHttpRequest.send()` 方法中如果 Ajax 请求是异步的则这个方法发送请求后就会返回，如果Ajax请求是同步的，那么请求必须知道响应后才会返回。
+5. 通过`XMLHttpRequest`对象的`onreadystatechange`事件监听服务器端的通信状态
+6. 接收数据并进行处理
+7. 将处理后的结果更新到页面上
 
 **AJAX的缺点：**
 - 本是针对MVC架构，不符合前端MVVM的浪潮
@@ -3341,12 +3528,12 @@ source.cancel('Operation canceled by the user.');
 将对象的所有成员复制一份给需要继承的对象。<font color="#FF6347">因为**浅拷贝**，对于引用类型，如果子类修改会对父类产生影响</font>
 
 2. 原型继承
-利用构造函数的原型对象实现继承(X.prototype)。<font color="#FF6347">只能继承父构造函数的原型对象上的成员，不能继承父构造函数的实例对象的成员</font>
+原型继承就是基于已有的对象来创建新的对象。实现原理就是向函数中传入一个对象，然后返回一个以这个对象为原型的对象。<font color="#FF6347">缺点与原型链继承相同：只能继承父构造函数的原型对象上的成员，不能继承父构造函数的实例对象的成员</font>
 
 使用Object.create方法实现继承
 
 ```js
-let parent4 = {
+  let parent4 = {
     name: "parent4",
     friends: ["p1", "p2", "p3"],
     getName: function() {
@@ -3383,7 +3570,7 @@ function Child() {
 Child.prototype = new Parent()
 console.log(new Child())
 ```
-<font color="#FF6347">不能向父构造函数传递参数。如果包含引用类型，会被所有的实例对象共享，容易造成修改混乱</font>
+<font color="#FF6347">创建子类实例时，不能向父构造函数传递参数，导致继承的父类属性没有值。如果包含引用类型，会被所有的实例对象共享，容易造成修改混乱</font>
 
 ```js
 const s1 = new Child()
@@ -3451,7 +3638,7 @@ console.log(child1.getName())
 6. 构造函数 + 深拷贝
 
 7. 寄生式继承
-在原型继承的基础上增加一些方法。
+在原型继承的基础上增加一些方法。<font color="#FF6347">无法实现函数的复用</font>
 
 ```js
 let parent5 = {
@@ -3683,6 +3870,20 @@ loader运行在打包文件之前；plugin在整个webpack生命周期都起作�
 - Tree Shanking：将代码永远不会走到的片段删除
 - Code Splitting：将代码按组件分块、做到按需加载，同时充分利用浏览器缓存
 - 提取公共第三方库：将公共模块抽取，利用浏览器缓存可以长期缓存这些无需变动的代码
+
+webpack优化前端的手段有：
+- 图片压缩
+- Tree Shaking：删除项目中未被引用的代码和被走到的分支
+- 代码分离：将代码分离到不同的bundle中，按需加载。代码分离可以使bundle更小，以控制资源加载的优先级
+- 优化loader（在配置loader中设置属性）：对于Loader来说，影响打包效率的首先肯定是babel，因为babel会将代码转换成字符串，再转换成AST，对AST进行词法分析后再进行转变生成新的代码。项目越大，转换代码越多，效率就越低。所以我们在配置babel中可以在`excludes`属性中添加不需要被babel转译的代码，例如`node_modules`。还可以设置将babel编译过的文件缓存起来，下次只需要编译更改过的代码文件即可。
+- HappyPack（插件）：因为webpack在打包过程中也是单线程的，而HappyPack可以将Loader的同步执行转换为并行的，开启多个线程，并行执行loader，这样就能充分利用系统资源来加快打包效率了。
+- 代码压缩：在weboack中使用`UglifyJS`来压缩代码，但这个插件也是单线程运行的，可以使用`webpack-parallel-uglify-plugin`来并行运行`UglifyJS`从而提高效率；在webpack4直接将`mode`设置为`production`即可开启代码压缩的功能。
+- 设置别名来映射一个路径
+- 按需加载：在开发SPA应用时，项目中都会存在很多路由页面，将这些页面全部打包到一个js文件中，但这样同时也加载了很多不需要的代码。为了首页能够更快的呈现给用户，希望页面能加载的文件体积越小越好，这时就可以使用按需加载，将每个路由页面单独打包为一个文件，在使用当前页面时再去加载。
+- 利用CDN加速：将引用的静态资源路径修改为CDN上对应的路径
+
+### webpack按需加载的原理
+1. 
 
 ### **Babel**
 Babel可以让我们在开发中使用TS、JSX、ES6语法而不用担心浏览器兼容性问题，它可以将这些语法特性转换为浏览器可以识别的语言。
@@ -6885,8 +7086,6 @@ history分为三类，分别是BrowserHistory、HashHistory和MemeoryHistory。<
 ### **React-Router的实现原理**
 React-Router是建立在history之上的，<font color="	#FF6347">history会监听浏览器地址栏的变化，并解析url转化为location对象，然后router匹配到对应的路由，最后渲染对应的组件</font>。总结：<font color="	#FF6347">hash值改变，会触发全局window对象上的hashchange事件。React-Router就是通过hashchange事件监听URL的变化，从而进行DOM操作来模拟页面跳转的</font>。
 
-
-
 Router负责<font color="	#FF6347">表示当前使用什么路由模式</font>。
 Route<font color="	#FF6347">根据当前的url与自身的path属性进行匹配，匹配成功就渲染对应的组件</font>。
 
@@ -7023,7 +7222,6 @@ const isAuth = () => {
 4. 使用\<useNavigate>代替\<useHistory>
 5. 使用\<useRoutes>代替react-router-config
 6. 更小的体积
-
 
 ```js
 // history模式
