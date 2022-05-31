@@ -13,35 +13,23 @@
     }
 
     .box {
-      height: 100px;
+      height: 500px;
+      width: 500px;
+      background-color: #ddd;
+
+      display: grid;
     }
 
-    .left {
-      float: left;
-      height: 100px;
-      width: 100px;
-      background-color: orange;
-    }
-
-    .center {
-      height: 100px;
-      background-color: blanchedalmond;
-    }
-
-    .right {
-      float: right;
-      height: 100px;
-      width: 200px;
-      background-color: gray;
+    .child {
+      align-self: center;
+      justify-self: center;
     }
   </style>
 </head>
 
 <body>
   <div class="box">
-    <div class="left"></div>
-    <div class="right"></div>
-    <div class="center"></div>
+    <div class="child">123</div>
   </div>
 </body>
 

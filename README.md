@@ -3699,6 +3699,48 @@ console.log(person6.getFriends()); // child5
 
 9. es6 extends
 
+### ES5继承和ES6继承的区别
+ES5的继承是通过prototype和构造函数机制来实现。<font color="#FF6347">ES5的继承是先创建子类的实例对象，然后再将父类的方法添加到this上</font>。
+
+```js
+function parent(a, b) {
+  this.a = a;
+  this.b = b;
+}
+
+function child(c) {
+  this.c = c
+};
+
+parent.call(child, 1, 2)
+// 使用call绑定其实是实现了如下代码：
+// child.prototype = new Parent(1, 2)
+console.log(child);
+```
+
+ES6的继承机制<font color="#FF6347">是先创建父类的实例对象this，然后再调用子类的构造函数修改this</font>。
+
+```js
+class Parent {
+  constructor(a, b) {
+    this.a = a
+    this.b = b
+  }
+}
+
+class child extends Parent {
+  constructor(a, b, c) {
+    // super(a, b)
+    this.c = c
+  }
+}
+
+const c = new child(1, 2, 3)
+console.log(c);
+```
+
+可以看到：<font color="#FF6347">ES5的继承原理是先创建子类元素child的实例对象，然后再把父类元素parent的`原型对象`中的属性赋值给子类元素child的实例对象里面，从而实现继承；ES6引入了class的概念，父类首先实例化出来，再修改子类构造函数中的this实现继承</font>。
+
 ## 垃圾回收机制
 ### **垃圾回收的概念**
 <font color="#FF6347">JS代码运行时，需要分配内存空间来存储变量和值，当变量不再参与运行时，就需要系统收回被占用的内存空间</font>。
@@ -3786,6 +3828,34 @@ const res2 = arr2.slice(1)   // [2, 3, 4, 5, 6, 7, 8]
 ### **git rebase和git merge的区别**
 - git merge会新建一个commit对象，将两个分支以前的commit记录都指向这个新commit记录。这种方法会保留之前每个分支的commit历史。
 - git rebase会先找到两个分支的第一个共同的commit祖先记录，然后将提取当前分支之后的所有commit记录，然后将这个 commit 记录添加到目标分支的最新提交后面。经过这个合并后，两个分支合并后的 commit 记录就变为了线性的记录了。
+
+## node.js 
+### 对node.js的理解
+`node.js`是一个跨平台的JS运行时环境，是基于V8 JS引擎的，利用事件驱动、非阻塞和异步输入输出模型等技术提高性能。<font color="#FF6347">`node.js`就是一个服务器端的JS运行环境</font>。
+
+#### 非阻塞异步
+`node.js`采用了非阻塞型I/O机制，在做I/O操作时不会造成任何的阻塞，当完成之后会以时间的形式通知执行操作。
+
+例如：在执行了访问数据库的操作后，立即执行其之后的代码，把数据库返回结果的处理代码放在回调函数中，从而提高了程序的执行效率。
+
+#### 事件驱动
+事件驱动就是当进来一个新的请求时，请求将会被压入一个事件队列中，然后通过一个循环来检测队列中的时间状态的变化，如果检测到有状态变化的事件，那么就执行该事件对应的回调函数。
+
+例如：比如读取一个文件，文件读取完毕后，就会触发对应的状态，然后通过对应的回调函数来进行处理。
+
+![image](https://user-images.githubusercontent.com/70066311/171083320-c068157b-828f-497d-90b2-922ddb4840b4.png)
+
+### node.js的优缺点
+优点：
+- 处理高并发场景性能更佳
+- 适合I/O密集型应用
+
+因为node.js也是单线程的，所以也会带来一些缺点：
+- 不适合CPU密集型应用
+- 只支持单核CPU，不能充分利用CPU
+- 可靠性低，一旦代码某个环境崩溃，整个系统都崩溃
+
+### 如何实现jwt鉴权机制
 
 
 ## Webpack
@@ -3882,8 +3952,57 @@ webpack优化前端的手段有：
 - 按需加载：在开发SPA应用时，项目中都会存在很多路由页面，将这些页面全部打包到一个js文件中，但这样同时也加载了很多不需要的代码。为了首页能够更快的呈现给用户，希望页面能加载的文件体积越小越好，这时就可以使用按需加载，将每个路由页面单独打包为一个文件，在使用当前页面时再去加载。
 - 利用CDN加速：将引用的静态资源路径修改为CDN上对应的路径
 
-### webpack按需加载的原理
-1. 
+### source-map
+JS脚本正在变得越来越复杂，大部分源码都要经过`转换`，才能投入生产环境。
+
+常见的`源码转换`，主要是以下三种情况：
+1. 压缩，减小体积
+2. 多个文件合并，减少http请求次数
+3. 其它语言编译成js，例如jsx编译为js
+
+这三种情况，都使得实际运行的代码`debug`变得很难。通常，JavaScript的解释器会告诉你，第几行第几列代码出错。但是，这对于转换后的代码毫无用处。举例来说，jQuery 1.9压缩后只有3行，每行3万个字符，所有内部变量都改了名字。你看着报错信息，感到毫无头绪，根本不知道它所对应的原始位置。
+
+这就是`source-map`要解决的问题。
+
+#### 什么是source-map
+<font color="#FF6347">`source-map`就是一个信息文件，里面存储着位置信息，也就是说，转换后的代码的每一个位置，所对应的转换前的位置</font>。有了`source-map`，除错工具将直接展示原始代码，而不是转换后的代码。
+
+source-map的文件结构
+```js
+{
+　version: 3,
+　file: "out.js",
+　sourceRoot: "",
+　sources: ["foo.js", "bar.js"],
+　names: ["src", "maps", "are", "fun"],
+　mappings: "AAgBC,SAAQ,CAAEA"
+}
+```
+
+#### source-map如何做到两个文件的各个位置一一对应
+`source-map`中的`mapping`属性，这是一个很长的字符串，分为三层：
+1. 第一层是<font color="#FF6347">行对应</font>，以`；`表示，每个`；`对应转换后的源码的一行。所以，第一个分号前的内容，就对应源码的第一行，以此类推。
+2. 第二层是<font color="#FF6347">位置对应</font>，以`，`表示，每个`，`对应转换后源码的一个位置。所以，第一个逗号前的内容，就对应该行源码的第一个位置，以此类推。
+3. 第三层是<font color="#FF6347">位置转换</font>，代表该位置对应的转换前的源码位置。
+
+例如：
+```js
+mappings:"AAAAA,BBBBB;CCCCC"
+```
+
+上述mappings表示：转换后的源码分成两行，第一行有两个位置，第二行有一个位置。
+
+#### 位置对应的原理
+每个位置使用五位，表示五个字段。
+1. 第一位表示这个位置在转换后的代码的第几列
+2. 第二位表示这个位置属于sources属性中的哪一个文件
+3. 第三位表示这个位置属于转换前代码的第几行
+4. 第四位表示这个位置属于转换前代码的第几列
+5. 第五位表示这个位置属于names属性中的哪一个变量
+
+### webpack压缩合并js后如何去排查错误？
+
+
 
 ### **Babel**
 Babel可以让我们在开发中使用TS、JSX、ES6语法而不用担心浏览器兼容性问题，它可以将这些语法特性转换为浏览器可以识别的语言。
@@ -6810,10 +6929,12 @@ componentDidUpdate()会在更新后被立即调用，首次渲染不会执行此
 ### React废弃了三个生命周期函数是为什么？
 被废弃的三个函数分别是：<font color="	#FF6347">componentWillMount()、componentWillUpdate()、componentWillReceiveProps()</font>。
 
-componentWillMount()的功能完全可以被constructor()和componentDidMount()代替，比如异步请求、消息订阅的操作。如果使用服务端渲染的话，componentWillMount()会在服务器和客户端各执行一次，这会导致请求两次，增加服务器负担；而componentDidMount()只会在客户端执行一次。如果我们在componentWillMount()中订阅事件，但服务端并不会执行componentWillUnMount()，这会导致服务器端内存泄漏。<font color="	#FF6347">如果在componentWillMount()中进行异步请求，可以使数据返回的更快。但componentWillMount()执行结束后会立即执行render()，这时可能请求的结果还没有返回，当请求结果返回后，又会执行一次render()，所以第一次的render()是没有必要的，造成性能开销大</font>。
+componentWillMount()的功能完全可以被constructor()和componentDidMount()代替，比如异步请求、消息订阅的操作。如果使用服务端渲染的话，componentWillMount()会在服务器和客户端各执行一次，这会导致请求两次，增加服务器负担；而componentDidMount()只会在客户端执行一次。
+1. <font color="	#FF6347">如果我们在componentWillMount()中订阅事件，但服务端并不会执行componentWillUnMount()，这会导致服务器端内存泄漏</font>。
+2. <font color="	#FF6347">如果在componentWillMount()中进行异步请求，可以使数据返回的更快。但componentWillMount()执行结束后会立即执行render()，这时可能请求的结果还没有返回，当请求结果返回后，又会执行一次render()，所以第一次的render()是没有必要的，造成性能开销大</font>。
 
 componentWillReceiveProps()中主要做的事是<font color="	#FF6347">比较更新前后的两个props是否一致，如果不一致，再将props更新到state</font>。这么做有两个问题：
-1. <font color="	#FF6347">破坏了state单一数据源，导致组件的状态变得不可预测</font>
+1. <font color="	#FF6347">componentWillReceiveProps不单单只是在props变化才触发，当父组件重新渲染时，子组件的componentWillReceiveProps也会触发</font>
 2. <font color="	#FF6347">会增加重绘的次数</font>
 
 componentWillUpdate()不管更没更新，都会执行回调函数，而我们有时只想在更新成功后执行回调函数，这可以将componentWillUpdate()的回调迁移到componentDidUpdate()中进行。
@@ -8030,10 +8151,14 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 
 #### 如何增加JWT的安全性
 - 将JWT Token放在请求头中传输，避免网络劫持
-- 使用HTTPS传输
+- 为了避免token被劫持，使用HTTPS传输
 - JWT可以使用暴力穷举破解，所以应该定期更换服务器的哈希签名密钥
 
 ### **单点登录**
 单点登录就是公司在内部搭建一个认证中心，公司下的所有产品都在认证中心进行登录，当一个产品在认证中心登录后，那么该公司的其他产品也会保留这个登录状态，使用其他产品时就不需要在登录了。
+
+#### 实现机制
+当用户第一次访问应用系统的时候，因为还没有登录，会被引导到认证中心进行登录；根据用户提供的登录信息，认证系统进行身份校验，如果通过校验，应该返回给用户一个认证的凭据`ticket`；用户再访问别的应用的时候，就会将这个`ticket`带上，作为自己认证的凭据，应用系统接受到请求之后会把`ticket`送到认证系统进行校验，检查`ticket`的合法性。如果通过校验，用户就可以在不用再次登录的情况下访问应用系统2和应用系统3了。
+
 ### **第三方登录**
-第三方账号进行登录，比如抖音可以使用今日头条的帐号登录。
+第三方账号进行登录，比如抖音可以使用微信的帐号登录。

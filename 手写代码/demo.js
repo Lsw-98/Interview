@@ -1,24 +1,50 @@
-function myNew() {
-  let result = null
-  let newObject = null
-  let constructor = Array.prototype.shift.call(arguments)
-
-  if (typeof constructor !== "function") {
-    console.log("type error");
-    return
-  }
-
-  newObject = Object.create(constructor.prototype)
-  result = constructor.apply(newObject, arguments)
-
-  let flag = result && (typeof result === "function" || typeof result === "object")
-  return flag ? result : newObject
+Promise.resolve = function (res) {
+  return new Promise((resolve, reject) => {
+    if (res instanceof Promise) {
+      res.then(data => {
+        resolve(data)
+      }).catch(err => {
+        reject(err)
+      })
+    } else {
+      resolve(res)
+    }
+  })
 }
 
-function Test() {
-  this.a = 10
-  this.b = 20
+Promise.reject = function (err) {
+  return new Promise((resolve, reject) => {
+    reject(err)
+  })
 }
 
-const res = myNew(Test)
-console.log(res);
+Promise.all = function (promises) {
+  return new Promise((resolve, reject) => {
+    let arr = []
+    let count = 0
+    for (let i = 0; i < promises.length; i++) {
+      promises[i].then(res => {
+        count += 1
+        arr[i] = res
+
+        if (count === promises.length) {
+          resolve(arr)
+        }
+      }).catch(err => {
+        reject(err)
+      })
+    }
+  })
+}
+
+Promise.race = function (promises) {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < promises.length; i++) {
+      promises[i].then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })  ``
+    }
+  })
+}
