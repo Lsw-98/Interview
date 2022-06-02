@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .father {
+      height: 100vw;
+      position: relative;
+    }
+
+    .first {
+      position: absolute;
+      background-color: orange;
+      left: 0;
+      width: 25%;
+      height: 100vw;
+    }
+
+    .second {
+      left: 25%;
+      height: 100vw;
+      width: 25%;
+      position: absolute;
+      background-color: green;
+    }
+
+    .third {
+      right: 25%;
+      height: 100vw;
+      width: 25%;
+      position: absolute;
+      background-color: gray;
+    }
+
+    .fourth {
+      right: 0;
+      width: 25%;
+      height: 100vw;
+      position: absolute;
+      background-color: bisque;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="first"></div>
+    <div class="second"></div>
+    <div class="third"></div>
+    <div class="fourth"></div>
+  </div>
+</body>
+
+</html>
