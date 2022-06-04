@@ -7520,6 +7520,10 @@ const value = useContext(TestContext);
 
 - useEffect：副作用钩子，<font color="	#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="	#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
 
+- useEffect的return函数的执行时机：
+    1. 组件卸载时
+    2. 执行当前effect会对上一个effect进行清除
+
 - useRef：获得组件的实例，多用于\<input>、\<form>等带有输入的DOM标签。
 
 **什么是闭包陷阱**：在hooks里面的函数，如果是useEffect(()=>(),[])这种写法，即只组件`挂载阶段`执行，那么在这里面的函数，拿到的值始终都只是初始化时候的值，就算你在其他地方修改了值之后，也是获取不到最新值的。
@@ -8187,7 +8191,7 @@ Token 是服务端生成的一串字符串，以作为客户端请求的一个�
 JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组成。
 
 - Header中存储着一些描述信息
-- Payload中存放着需要传递的数据，一般会把用户信息数据放在payload中
+- Payload中存放着需要传递的数据，一般会把`用户信息数据`和`token的有效期`放在payload中
 - Signature：签名部分，确保数据不被篡改
 
 #### JWT的认证流程如下：
@@ -8208,6 +8212,43 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 2. JWT可以被暴力穷举破解
 3. token一旦下发很难收回，因为token是在客户端的，服务器很难做到收回用户的token
 4. token需要进行签名，性能稍差
+
+### token过期问题
+#### 401错误的场景
+有两种情况会出现`401`状态码：
+- 未登录用户做一些需要权限才能做的操作，代码会报出401错误，这种情况下，应该让用户回到登录页
+- 登录用户的token过期了
+#### token过期
+在用户首次登录成功后，服务器会返回一个token，token在后续请求时通过请求头带上。token一般有一个有效期，这个有效期一般由后端决定。token一旦过期就会被网关拦截。
+
+#### refresh_token和token
+当用户登录成功后，返回的token有两个值：
+
+![image](https://user-images.githubusercontent.com/70066311/171977549-e150f433-8ce8-418f-b696-edbcb615febd.png)
+
+
+- token：在访问一些接口时，需要传入token
+- refresh_token：当token的有效期过了之后，可以使用它去请求一个特殊接口（由后端决定），并返回一个新的token回来，以替换过期的token。
+
+#### refresh_token
+服务端不需要刷新 Token 的过期时间，一旦 Token 过期，就反馈给前端，前端使用 Refresh Token 申请一个全新 Token 继续使用。这种方案中，服务端只需要在客户端请求更新 Token 的时候对 Refresh Token 的有效性进行一次检查，大大减少了更新有效期的操作，也就避免了频繁读写。当然 Refresh Token 也是有有效期的，但是这个有效期就可以长一点了，比如，以天为单位的时间。refresh token，也是加密字符串，并且和token是相关联的。相比获取各种资源的token，refresh token的作用仅仅是获取新的token，因此其作用和安全性要求都大为降低，所以其过期时间也可以设置得长一些。
+
+
+#### 响应拦截器
+
+![image](https://user-images.githubusercontent.com/70066311/171977583-1f43c22d-76e3-490c-b992-dd428c2f3734.png)
+
+在响应拦截器中：
+- 对于某次请求A，如果是401（2）
+    - 有refresh_token，用refresh_token去请求返回新的token（3）
+        - 新token请求成功（4）
+            - 更新本地token（5）
+            - 再发一次请求A（6）
+        - 新token请求失败
+            - 携带请求地址，跳转到登录页
+    - 没有refresh_token，说明没有登陆
+        - 携带请求地址跳转到登录页
+
 
 ### **单点登录**
 单点登录就是公司在内部搭建一个认证中心，公司下的所有产品都在认证中心进行登录，当一个产品在认证中心登录后，那么该公司的其他产品也会保留这个登录状态，使用其他产品时就不需要在登录了。
@@ -8253,3 +8294,9 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 ### JS兼容
 - 获取滚动高度的兼容性问题。<font color="#FF6347">一些浏览器将scrollTop绑定在body上，一些绑定在HTML上</font>。解决方式就是：`let scrollTop = document.body.scrollTop || document.documentElement.scroll`
 - 事件绑定兼容性问题。浏览器事件分为DOM0级、DOM2级和IE事件模型，DOM2级事件绑定支持大多数的浏览器，而对于IE8及以下的浏览器不支持DOM2级事件绑定，他有自己的绑定方法attachEvent，这时就需要进行判断了。
+
+## 为什么CSS要放在头部？CSS可不可以放在底部？为什么JS放在底部？JS可不可以放在头部
+- CSS放在头部可以增加页面性能。在加载HTML生成DOM tree时，就可以同时对DOM tree进行渲染，这样就可以防止白屏、闪屏或布局混乱。CSS文件是在HTML文件解析时并行解析的。
+- 如果CSS放在底部，那么要先渲染DOM，然后加载CSS后重新渲染DOM，这样就渲染了两次DOM，影响了性能。
+- JS放在底部可以防止阻塞后面资源的加载。因为JS在加载后会立即执行，此时可能DOM还没有完全渲染到页面上，那么执行JS会阻塞DOM的渲染，导致用户等待的时间较长。所以应该将JS放在底部以减少DOM渲染的时间，或者给JS加上defer属性。
+- 可以放在头部，但是要加上defer或者async属性。

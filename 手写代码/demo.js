@@ -1,50 +1,13 @@
-Promise.resolve = function (res) {
-  return new Promise((resolve, reject) => {
-    if (res instanceof Promise) {
-      res.then(data => {
-        resolve(data)
-      }).catch(err => {
-        reject(err)
-      })
-    } else {
-      resolve(res)
-    }
-  })
+function foo() {
+  console.log(a);
 }
-
-Promise.reject = function (err) {
-  return new Promise((resolve, reject) => {
-    reject(err)
-  })
+function bar() {
+  var a = 3;
+  console.log(this.a);
+  console.log(a);
+  console.log(this.a + a);
+  foo();
 }
+var a = 2;
 
-Promise.all = function (promises) {
-  return new Promise((resolve, reject) => {
-    let arr = []
-    let count = 0
-    for (let i = 0; i < promises.length; i++) {
-      promises[i].then(res => {
-        count += 1
-        arr[i] = res
-
-        if (count === promises.length) {
-          resolve(arr)
-        }
-      }).catch(err => {
-        reject(err)
-      })
-    }
-  })
-}
-
-Promise.race = function (promises) {
-  return new Promise((resolve, reject) => {
-    for (let i = 0; i < promises.length; i++) {
-      promises[i].then(res => {
-        resolve(res)
-      }).catch(err => {
-        reject(err)
-      })  ``
-    }
-  })
-}
+bar.call({ a: 4 });
