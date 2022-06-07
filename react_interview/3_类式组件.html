@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="test"></div>
+  <!-- 引入react核心库 -->
+  <script src="https://cdn.staticfile.org/react/16.8.0/umd/react.development.js"></script>
+  <!-- 引入react-dom，用于支持react操作DOM -->
+  <script src="https://cdn.staticfile.org/react-dom/16.8.0/umd/react-dom.development.js"></script>
+  <!-- 用于将jsx转化为js -->
+  <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+
+  <script type="text/babel">
+    class Demo extends React.Component {
+      state = {
+        color: '#000000',
+        preColor: ''
+      }
+      static getDerivedStateFromProps(props, state) {
+        if (props.color !== state.preColor) {
+          return {
+            color: props.color,
+            prevPropColor: props.color
+          }
+        }
+        return null
+      }
+
+      handleClick = () => {
+        this.setState = { color: this.state.color = "#ddd" }
+      }
+
+      render() {
+        return (
+          <div>
+            <button onClick={this.handleClick}></button>
+          </div>
+        )
+      }
+    }
+
+    // 渲染组件到页面
+    ReactDOM.render(<Demo />, document.getElementById("test"))
+
+  </script>
+</body>
+
+</html>

@@ -11,3 +11,5 @@ function bar() {
 var a = 2;
 
 bar.call({ a: 4 });
+
+bar().foo()

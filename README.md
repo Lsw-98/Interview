@@ -6286,14 +6286,14 @@ DOM是使用一颗逻辑树来表示一个文档，树的每个分支的终点�
 使用虚拟DOM可以很方便的进行跨平台操作。
 
 ### **diff算法的原理**
-diff算法探讨的就是<font color="#FF6347">虚拟DOM树发生变化后，生成DOM树更新补丁的方式、它通过对比新旧两颗虚拟DOM树的变更差异，将更新补丁作用于真实DOM，以最小的成本完成试图更新</font>。
+diff算法探讨的就是<font color="#FF6347">虚拟DOM树发生变化后，生成DOM树更新补丁的方式、它通过对比新旧两颗虚拟DOM树的变更差异，将更新补丁作用于真实DOM，以最小的成本完成视图更新</font>。
 
 ![image](https://user-images.githubusercontent.com/70066311/163707594-1c5dc046-dfd3-4645-ae48-e1884123074a.png)
 
 具体流程如下：
 1. 真实DOM首先映射为虚拟DOM
 2. 当虚拟DOM发生变化时，根据变化计算生成`patch`，这个`patch`就是一个结构化的数据，包含了增加、更新、删除等操作。
-3. 根据patch去更新真是DOM，反馈到用户页面上。
+3. 根据patch去更新真实DOM，反馈到用户页面上。
 
 <font color="#FF6347">这样一个生成补丁，更新差异的过程称为diff算法</font>。
 
@@ -8277,7 +8277,6 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 
 ## 一个显示股票的页面，有一个表格，表格里有很多行，如何动态的改变的某行某列的数据，用到了哪些api，如何去和后台进行数据的交互？
 
-
 # 开放性试题
 ## 如何提升兼容性问题
 ### CSS兼容
@@ -8300,3 +8299,68 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 - 如果CSS放在底部，那么要先渲染DOM，然后加载CSS后重新渲染DOM，这样就渲染了两次DOM，影响了性能。
 - JS放在底部可以防止阻塞后面资源的加载。因为JS在加载后会立即执行，此时可能DOM还没有完全渲染到页面上，那么执行JS会阻塞DOM的渲染，导致用户等待的时间较长。所以应该将JS放在底部以减少DOM渲染的时间，或者给JS加上defer属性。
 - 可以放在头部，但是要加上defer或者async属性。
+
+## react怎么做会在更新时陷入死循环
+1. 在事件绑定时传入带参数的函数
+```jsx
+class Demo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      isToggleOn: true
+    }
+  }
+  render() {
+    // console.log(this);
+    return (
+      <button onClick={this.toggleBtnClick(this, this.state.isToggleOn)}>
+        {this.state.isToggleOn ? 'Button On' : 'Button Off'}
+      </button>
+      );
+    }
+  toggleBtnClick(isToggleOn, e) {
+    console.log('Now state is' + isToggleOn + ' before to convert.');
+    this.setState({
+      isToggleOn: !isToggleOn
+    })
+  }
+}
+```
+解决方法：
+  - 使用bind进行调用
+  - 是用箭头函数调用
+
+2. useEffect等hooks
+在useEffect回调函数中使用了setState()方法，然后数组中绑定了该state，会导致进入无限循环
+3. 在`render`外使用了setState
+4. 在`componentUpdate`中使用setState
+```js
+class Demo extends React.Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          isToggleOn: 0
+        }
+      }
+
+      componentDidUpdate(props, state, snapshot) {
+        console.log(1);
+        this.setState({ isToggleOn: this.state.isToggleOn + 1 })
+      }
+
+      handleClick = () => {
+        this.setState({ isToggleOn: this.state.isToggleOn + 1 })
+      }
+
+      render() {
+        return (
+          <div>
+            <button onClick={this.handleClick}></button>
+            {console.log(111)}
+          </div>
+        )
+      }
+    }
+```
+5. 在`render`使用setState
+6. 在`getDerivedStatefromprops`使用setState

@@ -6,31 +6,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    * {
-      padding: 0;
-      margin: 0;
-    }
-
-    .box {
-      height: 500px;
-      width: 500px;
-      background-color: #ddd;
-
-      display: grid;
-    }
-
-    .child {
-      align-self: center;
-      justify-self: center;
-    }
-  </style>
 </head>
 
 <body>
-  <div class="box">
-    <div class="child">123</div>
-  </div>
+  <input id="input" type="text" onchange="handlechange()">
+  <p id="p"></p>
+
+  <script>
+    let input = document.querySelector("input")
+    let p = document.querySelector("p")
+    let data = {}
+
+    Object.defineProperty(data, "val", {
+      set: function (newVal) {
+        val = newVal
+        input.value = val
+        p.innerHTML = val
+      },
+      get: function () {
+        return val
+      }
+    })
+
+    function handlechange() {
+      data.val = input.value
+    }
+  </script>
 </body>
 
 </html>
