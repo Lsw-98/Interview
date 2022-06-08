@@ -6385,7 +6385,7 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 在进行虚拟DOM向真实DOM更新时，React会占据浏览器资源，导致用户触发的事件无法得到响应，给用户一种卡顿的感觉。<font color="#FF6347">React-Fiber可以暂停页面的渲染，让浏览器先执行更高级的任务，等浏览器空闲后再恢复渲染。可以提高浏览器的用户响应速度，并兼顾任务执行效率；延时对DOM的操作，避免一次性操作大量DOM节点</font>
 
 ### Fiber的双缓冲技术
-双缓冲指的是<font color="#FF6347">将需要变化的部分，现在内存中计算改变，计算完成后一次性展示给用户，这样用户就不会感知到明显的计算变化</font>。双缓冲共有两颗`Fiber树`，一颗为`current树`，展示到页面上的；另一颗是`WorkInProgress树`，存在于内存中，用来计算变化，然后直接替换`c urrent树`。
+双缓冲指的是<font color="#FF6347">将需要变化的部分，先在内存中计算改变，计算完成后一次性展示给用户，这样用户就不会感知到明显的计算变化</font>。双缓冲共有两颗`Fiber树`，一颗为`current树`，展示到页面上的；另一颗是`WorkInProgress树`，存在于内存中，用来计算变化，然后直接替换`current树`。
 
 ### React的渲染过程
 - 对于首次渲染，`React`主要的工作就是将`React.render`接收到的`VNode`转化为`Fiber`树，并根据`Fiber`树的层级关系，构建生成出`DOM`树并渲染至屏幕中
@@ -6398,7 +6398,7 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 
 React中有三个部分协助渲染，分别是：
 - Scheduler（调度器）：排序优先级，让优先级高的任务进行reconcile(调和)
-- Reconciler（调和器）：找出哪些节点发生了变化，并大小标签
+- Reconciler（调和器）：找出哪些节点发生了变化，并打标签
 - Renderer（渲染器）：将Reconciler中打好标签的节点渲染到页面上
 
 1. 首先`jsx`经过babel的ast词法解析后调用`React.createElement`，`React.createElement`执行后生成jsx对象，也就是VDOM
@@ -6406,10 +6406,23 @@ React中有三个部分协助渲染，分别是：
 3. 在render阶段：render阶段的主角是`Reconciler`，在mount阶段和update阶段，它会比较jsx和当前Fiber节点的差异（diff算法指的就是这个比较的过程），将带有副作用的Fiber节点标记出来，这些`副作用有Placement（插入）、Update（更新）、Deletetion（删除）`等，而这些带有副作用Fiber节点会加入一条`EffectList`中，在commit阶段就会遍历这条`EffectList`，处理相应的副作用，并且应用到真实节点上。而Scheduler和Reconciler都是在内存中工作的，所以他们不影响最后的呈现。
 4. 在commit阶段：会遍历`EffectList`，处理相应的生命周期，将这些副作用应用到真实节点，这个过程会对应不同的渲染器
 
-
 ### **受控组件与非受控组件**
 1. 受控组件
 在使用表单来收集用户输入时，例如\<input>、\<select>、\<textarea>等元素都要绑定一个`onChange`事件，当表单状态发生变化时，就会触发`onChange`事件，更新组件的state。这种组件为<font color="#FF6347">受控组件</font>，在受控组件中，组件渲染出的状态与它的value或checked属性相对应，react通过这种方法消息组件的局部状态，使整个状态可控。
+
+```js
+class TestComponent extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { username: 'lindaidai' };
+  }
+  render () {
+    return <input name="username" value={this.state.username} />
+  }
+}
+```
+
+当我们向这个`input`输入内容时，会发现输入的内容并无法显示出来，也就是`input`标签是一个可读的状态。这是因为`input的value`被`this.state.usename`所控制住，当用户输入新的内容时，`this.state.usename`并不会自动更新，这样的话`input`的内容也不会变了。所应该在`input`中加入`onChange`事件，输入的时候触发事件函数，在函数内部实现`state`的更新。<font color="#FF6347">受控组件一般需要我们设置初始状态和一个状态更新事件</font>。
 
 受控组件更新state的流程：
 - 可以通过初始state中设置表单的默认值
@@ -6421,7 +6434,7 @@ React中有三个部分协助渲染，分别是：
 表单元素的值都是由React组件进行管理，当有多个输入框，或者多个这种组件时，如果想同时获取到全部的值就必须每个都编写事件处理函数，这会让代码看起来很臃肿，所以为了解决这种情况，出现了非受控组件。
 
 2. 非受控组件 
-如果一个表单组件没有value或checked属性时，就是非受控组件。在非受控组件中，可以使用一个ref来获取DOM中的表单值，而不是为每个状态更新编写一个事件处理函数。
+如果一个表单组件没有value或checked属性时，就是非受控组件。在非受控组件中，可以<font color="#FF6347">使用一个ref来获取DOM中的表单值，而不是为每个状态更新编写一个事件处理函数</font>。
 
 如下第一个\<input>是一个非受控组件，它通过ref获取input输入框输入的值。
 ```js
@@ -6508,7 +6521,6 @@ export default class Home extends Component {
 }
 ```
 上面的例子，在React组件挂载时，会调用ref回调函数并传入DOM元素，当卸载时又会传入null。<font color="#FF6347">在componentDidMount和componentDidUpdate触发前，React会保证refs一定是最新的</font>。
-
 
 ### **createRef**
 #### **Refs的创建**
@@ -7730,6 +7742,8 @@ Redux源码主要分为以下几个模块文件：
 <font color="	#FF6347">view -> action -> middleware -> reducer -> store -> view</font>
 Redux中间件是对dispatch的扩展，位于action -> reducer之间，使用中间件可以进行异步操作、action过滤、异常报告等功能。
 
+在`Redux`中，中间件就是在`dispatch`过程中，在分发`action`时进行拦截处理，提供的时机是在`action`发起之后，到达`reducer`之前。这种机制可以使我们改变数据流，实现异步action、action过滤、日志输出、异常报告等功能。
+
 ### Redux异步<font color="	#FF6347">中间件</font>
 1. redux-thunk    
 优点：     
@@ -8021,7 +8035,7 @@ React事件触发只会发生在DOM事件流的冒泡阶段，因为在document�
 4. 执行合成事件中的回调函数
 
 ## React 高阶组件
-**高阶组件**：高阶组件（HOC）就是一个函数，接收一个函数组件作为参数，并返回一个新的组件。通常来说高阶组件会将额外的数据或功能添加到原本的数组中。
+**高阶组件**：高阶组件（HOC）就是一个函数，接收一个或多个组件作为参数，并返回一个新的组件。通常来说高阶组件会将额外的数据或功能添加到原本的组件中。本质上是一个<font color="#FF6347">装饰者设计模式</font>。高阶组件的主要功能是封装并分离组件的通用逻辑，让通用逻辑在组件间更好的被复用。
 
 ## React.Component 和 React.PureComponent 的区别
 PureComponent表示一个纯组件，可以<font color="#FF6347">减少render渲染次数，从而提高组件的性能</font>。  
@@ -8431,3 +8445,81 @@ class Demo extends React.Component {
 通过对`props`和`state`的浅比较结果来实现`shouldComponentUpdate`
 
 ### memo
+用来缓存组件，避免不必要的渲染。
+
+## 项目中如何做可以做到性能优化
+- 避免使用内联函数
+- 使用React Fragments避免额外标记
+- 使用Immutable
+- 懒加载
+- 事件绑定方式
+- 服务端渲染
+
+### 避免使用内联函数
+如果使用内联函数，则每次调用`render`函数时都会创建一个新的函数实例，例如：
+```js
+import React from "react";
+
+export default class InlineFunctionComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={(e) => { this.setState({inputValue: e.target.value}) }} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+```
+
+我们应该在组件内部创建一个函数，并将事件绑定到该函数本身。这样每次调用`render`时就不会创建单独的函数实例，如下：
+```js
+import React from "react";
+
+export default class InlineFunctionComponent extends React.Component {
+  
+  setNewStateData = (event) => {
+    this.setState({
+      inputValue: e.target.value
+    })
+  }
+  
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={this.setNewStateData} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+```
+
+### 使用 React Fragments 避免额外标记
+用户创建新组件时，每个组件应具有单个父标签。父级不能有两个标签，所以顶部要有一个公共标签，所以我们经常在组件顶部添加额外标签`div`。
+
+这个额外标签除了充当父标签之外，并没有其他作用，这时候则可以使用`fragement`。
+
+其不会向组件引入任何额外标记，但它可以作为父级标签的作用，如下所示：
+```js
+export default class NestedRoutingComponent extends React.Component {
+    render() {
+        return (
+            <>
+                <h1>This is the Header Component</h1>
+                <h2>Welcome To Demo Page</h2>
+            </>
+        )
+    }
+}
+```
+
+### 事件绑定方式
+类组件中在`constructor`中使用`bind`或`箭头函数`绑定事件之会生成一个实例；在`render`中会在每次`render`中都生成新的实例。
+
+## 在项目中如何捕获异常
+1. console.log()
+2. try...catch
+3. 在chrome F12中的源码按ctrl P搜索报错的文件，打断点调试
+4. 如果是请求的话查看请求的状态码
+5. 使用`componentDidCatch()`打印错误信息
