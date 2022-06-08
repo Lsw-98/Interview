@@ -1559,7 +1559,7 @@ console.log(fooSymbol == otherFooSymbol); // false
 
 这些数据类型可以分为：
 - 原始数据类型：null、undefined、Number、String、Boolean、Symbol，存储在栈
-- 引用数据类型：<font color="#FF6347">Object、数组和函数</font>，存储在堆
+- 引用数据类型：<font color="#FF6347">Object、数组、函数、`date`和`正则表达式`</font>，存储在堆
 
 ### 原始数据类型和引用数据类型的区别在于<font color="#FF6347">存储位置不同</font>
 - 原始数据类型因为简单，占用空间小，频繁使用，所以放在栈中存储。
@@ -1780,6 +1780,54 @@ console.log(newArray) // [1, 2, 4]
 const arr = [1,2,3]
 const sum = arr.reduce((acc,current)=>acc + current,0)
 console.log(sum)
+```
+
+### 类数组和数组
+类数组与数组类似，但它是一个对象，不具有数组的方法，但有length属性，类数组的原型是`Object`。常见的类数组就是`arguments`。
+```js
+var obj = {
+  "2": "a",
+  "3": "b",
+  "4": "cc",
+  "length": 5,
+  "push": Array.prototype.push,
+  "splice": Array.prototype.splice,
+  "pop": Array.prototype.pop
+};
+console.log(obj);
+obj.push("c");
+obj.push("d");
+obj.push("f");
+
+console.log(obj);
+obj.pop;
+console.log(obj);
+```
+
+### 将类数组转为数组的方式
+1. Array.from
+```js
+const args = Array.from(arguments)
+```
+2. 拓展运算符
+```js
+const args = [...arguments];
+```
+3. [].slice.call
+```js
+const args = [].slice.call(arguments);
+```
+4. Array.prototype.slice.call
+```js
+const args = Array.prototype.slice.call(arguments);
+```
+5. Array.prototype.splice.call
+```js
+const args = Array.prototype.splice.call(arguments, 0);
+```
+6. Array.prototype.concat.apply
+```js
+const args = Array.prototype.concat.apply([], arguments);
 ```
 
 ### JS原生实现双向绑定
