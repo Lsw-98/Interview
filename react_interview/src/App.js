@@ -4,10 +4,7 @@ export default function App() {
 
   const [count, setCount] = useState(1)
   useEffect(() => {
-    setInterval(() => {
-      console.log(count)
-    }, 2000)
-    //闭包陷阱
+    setCount(count + 1)
   }, [])
 
   const handleClick = () => {

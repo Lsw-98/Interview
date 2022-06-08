@@ -26,7 +26,14 @@
     function Demo() {
       const [count, setCount] = useState(0);
 
-      return <h1>我是函数式组件</h1>
+      useEffect(() => {
+        setCount(count + 20)
+      }, [count])
+
+
+      return (
+        <h1>123</h1>
+      )
     }
     // 渲染组件到页面
     ReactDOM.render(<Demo />, document.getElementById("test"))
