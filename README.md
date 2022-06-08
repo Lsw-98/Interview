@@ -7641,7 +7641,7 @@ useCallback和useMemo都是优化性能的手段，类似于类组件中的<font
 ### Memo、useMemo和useCallback的区别
 三者都是进行性能优化的：
 Memo针对的是一个组件是否重新渲染；而useMemo针对的是一段代码逻辑是否重新执行。
-而useCallback主要用来缓存函数，主要和state配合使用，如果useCallback中传入的state没有发生变化，就不会执行回调函数中缓存的函数，以此来提升性能。
+而useCallback主要用来缓存函数，如果state发生变化，那么整个组件都会被重新渲染，即使一些函数没有必要被渲染，可以使用useCallback来讲这些函数缓存，以此来减少性能损耗。
 
 ### useEffect和useLayoutEffect的区别
 <font color="	#FF6347">useEffect是异步执行的，useLayoutEffect是同步执行的；useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前，和componentDidMount等价</font>。若在useEffect的回调函数中需要对DOM进行样式修改，可以使用useLayoutEffect，避免页面闪烁。<font color="	#FF6347">useLayoutEffect总是比useEffect先执行</font>。
@@ -7721,6 +7721,10 @@ Redux源码主要分为以下几个模块文件：
 3. store通过subscribe()监听state是否发生变化，当state发生改变时，store就可以调用getState()方法获取到新的state
 4. store通过mapStateToProps()方法将新的state映射到view中
 
+### Redux的三大原则
+1. 单一不可变状态树：整个应用程序的所有状态由一个JS对象（状态树）来表示。
+2. 状态树只读：无法直接修改或写入状态树，只能通过发起`Action`来对其进行修改。`Action`是描述更改的一个普通JS对象，它是对该数据所做的更改的最小表示形式，它的结构完全取决于我们自己，唯一的要求是它必须有一个绑定的属性type。
+3. 只能在Reducer中描述状态变化，Reducer是一个纯函数。
 
 ### **Redux的中间件是什么**
 <font color="	#FF6347">view -> action -> middleware -> reducer -> store -> view</font>
@@ -8381,7 +8385,7 @@ class Demo extends React.Component {
 2. useEffect等hooks
 在useEffect回调函数中使用了setState()方法，然后数组中绑定了该state，会导致进入无限循环
 3. 在`render`外使用了setState
-4. 在`componentUpdate`中使用setState
+4. 在`componentDidUpdate`中使用setState
 ```js
 class Demo extends React.Component {
       constructor(props) {
@@ -8412,3 +8416,18 @@ class Demo extends React.Component {
 ```
 5. 在`render`使用setState
 6. 在`getDerivedStatefromprops`使用setState
+
+
+## React中如何提高组件中渲染效率的
+有三种方式：
+1. shoudleComponentUpdate
+2. PureComponent
+3. React.mome
+
+### shoudleComponentUpdate
+通过`shoudleComponentUpdate`生命周期函数来比对`state`和`props`，确定是否要重新渲染，默认情况下返回`true`表示重新渲染。
+
+### PureComponent
+通过对`props`和`state`的浅比较结果来实现`shouldComponentUpdate`
+
+### memo
