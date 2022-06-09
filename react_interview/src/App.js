@@ -1,20 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React, { Component } from 'react'
 
-export default function App() {
+class Children extends React.Component {
 
-  const [count, setCount] = useState(1)
-  useEffect(() => {
-    setCount(count + 1)
-  }, [])
-
-  const handleClick = () => {
-    setCount(count + 1)
+  shouldComponentUpdate(newProps, nextState) {
+    if (newProps.a === this.props.a) return false;
+    return true;
   }
 
-  return (
-    <div onClick={handleClick}>
-      click to add, count: {count}
-    </div>
-  )
+  render() {
+    console.log('Children Update');
+    return (
+      <div>Children Component</div>
+    )
+  }
+}
 
+export default class App extends Component {
+  state = {
+    a: [1, 2, 3]
+  }
+
+  add = () => {
+    this.setState({
+      count: this.state.a[0] + 1
+    })
+  }
+
+  render() {
+    const { count } = this.state.a[0];
+    return (
+      <div>
+        <button onClick={this.add}>加一</button>
+        <Children />
+        <p>count: {count}</p>
+      </div>
+    )
+  }
 }

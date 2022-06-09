@@ -5967,6 +5967,18 @@ console.log(obj2.c(1));    // 11
 
 <font color="	#FF6347">5. 箭头函数的 this 永远指向其上下文的 this ，任何方法都改变不了其指向，如 call() , bind() , apply()</font>。
 
+### 为什么箭头函数不能作为构造函数
+<font color="#FF6347">构造函数需要this这个对象，用于接收参来的参数，以及在构造函数的最后将这个this返回</font>。而箭头函数没有this，所以不能作为构造函数。
+
+### 如果new一个箭头函数会怎么样
+因为箭头函数相对于普通函数并没有自己的this指向，而构造函数需要由this，所以箭头函数不能new。
+<font color="#FF6347">new操作符实现的步骤如下</font>：
+
+1. 创建一个对象
+2. 将构造函数的作用域赋值给新对象（也就是将新对象的__proto__属性指向构造函数的prototype属性）
+3. 构造函数中的this指向新对象（也就是为这个新对象添加属性和方法）
+4. 返回新的对象 
+
 ## let、const、var的区别
 1. 块级作用域：块级作用域用{}包括，let和const具有块级作用域，var不具有。块级作用域解决了ES5的存在的两个问题：
     - 内层变量可能会覆盖外层变量
@@ -5976,27 +5988,107 @@ console.log(obj2.c(1));    // 11
 4. 初始值设置：var和let可以不设置初始值，const必须设置初始值
 5. let创建的变量可以修改指针指向（可重新赋值）
 
-## var、let、const分别在什么时候使用？
+### var、let、const分别在什么时候使用？
 - let限制了变量的作用域，保证不去污染全局变量，一般用于基本数据类型
 - const一般在定义一些全局的常量或使用`require`来导入模块时使用，一般用于引用数据类型。
 - 因为使用var可能会造成变量提升，全局变量污染等问题，应该尽可能少的使用var
 
 使用优先级：<font color="	#FF6347">const > let > var</font>
 
-## const对象可以修改吗？
+### const对象可以修改吗？
 const保证的并不是值不变，而是const变量指向的内存地址不变，<font color="	#FF6347">对于基本数据类型</font>，其值就永远保存在变量指向的那个内存地址，因此等同于常量。但<font color="#FF6347">对于引用类型的数据（对象和数组）</font>，变量指向数据的内存地址，const只能保证这个指针是固定不变的，至于它指向的数据结构是不是可变的，就完全不能控制了。
 
-## 为什么箭头函数不能作为构造函数
-<font color="#FF6347">构造函数需要this这个对象，用于接收参来的参数，以及在构造函数的最后将这个this返回</font>。而箭头函数没有this，所以不能作为构造函数。
+### 变量提升和函数提升
+#### 变量提升
+ES6之前，函数没有块级作用域，只有`全局作用域`和`函数作用域`，变量提升就是<font color="#FF6347">将变量申明提升到他所在的作用域的最开始的部分</font>。
 
-## 如果new一个箭头函数会怎么样
-因为箭头函数相对于普通函数并没有自己的this指向，而构造函数需要由this，所以箭头函数不能new。
-<font color="#FF6347">new操作符实现的步骤如下</font>：
+```js
+console.log(foo); // undefined
+var foo = '小花猫';
+console.log(foo)  // 小花猫
+```
 
-1. 创建一个对象
-2. 将构造函数的作用域赋值给新对象（也就是将新对象的__proto__属性指向构造函数的prototype属性）
-3. 构造函数中的this指向新对象（也就是为这个新对象添加属性和方法）
-4. 返回新的对象 
+相当于：
+
+```js
+var foo;
+console.log(foo);
+foo = '小花猫';
+console.log(foo);
+```
+
+#### 函数提升
+函数的创建方式有两种，<font color="#FF6347">一种是函数声明形式，一种字面量形式（函数表达式）</font>，只有`函数声明形式`才有函数提升。例如：
+
+```js
+// 声明式
+function foo () {
+    // to do...
+}
+```
+
+相当于：
+
+```js
+// 函数字面量
+var foo = function () {
+    // to do...
+}
+```
+
+<font color="#FF6347">函数提升的优先级高于变量提升，且不会被同名变量声明时覆盖，但是会被变量赋值后覆盖</font>。
+
+例如：
+
+```js
+console.log(bar);  // f bar() { console.log(123) }
+console.log(bar()); // undefined
+var bar = 456;
+function bar() {
+    console.log(123); // 123
+}
+console.log(bar); // 456
+bar = 789;
+console.log(bar); // 789
+console.log(bar()) // bar is not a function
+```
+
+相当于：
+
+```js
+// js执行步骤
+ 
+// 函数提升，函数提升优先级高于变量提升
+var bar = function() {
+    console.log(123)
+};
+// 变量提升，变量提升不会覆盖（同名）函数提升，只有变量再次赋值时，才会被覆盖
+var bar;
+console.log(bar);
+console.log(bar());
+// 变量赋值，覆盖同名函数字面量
+bar = 456;
+console.log(bar);
+// 再次赋值
+bar = 789
+console.log(bar);
+console.log(bar());
+```
+
+结果： 
+
+```js
+// js执行结果
+ 
+f bar() { console.log(123) }
+123  // 执行bar()里的console.log
+undefined // bar()的返回值，如果函数没有返回值，默认为：undefined
+456
+789
+[typeError]：bar is not a function
+```
+
+
 
 ## 扩展运算符（...）
 <font color="	#FF6347">扩展运算符对对象实例的拷贝属于浅拷贝</font>
@@ -6650,7 +6742,7 @@ export default class Home extends Component {
 ```
 
 ## Context
-Context提供了一个<font color="#FF6347">无需为每层组件手动添加props，就能在组件树间进行数据传递</font>的方法。某些属性很多组件都需要用，Context提供一种在组件之间共享此类值得方式，而不必显示地通过组件逐层传递props。
+Context提供了一个<font color="#FF6347">无需为每层组件手动添加props，就能在组件树间进行数据传递</font>的方法。某些属性很多组件都需要用，Context提供一种在组件之间共享此类值的方式，而不必显示地通过组件逐层传递props。
 
 ### **Context的API**
 1. React.createContext
@@ -8016,23 +8108,54 @@ class App extends React.Component {
 
 ![image](https://user-images.githubusercontent.com/70066311/170669506-b457c072-0114-4428-97b0-36387efede29.png)
 
-
 - document上注册：在React组件挂在阶段，根据组件内的声明的事件类型（onclick、onchange等），在document上注册事件（通过addEventListener），并指定统一的回调函数dispatchEvent。换句话说，<font color="	#FF6347">document 上不管注册的是什么事件，都具有统一的回调函数 dispatchEvent</font>。所以对于同一种事件类型，不论在document上注册了几次，最终也会保留一个有效实例，这样可以减少内存消耗。<font color="	#FF6347">并不是所有的事件都被挂载到了document上，例如：``</font>
+
+```js
+function TestComponent() {
+  handleFatherClick=()=>{
+		// ...
+  }
+ 
+  handleChildClick=()=>{
+		// ...
+  }
+ 
+  return <div className="father" onClick={this.handleFatherClick}>
+	<div className="child" onClick={this.handleChildClick}>child </div>
+  </div>
+}
+```
+
+在上述代码中，事件类型都是`onClick`，由于React的事件委托机制，会指定统一的回调函数`dispatchEvent`，所以最终只会在`document`上保留一个`click`事件，类似`document.addEventListener('click', dispatchEvent)`，这里可以看出React的事件是在DOM事件流的冒泡阶段被触发执行。
+
 - 存储事件回调：React为了在触发事件时可以查找到对应的回调去执行，会把组件内的所有事件统一的存放到一个对象中（映射表）。首先根据事件类型分类存储，例如click事件相关的统一存储在一个对象中，回调函数的存储采用键值对（key/value）的方式存储在对象中，key时组件的唯一标识id，value对应的就是事件的回调函数。
 
 React这样做有两个好处：
 1. 避免每次都要创建事件对象，减少了内存的消耗
 2. 组件在挂载或销毁时统一订阅和移除事件
 
+React的事件注册的关键步骤如下图：
+![image](https://user-images.githubusercontent.com/70066311/172813179-3700eed6-fcfc-4564-8a56-d601f09a582f.png)
+
 #### 事件触发
-React事件触发只会发生在DOM事件流的冒泡阶段，因为在document上注册时就默认是在冒泡阶段被触发执行。
+<font color="	#FF6347">React的事件触发只会发生在DOM事件流的冒泡阶段</font>，因为在`document`上注册时就默认是在冒泡阶段被触发执行。
 
-![image](https://user-images.githubusercontent.com/70066311/170670596-83c5432c-89bb-4eef-9286-fc7cb3d2f013.png)
+其大致流程如下：
+1. 触发事件，开始DOM事件流：事件捕获阶段、处于目标阶段、事件冒泡阶段
+2. 当事件冒泡到`document`时，触发统一的事件回调函数`ReactEventListener.dispatchEvent`
+3. 根据原生事件对象（nativeEvent）找到事件触发节点对应的组件
+4. 开始事件的合成
+    - 根据当前事件类型生成指定的合成对象
+    - 封装原生事件和冒泡机制
+    - 查找当前元素以及它所有父级
+    - 在`listenerBank`查找事件回调并合成到`event`
+5. 批量执行合成事件内的回调函数
+6. 如果没有阻止冒泡，会将继续进行 DOM 事件流的冒泡（从 document 到 window），否则结束事件触发
 
-1. 触发事件，开始DOM事件流，先后经过三个阶段：事件捕获阶段、处于目标阶段、事件冒泡阶段
-2. 当事件冒泡到document时，触发统一的事件分发函数ReactEventListener.dispatchEvent()
-3. 根据原生事件对象(nativeEvent)找到当前节点对应的组件
-4. 执行合成事件中的回调函数
+![image](https://user-images.githubusercontent.com/70066311/172816224-25b306bc-800d-482e-ab7b-fbab42719c43.png)
+
+![image](https://user-images.githubusercontent.com/70066311/172816154-d6927ce5-9766-4ca3-a449-3d6f7b3a589c.png)
+
 
 ## React 高阶组件
 **高阶组件**：高阶组件（HOC）就是一个函数，接收一个或多个组件作为参数，并返回一个新的组件。通常来说高阶组件会将额外的数据或功能添加到原本的组件中。本质上是一个<font color="#FF6347">装饰者设计模式</font>。高阶组件的主要功能是封装并分离组件的通用逻辑，让通用逻辑在组件间更好的被复用。
@@ -8442,7 +8565,7 @@ class Demo extends React.Component {
 通过`shoudleComponentUpdate`生命周期函数来比对`state`和`props`，确定是否要重新渲染，默认情况下返回`true`表示重新渲染。
 
 ### PureComponent
-通过对`props`和`state`的浅比较结果来实现`shouldComponentUpdate`
+通过对`props`和`state`的浅比较结果来实现`shouldComponentUpdate`。
 
 ### memo
 用来缓存组件，避免不必要的渲染。
