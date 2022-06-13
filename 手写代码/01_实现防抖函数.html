@@ -20,12 +20,12 @@
   <script>
     function debounce(fn, delay) {
       let timer = null   // 借助闭包
-      return function () {
+      return function (...args) {
         if (timer) {
           clearTimeout(timer)   // 取消由 setTimeout() 方法设置的定时操作。
         }
         timer = setTimeout(() => {
-          fn()
+          fn.apply(this, args)
         }, delay);
       }
     }

@@ -1,22 +1,12 @@
-function myObject() {
-  let result = null
-  let newObject = null
-  let constructor = Array.prototype.shift.call(arguments)
-
-  if (typeof constructor !== "function") {
-    console.log("type err");
-    return
+function Foo() {
+  var i = 0
+  return function () {
+    console.log(i++)
   }
-
-  newObject = Object.create(constructor.prototype)
-  result = constructor.apply(newObject, arguments)
-  let flag = result && (typeof result === "function" || typeof result === "object")
-  return flag ? result : newObject
 }
 
-function myFun() {
-  this.a = 10
-  this.b = 20
-}
-
-console.log(myObject(myFun));
+var f1 = Foo()
+var f2 = Foo()
+f1()
+f1()
+f2()

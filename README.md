@@ -5,7 +5,7 @@
     &emsp;&emsp;下面进行正题。  
 
 # HTML篇
-### **src和href的区别**
+### src和href的区别
 src指向外部资源的位置，在请求src资源时会将其指向的资源下载并应用到文档内。<font color="	#FF6347">当浏览器解析到该元素时，**会暂停其他资源的下载和处理**，直到将该资源加载、编译、执行完毕</font>，图片和框架等元素也是如此。<font color="	#FF6347">所以应该将js文件的引入放到文档最底部</font>。
 
 href指向网络资源所在的位置，建立与当前元素或当前文档之间的链接，如果在文档中添加：
@@ -18,6 +18,164 @@ href指向网络资源所在的位置，建立与当前元素或当前文档之�
 1. src用于引入外部资源；href用于引入网络资源
 2. src在解析外部资源时会暂停其他资源的下载和处理；href会并行处理下载资源和处理当前文档
 3. src用于替换当前元素；href用于在当前文档和引用资源之间建立连接
+
+### 对HTML语义化的理解
+语义化就是根据内容选择合适的标签，让元素、属性有含义。
+
+语义化的优点如下：
+- 对机器友好，带有语义化的文字表现力丰富，适合搜索引擎爬取有效信息。
+- 对开发者友好：语义化标签使HTML文档结构清晰，增强了可读性，便于团队开发与维护。
+
+常见的语义化标签：
+```html
+<header></header>  头部
+<nav></nav>  导航栏
+<section></section>  区块（有语义化的div）
+<main></main>  主要区域
+<article></article>  主要内容
+<aside></aside>  侧边栏
+<footer></footer>  底部
+```
+
+### DOCTYPE的作用
+告诉浏览器应该以什么样的文档类型来解析文档。
+
+### script标签中defer和async的区别
+如果没有defer和async属性，浏览器会立即加载并执行相应的脚本，不会等待后续加载的文档元素，读取到就会开始加载和执行，这样就阻塞了后续文档的加载。
+
+![image](https://user-images.githubusercontent.com/70066311/164873705-75330fb5-1c29-4c32-ab4a-cf76ef1e9342.png)
+
+上图中蓝色代表js脚本网络加载时间，红色代表js脚本执行时间，绿色代表html解析。可以看出<font color="	#FF6347">defer和async属性都是去异步加载外部的js脚本文件，他们都不会阻塞页面的解析，区别在于：</font>
+- 执行顺序：多个带async属性的标签，不能保证加载的顺序；多个defer属性的标签，按照加载顺序执行。
+- 脚本是否并行执行：async属性，表示后续文档的加载和执行与js脚本的加载和执行是并行进行的，在加载完js脚本后会暂停html脚本的解析，立即执行js脚本；而defer属性在加载完js脚本后会等待html解析完后在执行js脚本。
+- async适合加载第三方脚本；而defer适合加载与DOM有关联的脚本
+
+### 常用的meta标签有哪些
+1. charset：执行编码类型
+```html
+<meta charset="UTF-8" >
+``` 
+
+2. keywords：页面关键词
+```html
+<meta name="keywords" content="关键词" />
+```
+
+3. description：页面描述
+```html
+<meta name="description" content="页面描述内容" />
+```
+
+4. viewport：适配移动端
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+```
+
+5. refresh：页面重定向和刷新
+```html
+<meta http-equiv="refresh" content="0;url=" />
+```
+
+
+### HTML5有哪些更新
+1. 语义化标签
+2. 媒体标签：audio、video、source
+3. 表单
+    - 表单类型：
+        - email：验证邮箱
+        - url：验证URL
+        - number：只能输入数字
+        - date：日期选择
+    - 表单属性：
+        - placeholder：提示信息
+        - autofocus：自动获取焦点
+        - required：输入框不能为空
+    - 表单事件：
+        - oninput：每当输入框的内容发生变化时都会触发该事件
+        - oninvaild：当表单验证不通过触发该事件
+4. 进度条：progress标签用来表示任务进度
+5. DOM查询：document.querySelector()和document.querySelectorAll()可以查询标签、类、ID
+6. Web存储
+localStorage和sessionStorage
+7. 新增了画布Canvas，可以在网页上绘制图像
+8. SVG矢量图：使用XML格式定义图形，在图像改变尺寸的情况下图像质量不会有损失
+8. 新增了Geolocation：定位用户位置
+
+### 行内元素有哪些，块级元素有哪些、空元素有哪些
+- 行内元素：a、b、span、img、input
+- 块级元素：div、ul、ol、li、h1~h6、p
+- 空元素：没有内容的HTML标签，即没有闭合标签：br、hr、img、input
+
+### 对于web worker的理解
+当JS执行耗时长的同步任务时，会阻塞后面的线程，而<font color="	#FF6347">web worker给JS创建多线程的运行环境，将一些任务分配给worker线程，主线程执行的同时worker线程也在执行，这样在进行复杂操作时就不会阻塞主线程了</font>。
+
+Worker线程一旦创建成功，就会始终运行，不会被主线程上的活动（比如用户点击按钮，提交表单）打断。这样有利于随时响应主线程的通信，但这样也更浪费资源，不应该过度使用，而且一旦使用完毕，就应该关闭。
+
+使用web worker要注意以下几点：
+1. 同源限制。分配给worker线程运行的脚本文件，必须与主线程的脚本文件同源。
+2. DOM限制。无法读取主线程所在网页的DOM对象，也无法使用`document`、`window`这些对象。
+
+### HTNL5离线存储
+离线存储是指：<font color="	#FF6347">在用户没有连接网络时，可以正常访问应用或某些网站，当用户连接后，自动更新用户机器上的缓存文件</font>。
+
+- 在线的情况下：浏览器发现html头部有`manifest`属性，它会请求`menifest`文件，如果是第一次访问页面，那么浏览器就会根据`manifest`文件的内容下载相应的资源并且进行离线存储 。如果已经访问过该页面并已经进行了离线存储，那么浏览器就会使用离线的资源加载页面，然后浏览器会对比`manifest`文件，查看是否发生改变，如果改变了就重新下载文件中的资源并进行离线存储。
+- 离线的情况下：浏览器直接使用离线存储的资源。
+
+### strong和b、i和em、title和h1的区别
+- strong标签有语义，是起到加重语气的效果，而b标签是没有的，b标签只是一个简单加粗标签。b标签之间的字符都设为粗体，strong标签加强字符的语气都是通过粗体来实现的，而搜索引擎更侧重strong标签。
+- title属性没有明确意义只表示是个标题，h1则表示层次明确的标题，对页面信息的抓取有很大的影响
+- i内容展示为斜体，em表示强调的文本
+
+### iframe有哪些优缺点
+<font color="	#FF6347">iframe属性可以将一个文档嵌入在另一个文档中</font>
+
+**优点**：
+- 用来加载速度较慢的内容（例如广告、视频等）
+- 可以使脚本并行加载
+- 可以实现跨子域通信
+
+**缺点**：
+- 会阻塞主页面的`onload`事件
+- 容易产生安全问题。将一个不可见的或用户感兴趣内容的`iframe`覆盖在文档的某个位置上，诱导用户点击。
+
+### label的作用是什么
+label标签用来定义与表单控件的关系，会自动将焦点转到和label标签对应的表单控件上。
+```html
+<label for="mobile">Number:</label>
+<input type="text" id="mobile"/>
+
+<label>Date:<input type="text"/></label>
+```
+
+### SVG和Canvas的区别
+- SVG是使用XML格式定义的矢量图，SVG是基于XML的，可以为其添加JS事件处理器。如果SVG对象的属性发生变化，那么浏览器能够自动重现图形。其特点如下：
+    - 不依赖分辨率
+    - 支持事件处理器
+    - 适合带有大型渲染区域的应用程序，例如地图
+    - 复杂度高会减慢渲染速度
+    - 不适合游戏应用
+- Canvas通过JS来绘制图形，其位置发生改变，就会重新进行渲染。其特点如下：
+    - 依赖分辨率
+    - 不支持事件处理器
+    - 可以以图片格式保存图像
+
+### head标签的作用
+head可以引入脚本、样式、提供元信息等。还可以规定字符集，描述了文档的各种属性，例如title、description。还可以配置是否适配移动端等。
+
+### 严格模式与怪异模式
+- 严格模式：浏览器按照W3C标准解析代码
+- 怪异模式：浏览器按照自己的方式解析代码，模拟浏览器的行为，以防止老站点无法工作
+
+HTML5不分严格模式与怪异模式
+
+### HTML5 drag API
+- dragstart：在开始拖放元素时触发的事件
+- drag：正在拖放时触发的事件
+- dragenter：在被拖放元素进入某元素时触发
+- dragover：在被拖放在某元素内移动时触发
+- dragleave：在被拖放元素移出目标元素时触发
+- drop：在目标元素完全接受被拖放元素时触发
+- dragend：在整个拖放操作结束时触发
 
 ### a标签
 `a`标签定义超链接，用于从一个页面链接到另一个页面。
@@ -140,146 +298,12 @@ function reverseULFragment(ul) {
 - 都可以使用appendChild添加子元素
 - 若添加的子元素是文档中存在的元素，通过appendChild在为其添加子元素时，会从文档中删除之前存在的元素。
 
-### **对HTML语义化的理解**
-语义化就是根据内容选择合适的标签。
-
-语义化的优点如下：
-- 对机器友好，带有语义化的文字表现力丰富，适合搜索引擎爬取有效信息。
-- 对开发者友好：语义化标签增强了可读性，便于团队开发与维护。
-
-常见的语义化标签：
-```html
-<header></header>  头部
-<nav></nav>  导航栏
-<section></section>  区块（有语义化的div）
-<main></main>  主要区域
-<article></article>  主要内容
-<aside></aside>  侧边栏
-<footer></footer>  底部
-```
-
-### **DOCTYPE的作用**
-告诉浏览器应该以什么样的文档类型来解析文档。
-
-### **script标签中defer和async的区别**
-如果没有defer和async属性，浏览器会立即加载并执行相应的脚本，不会等待后续加载的文档元素，读取到就会开始加载和执行，这样就阻塞了后续文档的加载。
-
-![image](https://user-images.githubusercontent.com/70066311/164873705-75330fb5-1c29-4c32-ab4a-cf76ef1e9342.png)
-
-上图中蓝色代表js脚本网络加载时间，红色代表js脚本执行时间，绿色代表html解析。可以看出<font color="	#FF6347">defer和async属性都是去异步加载外部的js脚本文件，他们都不会阻塞页面的解析，区别在于：</font>
-- 执行顺序：多个带async属性的标签，不能保证加载的顺序；多个defer属性的标签，按照加载顺序执行。
-- 脚本是否并行执行：async属性，表示后续文档的加载和执行与js脚本的加载和执行是并行进行的，在加载完js脚本后会暂停html脚本的解析，立即执行js脚本；而defer属性在加载完js脚本后会等待html解析完后在执行js脚本。
-
-### **常用的meta标签有哪些**
-1. charset：执行编码类型
-```html
-<meta charset="UTF-8" >
-``` 
-
-2. keywords：页面关键词
-```html
-<meta name="keywords" content="关键词" />
-```
-
-3. description：页面描述
-```html
-<meta name="description" content="页面描述内容" />
-```
-
-4. viewport：适配移动端
-```html
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-```
-
-5. refresh：页面重定向和刷新
-```html
-<meta http-equiv="refresh" content="0;url=" />
-```
-
-### **HTML5有哪些更新**
-1. 语义化标签
-2. 媒体标签：audio、video、source
-3. 表单
-    - 表单类型：
-        - email：验证邮箱
-        - url：验证URL
-        - number：只能输入数字
-        - date：日期选择
-    - 表单属性：
-        - placeholder：提示信息
-        - autofocus：自动获取焦点
-        - required：输入框不能为空
-    - 表单事件：
-        - oninput：每当输入框的内容发生变化时都会触发此事件
-4. 进度条：progress标签用来表示任务进度
-5. DOM查询：document.querySelector()和document.querySelectorAll()可以查询标签、类、ID
-6. Web存储
-localStorage和sessionStorage
-7. 新增了画布Canvas，可以在网页上绘制图像
-8. SVG矢量图：使用XML格式定义图形，在图像改变尺寸的情况下图像质量不会有损失
-8. 新增了Geolocation：定位用户位置
-
-### **行内元素有哪些，块级元素有哪些、空元素有哪些**
-- 行内元素：a、b、span、img、input
-- 块级元素：div、ul、ol、li、h1~h6、p
-- 空元素：没有内容的HTML标签，即没有闭合标签：br、hr、img、input
-
-### **对于web worker的理解**
-当JS执行耗时长的同步任务时，会阻塞后面的线程，而<font color="	#FF6347">web worker给JS创建多线程的运行环境，将一些任务分配给worker线程，主线程执行的同时worker线程也在执行，这样在进行复杂操作时就不会阻塞主线程了</font>。
-
-### **HTNL5离线存储**
-离线存储是指：<font color="	#FF6347">在用户没有连接网络时，可以正常访问应用或某些网站，当用户连接后，自动更新用户机器上的缓存文件</font>。
-
-### **strong和b、i和em、title和h1的区别**
-- strong标签有语义，是起到加重语气的效果，而b标签是没有的，b标签只是一个简单加粗标签。b标签之间的字符都设为粗体，strong标签加强字符的语气都是通过粗体来实现的，而搜索引擎更侧重strong标签。
-- title属性没有明确意义只表示是个标题，H1则表示层次明确的标题，对页面信息的抓取有很大的影响
-- i内容展示为斜体，em表示强调的文本
-
-### **label的作用是什么**
-label标签用来定义与表单控件的关系，会自动将焦点转到和label标签对应的表单控件上。
-```html
-<label for="mobile">Number:</label>
-<input type="text" id="mobile"/>
-
-<label>Date:<input type="text"/></label>
-```
-
-### **SVG和Canvas的区别**
-- SVG是使用XML格式定义的矢量图，SVG是基于XML的，可以为其添加JS事件处理器。如果SVG对象的属性发生变化，那么浏览器能够自动重现图形。其特点如下：
-    - 不依赖分辨率
-    - 支持事件处理器
-    - 适合带有大型渲染区域的应用程序，例如地图
-    - 复杂度高会减慢渲染速度
-    - 不适合游戏应用
-- Canvas通过JS来绘制图形，其位置发生改变，就会重新进行渲染。其特点如下：
-    - 依赖分辨率
-    - 不支持事件处理器
-    - 可以以图片格式保存图像
-
-### **head标签的作用**
-head可以引入脚本、样式、提供元信息等。还可以规定字符集，描述了文档的各种属性，例如title、description。还可以配置是否适配移动端等。
-
-### **严格模式与怪异模式**
-- 严格模式：浏览器按照W3C标准解析代码
-- 怪异模式：浏览器按照自己的方式解析代码，模拟浏览器的行为，以防止老站点无法工作
-
-HTML5不分严格模式与怪异模式
-
-### **HTML5 drag API**
-- dragstart：在开始拖放元素时触发的事件
-- drag：正在拖放时触发的事件
-- dragenter：在被拖放元素进入某元素时触发
-- dragover：在被拖放在某元素内移动时触发
-- dragleave：在被拖放元素移出目标元素时触发
-- drop：在目标元素完全接受被拖放元素时触发
-- dragend：在整个拖放操作结束时触发
-
-### **前端无障碍**
+### 前端无障碍
 前端无障碍是指<font color="	#FF6347">任何人都可以平等的、方便的、无障碍地获取信息、利用信息</font>。常见的无障碍设计例如：键盘上突起的F和J键，可以使人们方便的找到键盘字母的位置；某些浏览器无法显示图像，采用文字或声音的方式描述图像。
 
 腾讯无障碍说明：每个页面至少有一个h1并不为空、每个页面应至少有一个导航栏、每个页面的title不应长于60个字符等等。字节跳动无障碍短视频。无障碍检测工具：pa11y，可以很方便的进行用户测试，例如假设你自己是一个纯键盘的网站浏览者，尝试一下用键盘浏览自己开发的网站，是否能够方便的导航到网页的各个部分，并进行无障碍的阅读和交互。
 
-### **对MVVM的理解**
+### 对MVVM的理解
 MVVM分为：Model、View、ViewModel
 - Model：数据模型，数据和业务的逻辑都在Model中定义
 - View：UI视图，负责数据的展示
@@ -289,6 +313,21 @@ Model和View并无直接联系，而是通过ViewModel进行联系，Model和Vie
 
 ![image](https://user-images.githubusercontent.com/70066311/165209081-5b2f1034-1230-40db-b732-3a6a69369feb.png)
 
+优点：
+- 双向绑定
+- 将View和Medol彻底分离，降低了耦合性，有利于测试
+
+### 对MCV的理解
+MVC是一种设计模式。
+- M：模型层，是应用程序中用于处理应用程序数据逻辑的部分，模型对象负责在数据库中存取数据
+- V：视图层：在应用程序中处理数据显示的部分，视图是依据模型数据创建的
+- C：控制层，在应用程序中处理用户交互的部分，控制器接受用户的输入并调用模型和视图去完成用户的需求，控制器本身不输出任何东西和做出任何处理。它只是接收请求并决定调用哪个模型去处理请求，然后再确定用哪个视图来显示返回数据。
+
+![image](https://user-images.githubusercontent.com/70066311/173271858-691015a2-1cff-42d7-a27d-d29cba6c2029.png)
+
+
+### MVVM和MVC的区别
+MVC和MVVM都是一种设计思想，区别在于<font color="	#FF6347">MVVM实现了双向绑定，即View和Model的自动同步，当Model的属性改变时，不需要再去手动操作DOM就可以自动更新View。而MVC中大量的DOM操作会影响页面渲染的性能</font>。
 
 ### 对SPA的理解
 SPA为单页面应用，它将所有活动局限于一个Web页面中，仅在该Web页面初始化时加载相应的HTML、JS、CSS，一旦页面加载完成了，<font color="	#FF6347">SPA不会因为用户的操作而进行页面的重新加载或跳转，取而代之的是利用JS动态的变换HTML的内容</font>，从而实现UI与用户交互。
@@ -304,12 +343,12 @@ SPA为单页面应用，它将所有活动局限于一个Web页面中，仅在�
 3. 不利于SEO
 
 ### SEO
-SEO（搜索引擎优化）是一种了解搜索殷勤的运作规则（如何抓取网站页面、如何索引以及如何根据特定的关键字展现搜索结果排序等）来调整网站，以提高该网站在搜索引擎中某些关键词的搜索结果排名。
+SEO（搜索引擎优化）是一种了解搜索引擎的运作规则（如何抓取网站页面、如何索引以及如何根据特定的关键字展现搜索结果排序等）来调整网站，以提高该网站在搜索引擎中某些关键词的搜索结果排名。
 
 ### SSR（服务器端渲染）
 在普通的SPA中，<font color="	#FF6347">一般是将框架及网页代码发送到浏览器，然后在浏览器中生成和操作DOM</font>（这也是第一次访问SPA页面在同等带宽及网络延迟下比传统的在后端生成HTML发送到浏览器要更慢的主要原因），但其实也可以将SPA应用打包到服务器上，在服务器上渲染出HTML，发送到浏览器，这样的HTML页面还不具备交互能力，所以还需要与SPA框架配合，在浏览器上“混合”成可交互的应用程序。
 
-SSR能够在服务端先进行请求渲染，由于服务端进行请求数据的时延较小，能够快速拿到数据并且返回HTML代码。在客户端可以直接渲染数据而不需要花费一些请求数据的时间，这是服务端渲染的好处。返回内容SSR会比普通的SPA在HTML代码中多出首次渲染的结果，这样在初始化的时候直接将页面进行渲染，无需花费时间去请求数据再次渲染。SSR并不是说只在服务端进行渲染，而是说SSR会比普通的客户端渲染多一次在服务端渲染。到浏览器这边，SSR还是需要进行再次初始化React，并且经过生命周期
+SSR能够在服务端先进行请求渲染，由于服务端进行请求数据的时延较小，能够快速拿到数据并且返回HTML代码。在客户端可以直接渲染数据而不需要花费一些请求数据的时间，这是服务端渲染的好处。返回内容SSR会比普通的SPA在HTML代码中多出首次渲染的结果，这样在初始化的时候直接将页面进行渲染，无需花费时间去请求数据再次渲染。SSR并不是说只在服务端进行渲染，而是说SSR会比普通的客户端渲染多一次在服务端渲染。到浏览器这边，SSR还是需要进行再次初始化React，并且经过生命周期。
 
 **SSR的优势**
 - 对SEO友好
@@ -336,6 +375,8 @@ DOM是指文档对象模型，它指的是把文档当作一个对象，这个�
 #### BOM对象
 BOM是浏览器对象，主要定义了和浏览器进行交互的方法和接口。`BOM`的核心是`window`，而`window`对象具有双重角色，<font color="	#FF6347">它既是通过js访问浏览器窗口的一个接口，又是一个全局对象</font>。这意味着在网页中定义的任何对象、变量和函数，都作为`window`的一个属性或者方法存在。
 
+在全局作用域中声明的对象都会变成window对象的属性和方法。
+
 **常用的BOM属性**：
 - location对象
     - location.href：返回或设置当前文档的url
@@ -347,38 +388,21 @@ BOM是浏览器对象，主要定义了和浏览器进行交互的方法和接�
     - history.back
     - history.forward
 
-### **click在ios上有300ms延迟的原因，应该如何解决**
+### location
+location对象包含有关当前的url的信息，它既是`window`的属性也是`document`的属性，我们可以通过改变其属性值修改页面的url。
+
+### history
+history对象包含用户访问过的URL，它内置了三个方法可以实现浏览器的前进后退：`history.go`、`history.back`、`history.forward`
+
+`history.replaceState`、`history.push`、`history.pop`
+
+### click在ios上有300ms延迟的原因，应该如何解决
 iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕上，采用了双击缩放，浏览器为了区分用户是单机还是双击进行操作，所以设置了300ms的延迟。
 
 - 禁用缩放：将缩放禁用，就没有300ms的延迟了
 - FastClick：在检测到touched事件后，立即触发一个模拟click事件，并把浏览器300ms之后真正触发的click事件阻断掉。
 
 # CSS篇
-
-## 盒子模型
-盒模型规定了网页元素如何显示以及元素之间的相互关系。盒子模型分为标准盒子模型和IE盒子模型，
- - 标准盒子模型包括4个部分：
-     margin、border、padding、content
- - IE盒子模型包括2个部分：
-     margin、content(padding、border、content)
-
-
-### **如何转化盒子模型**
-    标准盒子模型：box-sizing: content-box  
-    IE盒子模型： box-sizing:border-box  
-
-### **两者的区别**
- - 标准盒子模型的宽度为border * 2 + padding * 2 + content(width)
- - IE盒子模型为border * 2 + padding * 2 > width ? border + padding : width
-
-## height和line-height的区别
-### *height
- - height是整个盒子的高度
-### *line-height
- - line-height是一行文字的高度，盒子的高度 = 行数 * 行高
-
-    如果height === line-height，那么文字会居行中显示
-
 ## CSS选择器
  - 通配（*）
  - id选择器（#）
@@ -389,10 +413,10 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
  - 子元素选择器（>）
  - 属性选择器（a[href]）
 
-### **CSS优先级算法问题**
-    !important > 内联样式 > id > class > 标签 > 通配 
+### CSS优先级算法问题
+!important > 内联样式 > id > class > 标签 > 通配 
 
-### **CSS权重计算**
+### CSS权重计算
 首先我给每个CSS选择器赋一个权重：
  - !important权重为10000
  - 内联样式权重为：1000
@@ -403,12 +427,15 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 
 然后计算每个样式的权重值，权重大的优先
 
-### **注意事项**
+### 注意事项
 1. 继承得到的样式的优先级最低
-2. 如果权重相同，最后出现的样式生效
-3. 样式来源不同时：内联样式 > 内部样式 > 外部样式 > 浏览器用户自定义样式 > 浏览器默认样式
+2. !important的优先级最高
+3. 如果权重相同，最后出现的样式生效
+4. 样式来源不同时：内联样式 > 内部样式 > 外部样式 > 浏览器用户自定义样式 > 浏览器默认样式
 
-### **CSS属性哪些可以继承**
+### CSS属性哪些可以继承
+常见的有：font-family、font-size、font-style、text-align、line-height、visibility、list-style、opacity等。
+
  1. 字体系列属性：
     - font：组合字体
     - font-family：规定元素的字体系列
@@ -439,8 +466,9 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
     - list-style-position：规定列表中列表项目标记的位置
     - list-style：设置列表属性
 
+### CSS属性哪些不可以继承
+常见的有：display、border、padding、background、position等
 
-### **CSS属性哪些不可以继承**
 1. display
 2. 文本属性：
     - text-decoration：规定添加到文本的装饰
@@ -451,7 +479,7 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 5. 定位属性：position、top、right、bottom等
 6. 页面样式属性：size
 
-### **display有哪些属性，作用是什么？**
+### display有哪些属性，作用是什么？
   display: none   - 表示该元素不会显示，并且从文档流中移除    
   display: block  - 把某元素转化为块元素，会占一行，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>  
   display: inline - 把某元素转化为行内元素，<font color="	#FF6347">默认宽度为内容宽度，不可以设置宽高，同行显示 </font>  
@@ -461,14 +489,14 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
   display：table - 将元素当作表格使用，<font color="	#FF6347">默认宽度为父元素宽度，可以设置宽高</font>    
   display: inherit - 继承父元素的display属性
 
-### **display的block、inline和inline-block的区别**
+### display的block、inline和inline-block的区别
 - block：    
       - <font color="#FF6347">元素表现为块级元素，可以设置宽高，独占一行，若没有设置宽度，则默认填满父级元素的宽度</font>。     
       - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>。
       - <font color="#FF6347">使用width和height都会生效</font>。
 - inline：   
       - <font color="#FF6347">元素表现为行内元素</font>；   
-      - <font color="#FF6347">不能设置宽高，大小完全由内容撑开</font>；   
+      - <font color="#FF6347">大小完全由内容撑开</font>；   
       - <font color="#FF6347">padding上下左右都有效，但margin只有左右会产生效果，上下不生效</font>。
       - <font color="#FF6347">使用width和height不会生效</font>。
 - inline-block：     
@@ -476,15 +504,18 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
       - <font color="#FF6347">可以设置宽高</font>    
       - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>
 
-## 隐藏元素的方式
+### 隐藏元素的方式
 1. display:none是彻底消失，<font color="	#FF6347">不在文档流中占位，浏览器也不会解析该元素，不会响应绑定事件，子节点不会继承</font>。  
 2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
-3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="	#FF6347">会响应绑定的事件</font>。  
-4. z-index:负值是其他元素覆盖该元素，实现隐藏  
-5. 将height设为0
+3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="#FF6347">在文档流中占位，会响应绑定的事件</font>。
+4. z-index:负值使其他元素覆盖该元素，实现隐藏。 
+5. 将height设为0。
+6. position: absolute。使用绝对定位将元素移到可视区外。
+7. transform: scale(0, 0)将元素缩放为0.<font color="#FF6347">在文档流中占位，不会响应绑定的事件</font>。
 
-### **display:none与visibility:hidden的区别**
-- 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生回流，造成文档重排；而visibility切换时不会引起回流，只会引起本元素重绘</font>。
+### display:none与visibility:hidden的区别
+两者都是隐藏元素的方式，都不会对事件做出响应，区别在于：
+- 使用visibility:hidden比display:none性能更好，<font color="	#FF6347">当display进行切换属性时，页面会发生重排；而visibility切换时不会引起重排，只会引起本元素重绘</font>。
 - display:none不可继承，visibility:hidden可以继承
 - display:none会让元素完全从渲染树中消失，渲染时不会占据任何空间;visibility:hidden不会让元素从渲染树中消失，渲染的元素还会占据相应的空间，只是内容不可见。
 
@@ -529,14 +560,14 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
 </div>
 ```
 
-## link和@import的区别
+### link和@import的区别
 两者都是外部引用CSS的方式，区别如下：
 1. link是XHTML标签，除了可以引用CSS还可以引用其他文件；@import只能引用CSS文件
 2. link兼容性比@import更好
 3. link在引入CSS时，在页面载入的同时进行加载；@import要等页面完全加载完后再加载CSS
 4. link可以使用JS控制DOM改变样式；@import不可以。
 
-## transiton和animation的区别
+### transiton和animation的区别
  - transition是过渡属性，在某些时候触发的事件例如输入框得到焦点、失去焦点等。
  - animation是动画属性，它的实现不需要触发事件，设定好时间会自己执行。
 
@@ -556,6 +587,25 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
  ```
 
  - 区别：伪类是通过元素选择器加上伪类改变该元素状态；伪元素是增加额外的元素或样式。
+
+
+## 盒子模型
+盒模型规定了网页元素如何显示以及元素之间的相互关系。盒子模型分为标准盒子模型和IE盒子模型，
+ - 标准盒子模型包括4个部分：
+     margin、border、padding、content
+ - IE盒子模型包括2个部分：
+     margin、content(padding、border、content)
+
+### 如何转化盒子模型
+    标准盒子模型：box-sizing: content-box  
+    IE盒子模型： box-sizing:border-box  
+
+### 两者的区别
+ - 标准盒子模型的宽度为border * 2 + padding * 2 + content(width)
+ - IE盒子模型为border * 2 + padding * 2 > width ? border + padding : width
+
+### li 与 li 之间有看不见的空白间隔是什么原因引起的？如何解决？
+
 
 ### **CSS3有哪些新特性**
 - 边框：border-radius、border-shadow
@@ -657,7 +707,13 @@ CSS动画只需要定义一些关键帧，其余的帧由浏览器根据计时�
 }
 ```
 
+## height和line-height的区别
+### height
+ - height是整个盒子的高度
+### line-height
+ - line-height是一行文字的高度，盒子的高度 = 行数 * 行高
 
+    如果height === line-height，那么文字会居行中显示
 
 ### **CSSSprites（精灵图）**
 CSSSprites（精灵图），<font color="	#FF6347">将一个页面涉及到的所有图片都包含到一张大图中去，然后利用CSS的 background-image，background-repeat，background-position属性的组合进行背景定位</font>。
@@ -4752,14 +4808,24 @@ SYN洪泛攻击属于DOS攻击的一种，它的原理是：
 - 增大最大半连接数，缩短超时时间
 - 过滤网关
 
-### **三次握手的第三次丢包会发生什么？** 
+### 三次握手的第三次丢包会发生什么？
 - 服务器端：超过一定时间未收到客户端发来的确认包，会重传`SYN/ACK`包、若多次重传后还未收到确认包，则会关闭该连接。  
 - 客户端：客户端在发送`ACK`包后会认为该连接建立成功，随后发送数据进行通信，服务器段会返回一个`RST`包告诉客户端这个连接异常已被关闭，这样客户端就知道三次握手失败了。
 
-### **如果已经建立了连接，但客户端出现了故障怎么办？**
+### 如果已经建立了连接，但客户端出现了故障怎么办？
 通过<font color="	#FF6347">**定时器与超时重传机制**</font>，尝试获取**确认**，直到最后自动断开连接。
 
 TCP 设有一个计时器Keep-alive。服务器每收到一次客户端的数据，都会重新复位这个计时器，时间通常是设置为 2 小时。若 2 小时还没有收到客户端的任何数据，服务器就开始重试：每隔 75 分钟发送一个探测报文段，若发送 10 个探测报文后客户端依然没有回应，那么服务器就认为连接已经断开了。
+
+### TCP建立连接可以两次握手吗？
+不可以。
+- <font color="#FF6347">可能会出现已失效的连接请求报文段有传到了服务器端</font>。client发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达 server。本来这是一个早已失效的报文段。但 server 收到此失效的连接请求报文段后，就误认为是 client 再次发出的一个新的连接请求。于是就向 client 发出确认报文段，同意建立连接。假设不采用 “三次握手”，那么只要 server 发出确认，新的连接就建立了。由于现在 client 并没有发出建立连接的请求，因此不会理睬 server 的确认，也不会向 server 发送数据。但 server 却以为新的运输连接已经建立，并一直等待 client 发来数据。这样，server 的很多资源就白白浪费掉了。采用 “三次握手” 的办法可以防止上述现象发生。例如刚才那种情况，client 不会向 server 的确认发出确认。server 由于收不到确认，就知道 client 并没有要求建立连接。
+- Server无法确认Client是否收到第二次握手的报文。
+
+### 可以四次握手吗？
+四次握手会降低传输的效率。
+
+四次握手是在第二次握手时，Server只发送ACK和ack，而Server的SYN的seq在第三次握手时发送。处于优化的目的，将四次握手中的二三次握手合并。
 
 **四次挥手**  
 FIN：释放一个连接
