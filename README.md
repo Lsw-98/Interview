@@ -188,9 +188,6 @@ HTML5不分严格模式与怪异模式
 - _self：当前页面跳转
 - _top：在当前窗体打开链接，替换当前的整个窗体
 
-### 超链接访问过后hover样式就不出现的问题
-<font color="	#FF6347">被点击访问后的超链接样式不在具有`:hover`和`:active`，解决方法是改变CSS属性的排列顺序：L-V-H-A（LINK-VISITED-HOVER-ACTIVE）</font>
-
 ### form标签
 在`form`标签中添加Action（提交的地址）和method（post方法），且有一个submit按钮，就可以实现数据的提交。
 
@@ -541,7 +538,7 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 </ul>
 ```
 
-### **opacity和rgba的区别**
+### opacity和rgba的区别
 opacity和rgba都可以给元素设置透明度，但不同之处在于：
 1. **opacity作用于元素以及元素内的所有内容的透明度**，而**rgba()只作用于元素的颜色和其背景色**
 2. **opacity可以被继承，rgba()不会被继承**
@@ -605,7 +602,15 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
  - IE盒子模型为border * 2 + padding * 2 > width ? border + padding : width
 
 ### li 与 li 之间有看不见的空白间隔是什么原因引起的？如何解决？
+浏览器会把`inline`元素间的空白字符（空格、换行、Tab等）渲染成一个空格。在`ul`中，通常是一个`li`占据一行，这导致`li`换行后会产生换行字符，它变成了一个空格，占用了一个字符的宽度。
 
+解决方法：
+1. 为`li`设置`float:left`。缺点：`li`中的某些元素可能不能设置浮动。
+2. 将`ul`中的`font-size`设为0。缺点：如果`ul`中的其它字符的`fontsize`也被设为0，需要重新设定`font-size`
+3. 将`ul`中的字符间隔`letter-spacing`设置为`-8px`，同时设置`li`内的字符间隔为`normal`。
+
+### 超链接访问过后hover样式就不出现的问题
+<font color="	#FF6347">被点击访问后的超链接样式不在具有`:hover`和`:active`，解决方法是改变CSS属性的排列顺序：L-V-H-A（LINK-VISITED-HOVER-ACTIVE）</font>
 
 ### **CSS3有哪些新特性**
 - 边框：border-radius、border-shadow
@@ -643,8 +648,8 @@ transform-origin: top left;
 transform: rotate(45deg);
 ```
 
-### **CSS动画**
-<font color="	#FF6347">CSS动画就是元素从一种样式过渡到另一种样式的过程</font>。常见的动画效果很多，比如：平移、缩放、旋转等。CSS实现动画的方式有以下几种：
+### CSS动画
+<font color="#FF6347">CSS动画就是元素从一种样式过渡到另一种样式的过程</font>。常见的动画效果很多，比如：平移、缩放、旋转等。CSS实现动画的方式有以下几种：
 
 1. transition：实现渐变动画
 2. transform：实现缩放、平移等效果
@@ -707,22 +712,16 @@ CSS动画只需要定义一些关键帧，其余的帧由浏览器根据计时�
 }
 ```
 
-## height和line-height的区别
-### height
- - height是整个盒子的高度
-### line-height
- - line-height是一行文字的高度，盒子的高度 = 行数 * 行高
-
-    如果height === line-height，那么文字会居行中显示
-
 ### **CSSSprites（精灵图）**
 CSSSprites（精灵图），<font color="	#FF6347">将一个页面涉及到的所有图片都包含到一张大图中去，然后利用CSS的 background-image，background-repeat，background-position属性的组合进行背景定位</font>。
 
 优点：
 - 可以减少网络请求，提高页面性能
+- 占用的字节数更少
 
 缺点：
 - 维护麻烦：如果图片中的一小部分需要改动，那么整个合并的图片都要改变。
+- 定位复杂：需要借助其他工具来得到图片的准确位置
 
 ### **什么是物理像素，逻辑像素和像素密度，为什么在移动端开发时需要用到@3x, @2x这种图片？**
 以 iPhone XS 为例，当写 CSS 代码时，针对于单位 px，其宽度为 414px & 896px，也就是说当赋予一个 DIV元素宽度为 414px，这个 DIV 就会填满手机的宽度；
@@ -731,14 +730,23 @@ CSSSprites（精灵图），<font color="	#FF6347">将一个页面涉及到的�
 
 对于图片来说，为了保证其不失帧，1 个图片像素至少要对应一个物理像素，假如原始图片是 500300 像素，那么在 3 倍屏上就要放一个 1500900 像素的图片才能保证 1 个物理像素至少对应一个图片像素，才能不失真。
 
-### **margin 和 padding 的使用场景**
+### margin 和 padding 的使用场景
 - 需要在border外部添加空白，且空白处不需要背景色时，使用margin
 - 需要在border内测添加空白，且空白处需要背景色时，使用padding
 
-## line-height的三种赋值方式
+### line-height的三种赋值方式
 1. 单位：使用px为固定值，em会参考父元素font-size值计算自身行高
 2. 数字：按比例传给后代，例如父元素行高为1.5，子元素字体为18px，则子元素的行高为1.5 * 18 = 24px
 3. 百分比：按计算后的值传给后代
+
+## height和line-height的区别
+### height
+height是整个盒子的高度
+### line-height
+- line-height是一行文字的高度，实际上是下一行基线到上一行基线的距离。
+- 盒子的高度 = 行数 * 行高。
+- 如果一个元素没有定义height，那么最终表现的高度为line-height。
+- 如果height === line-height，那么文字会居行中显示。
 
 ## <font color="	#FF6347">CSS优化性能的方法</font>
 ### **<font color="	#FF6347">加载性能</font>**
@@ -761,15 +769,28 @@ CSSSprites（精灵图），<font color="	#FF6347">将一个页面涉及到的�
 4. 避免选择器深层嵌套
 5. 使用精灵图
 
-### **<font color="	#FF6347">可维护性、健壮性</font>**
+### <font color="	#FF6347">可维护性、健壮性</font>
 1. 将具有相同属性的CSS代码抽离出来，提高CSS可维护性
 2. 将CSS定义到外部文件，做到样式与内容分离
 
-### **::before 和 :after 的双冒号和单冒号有什么区别？**
+### ::before 和 :after 的双冒号和单冒号有什么区别？
 - :用于伪类，::用于伪元素
 - ::before就是一个子元素的存在，定义在元素主题内容之前的一个伪元素，并不存在于DOM之中，只存在页面之中
 
-### **单行、多行文本溢出隐藏**
+### CSS预处理器
+因为传统的CSS结构混乱，可维护性差，编写起来较复杂。     
+
+而Sass、Less等都是CSS预处理器，他们是一种特殊的语法编译成的CSS。可以在CSS中使用变量，函数以及一些简单逻辑的代码。可以让CSS更加简洁、复用性更强、可维护性更高。
+
+- 预处理器结构清晰、便于扩展。
+- 可以轻松实现多重继承。 
+- 完全兼容 CSS 代码，可以方便地应用到老项目中。
+- 使CSS代码复用性更强，可维护性更高。
+
+### CSS后处理器
+CSS后处理器如`postCss`通常对已经定义好的CSS进行处理，让其更符合规范，常见的就是给样式添加浏览器私有前缀，使其兼容更多的浏览器。
+
+### 单行、多行文本溢出隐藏
 - 单行文本溢出
 
 ```css
@@ -787,22 +808,133 @@ display:-webkit-box;         // 作为弹性伸缩盒子模型显示。
 -webkit-line-clamp:3;        // 显示的行数
 ```
 
-### **css的弊端**
+### 媒体查询
+当我们在不同的设备上运行我们的程序时，样式不会很好的展现，例如：宽度、高度和颜色等。媒体查询可以针对不同的屏幕尺寸设置不同的样式，当浏览器大小发生变化时，页面也会根据浏览器的宽高重新渲染页面，实现响应式页面。
+
+语法规范：
+```css
+@media mediatype and|not|only (media feature){
+  css-Code
+}
+```
+- 用@media开头
+- mediatype媒体类型
+- 关键字：and、not、only
+- media feature媒体特性
+
+**mediatype**      
+媒体类型主要分为：all（用于所有设备）、print（打印设备）、screen（电脑屏幕、平板、手机等）
+
+**媒体特性**
+- width：定义输出设备中页面可见区域的宽度
+- min-width：定义输出设备中页面最小可见区域宽度
+- max-width：定义输出设备中页面最大可见区域宽度
+
+### CSS工程化
+CSS工程化主要解决的问题是：
+1. CSS如何拆分，如何进行模块化设计
+2. 如何使CSS打包结果最优
+3. CSS的可维护性
+
+CSS工程化的实践：CSS预处理器、webpack loader
+
+## z-index属性
+在有两个重叠的标签时，想要一个在另一个上方或下方出现，z-index的值越大，就越在上层。使用z-index属性需要position属性是relative、absolute或fixed。
+
+z-index属性在下列情况会失效：
+1. 若父元素的position为relative，子元素的z-index就会失效
+2. 元素的position属性不是relative、absolute或fixed
+3. 元素在设置了z-index的同时还设置了float浮动。去除float，改为display:inline-block
+
+### nth-child和:nth-of-type的区别
+- nth-child：找出包含对应元素父元素内所有的子元素然后再去找到对应位置的元素后再去匹配选择器
+- nth-of-type：找出包含对应元素父元素内的子元素,然后根据样式选择器找到的元素的tag,把父元素内子元素所有对应tag种类分别取出排列后,分别比对对应的位置然后匹配选择器
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .a:nth-of-type(4) {
+      background: #ff0000;
+    }
+
+    .a:nth-child(4) {
+      background: green;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>这是标题</h1>
+  <div class="a">div1</div>
+  <p>p1特别</p>
+  <label class="a">label1</label>
+  <div>div2特别</div>
+  <div>div2特别的</div>
+  <div class="a">div3</div>
+  <p class="a">p2</p>
+  <label class="a">label2</label>
+  <div class="a">div4</div>
+  <p class="a">p3</p>
+  <label>label3特别</label>
+  <div class="a">div5</div>
+  <p class="a">p4</p>
+  <label class="a">label4</label>
+</body>
+
+</html>
+```
+
+首先是 `.a:nth-child(4)`：
+1. 找到`.a`元素的父元素下的所有子元素，即`body`下的所有子元素
+2. 找到第四个元素
+3. 再匹配class选择器`.a`，如果匹配到了，就赋予样式
+
+`.a:nth-of-type(4)`：
+1. 找到`.a`元素的父元素下的所有子元素，即`body`下的所有子元素
+2. 并根据标签进行归类
+
+div组：
+```html
+<div class="a">div1</div>
+<div>div2特别</div>
+<div>div2特别的</div>
+<div class="a">div3</div>
+<div class="a">div4</div>
+<div class="a">div5</div>
+```
+
+label组：
+```html
+<label class="a">label1</label>
+<label class="a">label2</label>
+<label>label3特别</label>
+<label class="a">label4</label>
+
+```
+
+p组：
+```html
+<p>p1特别</p>
+<p class="a">p2</p>
+<p class="a">p3</p>
+<p class="a">p4</p>
+```
+
+3. 然后分别对每个type组内找到第4个元素
+4. 再匹配class选择器`.a`，如果匹配到了，就赋予样式
+
+
+### css的弊端
 1. CSS是一门非程序化语言，没有变量、函数、作用于等概念
 2. 不方便维护，不利于复用
 3. 冗余度高
 4. CSS没有很好的计算能力
 
-### **Sass、Less**
-因为传统的CSS结构混乱，可维护性差。     
-
-而Sass、Less都是CSS预处理器，他们是一种特殊的语法编译成的CSS。可以在CSS中使用变量，函数以及一些简单逻辑的代码。可以让CSS更加简洁、复用性更强、可维护性更高。
-
-- 预处理器结构清晰、便于扩展。
-- 可以轻松实现多重继承。 完全兼容 CSS 代码，可以方便地应用到老项目中。
-- 使CSS代码复用性更强，可维护性更高。
-
-### **如何判断元素是否到达可视区域**
+### 如何判断元素是否到达可视区域
 ![image](https://user-images.githubusercontent.com/70066311/164966495-05ce76c5-e33a-4b92-b2d1-4206197cccdc.png)
 
 - window.innerHeight：浏览器可视区的高度
@@ -811,13 +943,6 @@ display:-webkit-box;         // 作为弹性伸缩盒子模型显示。
 
 那么元素到达可视区域的条件就是：`img.offsetTop < window.innerHeight + document.body.scrollTop`
 
-## z-index属性
-在有两个重叠的标签时，想要一个在另一个上方或下方出现，z-index的值越大，就越在上层。使用z-index属性需要position属性是relative、absolute或fixed。
-z-index属性在下列情况会失效：
-1. 若父元素的position为relative，子元素的z-index就会失效
-2. 元素的position属性不是relative、absolute或fixed
-3. 元素在设置了z-index的同时还设置了float浮动。去除float，改为display:inline-block
-
 ## 常见的CSS布局单位
 1. px  
 px是页面布局的基础，px是屏幕能显示的最小区域，分为CSS像素和物理像素。
@@ -825,12 +950,16 @@ px是页面布局的基础，px是屏幕能显示的最小区域，分为CSS像�
     - 物理像素只与设备的硬件密度有关，任何设备的物理像素都是固定的
 2. em和rem  
 em和rem都是相对长度单位。em是相对于父元素，rem相对于root。
-    - em：文本相对长度单位，**相对父元素字体大小的倍数**。相对于当前对象内文本的字体尺寸。如果当前行内文本的字体尺寸未被设置，则相对于浏览器默认字体尺寸（16px）进行设置。
+    - em：文本相对长度单位，**相对父元素字体大小的倍数**。相对于当前对象内文本的字体尺寸。如果当前行内文本的字体尺寸未被设置，则相对于浏览器默认字体大小（16px）进行设置。
     - rem：**相对于根元素的字体大小的倍数**。使用rem可以实现响应式布局，当屏幕分辨率发生变化时，元素也随之变化。
 3. %  
-当浏览器的宽高发生变化时，通过%可以实现响应式效果。一般认为子元素的百分比相对于父元素。
+当浏览器的宽高发生变化时，通过%可以实现响应式效果。<font color="	#FF6347">一般认为子元素的百分比相对于父元素</font>
 4. vw和vh  
 vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度，除了vw和vh之外，还有vmin和vmax两个相关的单位。vmin代表vw和vh之中的较小值，vmax代表较大值。使用vw和vh也可以实现响应式。
+
+### vw/vh和%的区别：
+- %大部分相对于祖先元素，也有相对于自身的元素：比如（border-radius、translate）
+- vw/vh：相对于视口的尺寸
 
 ## px、em、rem的区别及使用场景
 ### 区别
@@ -843,7 +972,6 @@ vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度�
 2. 对于需要适配各种移动设备，就用rem。
 
 ## 一个盒子不给宽高如何水平居中
-
 方法一：使用弹性布局
 
 ```html
@@ -903,6 +1031,199 @@ vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度�
     }
   </style>
 ```
+
+## CSS布局
+### **table布局**
+table的特性决定了它非常适合用来做布局，表格中的内容可以自动居中。但table局部有很多缺点：
+1. <font color="#FF6347">比其他HTML标签占更多的字节，造成下载时间延迟，占用服务器更多资源</font>
+2. <font color="#FF6347">阻挡浏览器渲染引擎的渲染顺序，延迟页面的加载速度</font>
+
+### **flex布局**
+**1. 盒模型**    
+- 标准盒子模型：width = 2 * border + 2 * padding + content
+- IE盒子模型：width = 2 * border + 2 * padding > content ? border * 2 + padding * 2 : content
+
+**2. display/position**
+display：
+- block：    
+      - <font color="#FF6347">元素表现为块级元素，可以设置宽高，独占一行，若没有设置宽度，则默认填满父级元素的宽度</font>。     
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>。
+- inline：   
+      - <font color="#FF6347">元素表现为行内元素</font>；   
+      - <font color="#FF6347">不能设置宽高，大小完全由内容撑开</font>；   
+      - <font color="#FF6347">padding上下左右都有效，但margin只有左右会产生效果，上下不生效</font>。
+- inline-block：     
+      - <font color="#FF6347">对外表现为行内元素，对内表现为块级元素</font>     
+      - <font color="#FF6347">可以设置宽高</font>    
+      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>
+
+**inline-block与浮动**
+不同点：<font color="#FF6347">inline-block不会脱离文档流；浮动会脱离文档流</font>。
+相同点：<font color="#FF6347">可以达到一样的效果</font>。
+
+
+position：
+- static：<font color="#FF6347">没有定位，存在于正常的文档流中</font>
+- relative：<font color="#FF6347">相对元素本来的位置进行偏移，不会改变布局的计算</font>
+- absolute：<font color="#FF6347">脱离文档流，相对于第一个不是static的父元素进行定位</font>
+- fixed：<font color="#FF6347">固定定位，相对于浏览器窗口进行定位</font>
+
+static不可以设置z-index。    
+
+**3. flex布局（弹性盒子布局）**     
+任何容器都可以指定为flex布局。采用flex布局的元素，称为flex容器，它的所有子元素自动成为容器成员。
+
+![image](https://user-images.githubusercontent.com/70066311/161722952-f8e30262-53e0-4ee5-8911-64a3ab607dee.png)
+
+容器默认存在两根轴，<font color="#FF6347">水平的主轴和垂直的交叉轴</font>。
+
+**flex容器**有6个属性：
+- flex-direction：<font color="#FF6347">决定主轴方向的排列</font>
+
+![image](https://user-images.githubusercontent.com/70066311/161723235-b8eda26f-1225-492f-b3b4-bc8db7625f17.png)
+
+- flex-wrap：默认情况下，项都排列在一条直线上。<font color="#FF6347">而该属性定义如果排列不下，该如何换行</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/161723699-b60322b1-d78f-41fd-a907-6c8f9c028c82.png)
+nowrap：不换行     
+wrap：换行，第一行在上方：
+
+![image](https://user-images.githubusercontent.com/70066311/161723822-ccfd4fd7-40ca-47bb-bb31-0b829d3be4c6.png) 
+wrap-reverse：换行，第一行在下方：
+
+![image](https://user-images.githubusercontent.com/70066311/161724323-64fa817c-2ca8-4c71-9a17-4a1134f9d56f.png)
+
+- flex-flow：是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap
+
+- justify-content：定义了项目在主轴上对齐的方式
+
+![image](https://user-images.githubusercontent.com/70066311/161724697-1c9f09cc-b935-49eb-9f22-042c4c387d63.png)
+
+space-between：两端对齐，项目之间的间隔都相等。
+
+space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+
+- align-item：定义项目在交叉轴上如何对齐
+
+![image](https://user-images.githubusercontent.com/70066311/161724975-4a4ff18b-f619-48f9-8eb3-d9dca5409b5b.png)
+
+stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
+
+- align-content：定义了多根轴线的对齐方式，如果只有一根轴线，则该属性不起作用
+
+![image](https://user-images.githubusercontent.com/70066311/161726025-401fa82b-4290-4662-95ef-b53c6be84260.png)
+
+**子项**的6个属性：
+- order：数值越小，排列越靠前
+
+![image](https://user-images.githubusercontent.com/70066311/161726640-59d02e21-b97e-4236-9546-a59d92b53251.png)
+
+- flex-grow：定义项目放大的比例，默认为0。<font color="#FF6347">如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍</font>。
+
+![image](https://user-images.githubusercontent.com/70066311/168708588-49f9e071-0ec1-4767-b585-55f3248fd7b0.png)
+
+
+- flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小</font>。负值对该属性无效。
+
+![image](https://user-images.githubusercontent.com/70066311/168708630-d9261625-12a6-43d8-8b92-d934a8d2e78c.png)
+
+- flex-basis：在计算剩余空间之前设置子项的基础宽度。
+
+- flex：<font color="#FF6347">flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选</font>。该属性有两个快捷值：<font color="#FF6347">auto (1 1 auto) 和 none (0 0 auto)</font>。
+
+- align-self：align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
+
+### Grid布局
+Grid布局将网页划分为一个个网格，可以任意组合不同的网格，做出各种各样的布局。<font color="#FF6347">使用display: grid指定网格布局</font>。默认情况下，容器元素都为块级元素，也可以设置为行内元素。<font color="#FF6347">使用display: inline-grid指定行内网格布局</font>。
+
+**划分行列**
+- grid-template-colums：定义每一列的列宽
+- grid-template-rows：定义每一行的行高
+
+**实现一个九宫格布局：**
+```html
+  <style>
+    .container {
+      display: grid;      
+      /* grid-template-columns: 100px 100px 100px;
+      grid-template-rows: 100px 100px 100px; */
+
+      /* 除了使用绝对单位，也可以使用百分比 */
+      /* grid-template-columns: 33.33% 33.33% 33.33%;
+      grid-template-rows: 33.33% 33.33% 33.33%; */
+
+      /* 可以使用repeat函数简化重复值 */
+      grid-template-columns: repeat(3, 33.33%);
+      grid-template-rows: repeat(3, 33.33%);
+
+    }
+  </style>
+  
+  <div>foo</div>
+  <div class="container">
+    <div class="item">1</div>
+    <div class="item">2</div>
+    <div class="item">3</div>
+    <div class="item">4</div>
+    <div class="item">5</div>
+    <div class="item">6</div>
+    <div class="item">7</div>
+    <div class="item">8</div>
+    <div class="item">9</div>
+  </div>
+  <div>bar</div>
+```
+
+**网格间隔**
+- row-gap：行间隔
+- column-gap：列间隔
+- gap：上述两个的简写形式
+
+**项目排序顺序**
+- grid-auto-flow：默认值为row，先行后列。
+- grid-auto-flow还可以设置为<font color="#FF6347">row dense和column dense</font>，表示某些项目指定位置后，剩余项目如何放置。
+
+
+**justify-items、align-items**    
+- justify-items属性设置单元格内容的水平位置（左中右）
+- align-items属性设置单元格内容的垂直位置（上中下）
+
+这两个属性的写法完全相同，都可以取下面这些值。
+- start：对齐单元格的起始边缘
+- end：对齐单元格的结束边缘
+- center：单元格内部居中
+- stretch：拉伸，占满单元格的整个宽度（默认值）
+
+place-items属性是align-items属性和justify-items属性的合并简写形式。
+
+```html
+place-items: <align-items> <justify-items>;
+```
+
+**justify-content、align-content**
+- justify-content属性是整个内容区域在容器里面的水平位置（左中右）
+- align-content属性是整个内容区域的垂直位置（上中下）
+
+- start
+- end
+- center
+- stretch
+- space-around
+- space-between
+- space-evenly：<font color="#FF6347">项目与项目的间隔相等，项目与容器边框之间也是同样长度的间隔</font>。
+
+place-content属性是align-content属性和justify-content属性的合并简写形式。
+```html
+place-content: <align-content> <justify-content>
+```
+
+**grid-auto-columns、grid-auto-rows**     
+有时候，项目的指定位置，在现有网格的外部。比如网格只有3列，但某一个项目指定在第5行，这时，浏览器会生成多余的网格，以便放置项目。
+<font color="#FF6347">grid-auto-columns、grid-auto-rows属性就是用来设置浏览器自动生成网格的宽高的。如果不指定，浏览器会根据内容大小，决定新增网格的大小</font>。
+
+**grid-template、grid**    
+- grid-template属性是grid-template-columns、grid-template-rows和grid-template-areas这三个属性的合并简写形式
+- grid属性是grid-template-rows、grid-template-columns、grid-template-areas、 grid-auto-rows、grid-auto-columns、grid-auto-flow这六个属性的合并简写形式
 
 ## BFC规范
 BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面的子元素不会影响到外面的元素
@@ -1054,107 +1375,6 @@ BFC就是页面中一块渲染的区域，在这个区域中浮动元素也参�
 - 子元素变为行内盒子：display：inline-block
 - 子元素加入浮动或定位
 
-## CSS布局
-### **table布局**
-table的特性决定了它非常适合用来做布局，表格中的内容可以自动居中。但table局部有很多缺点：
-1. <font color="#FF6347">比其他HTML标签占更多的字节，造成下载时间延迟，占用服务器更多资源</font>
-2. <font color="#FF6347">阻挡浏览器渲染引擎的渲染顺序，延迟页面的加载速度</font>
-
-### **flex布局**
-**1. 盒模型**    
-- 标准盒子模型：width = 2 * border + 2 * padding + content
-- IE盒子模型：width = 2 * border + 2 * padding > content ? border * 2 + padding * 2 : content
-
-**2. display/position**
-display：
-- block：    
-      - <font color="#FF6347">元素表现为块级元素，可以设置宽高，独占一行，若没有设置宽度，则默认填满父级元素的宽度</font>。     
-      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>。
-- inline：   
-      - <font color="#FF6347">元素表现为行内元素</font>；   
-      - <font color="#FF6347">不能设置宽高，大小完全由内容撑开</font>；   
-      - <font color="#FF6347">padding上下左右都有效，但margin只有左右会产生效果，上下不生效</font>。
-- inline-block：     
-      - <font color="#FF6347">对外表现为行内元素，对内表现为块级元素</font>     
-      - <font color="#FF6347">可以设置宽高</font>    
-      - <font color="#FF6347">使用padding、margin上下左右都可以产生边距效果</font>
-
-**inline-block与浮动**
-不同点：<font color="#FF6347">inline-block不会脱离文档流；浮动会脱离文档流</font>。
-相同点：<font color="#FF6347">可以达到一样的效果</font>。
-
-
-position：
-- static：<font color="#FF6347">没有定位，存在于正常的文档流中</font>
-- relative：<font color="#FF6347">相对元素本来的位置进行偏移，不会改变布局的计算</font>
-- absolute：<font color="#FF6347">脱离文档流，相对于第一个不是static的父元素进行定位</font>
-- fixed：<font color="#FF6347">固定定位，相对于浏览器窗口进行定位</font>
-
-static不可以设置z-index。    
-
-**3. flex布局（弹性盒子布局）**     
-任何容器都可以指定为flex布局。采用flex布局的元素，称为flex容器，它的所有子元素自动成为容器成员。
-
-![image](https://user-images.githubusercontent.com/70066311/161722952-f8e30262-53e0-4ee5-8911-64a3ab607dee.png)
-
-容器默认存在两根轴，<font color="#FF6347">水平的主轴和垂直的交叉轴</font>。
-
-**flex容器**有6个属性：
-- flex-direction：<font color="#FF6347">决定主轴方向的排列</font>
-
-![image](https://user-images.githubusercontent.com/70066311/161723235-b8eda26f-1225-492f-b3b4-bc8db7625f17.png)
-
-- flex-wrap：默认情况下，项都排列在一条直线上。<font color="#FF6347">而该属性定义如果排列不下，该如何换行</font>。
-
-![image](https://user-images.githubusercontent.com/70066311/161723699-b60322b1-d78f-41fd-a907-6c8f9c028c82.png)
-nowrap：不换行     
-wrap：换行，第一行在上方：
-
-![image](https://user-images.githubusercontent.com/70066311/161723822-ccfd4fd7-40ca-47bb-bb31-0b829d3be4c6.png) 
-wrap-reverse：换行，第一行在下方：
-
-![image](https://user-images.githubusercontent.com/70066311/161724323-64fa817c-2ca8-4c71-9a17-4a1134f9d56f.png)
-
-- flex-flow：是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap
-
-- justify-content：定义了项目在主轴上对齐的方式
-
-![image](https://user-images.githubusercontent.com/70066311/161724697-1c9f09cc-b935-49eb-9f22-042c4c387d63.png)
-
-space-between：两端对齐，项目之间的间隔都相等。
-
-space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
-
-- align-item：定义项目在交叉轴上如何对齐
-
-![image](https://user-images.githubusercontent.com/70066311/161724975-4a4ff18b-f619-48f9-8eb3-d9dca5409b5b.png)
-
-stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
-
-- align-content：定义了多根轴线的对齐方式，如果只有一根轴线，则该属性不起作用
-
-![image](https://user-images.githubusercontent.com/70066311/161726025-401fa82b-4290-4662-95ef-b53c6be84260.png)
-
-**子项**的6个属性：
-- order：数值越小，排列越靠前
-
-![image](https://user-images.githubusercontent.com/70066311/161726640-59d02e21-b97e-4236-9546-a59d92b53251.png)
-
-- flex-grow：定义项目放大的比例，默认为0。<font color="#FF6347">如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍</font>。
-
-![image](https://user-images.githubusercontent.com/70066311/168708588-49f9e071-0ec1-4767-b585-55f3248fd7b0.png)
-
-
-- flex-shrink：定义项目缩小的比例，默认为1。<font color="#FF6347">如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小</font>。负值对该属性无效。
-
-![image](https://user-images.githubusercontent.com/70066311/168708630-d9261625-12a6-43d8-8b92-d934a8d2e78c.png)
-
-- flex-basis：在计算剩余空间之前设置子项的基础宽度。
-
-- flex：<font color="#FF6347">flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选</font>。该属性有两个快捷值：<font color="#FF6347">auto (1 1 auto) 和 none (0 0 auto)</font>。
-
-- align-self：align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
-
 ### **浮动**
 <font color="#FF6347">在容器不设置高度且子元素浮动时，容器高度不能被内容撑开，使内容跑到容器外面，影响布局，这种现象就是浮动</font>。
 
@@ -1265,128 +1485,6 @@ html{
 3. 响应式布局：常见的响应式布局为两栏布局、三栏布局
 
 使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
-
-### **媒体查询**
-媒体查询可以针对不同的屏幕尺寸设置不同的样式，当浏览器大小发生变化时，页面也会根据浏览器的宽高重新渲染页面。
-
-语法规范：
-```css
-@media mediatype and|not|only (media feature){
-  css-Code
-}
-```
-- 用@media开头
-- mediatype媒体类型
-- 关键字：and、not、only
-- media feature媒体特性
-
-**mediatype**      
-媒体类型主要分为：all（用于所有设备）、print（打印设备）、screen（电脑屏幕、平板、手机等）
-
-**媒体特性**
-- width：定义输出设备中页面可见区域的宽度
-- min-width：定义输出设备中页面最小可见区域宽度
-- max-width：定义输出设备中页面最大可见区域宽度
-
-### **CSS工程化**
-CSS工程化主要解决的问题是：
-1. CSS如何拆分，如何进行模块化设计
-2. 如何使CSS打包结果最优
-3. CSS的可维护性
-
-CSS工程化的实践：CSS预处理器、webpack loader
-
-### **Grid布局**
-Grid布局将网页划分为一个个网格，可以任意组合不同的网格，做出各种各样的布局。<font color="#FF6347">使用display: grid指定网格布局</font>。默认情况下，容器元素都为块级元素，也可以设置为行内元素。<font color="#FF6347">使用display: inline-grid指定行内网格布局</font>。
-
-**划分行列**
-- grid-template-colums：定义每一列的列宽
-- grid-template-rows：定义每一行的行高
-
-**实现一个九宫格布局：**
-```html
-  <style>
-    .container {
-      display: grid;      
-      /* grid-template-columns: 100px 100px 100px;
-      grid-template-rows: 100px 100px 100px; */
-
-      /* 除了使用绝对单位，也可以使用百分比 */
-      /* grid-template-columns: 33.33% 33.33% 33.33%;
-      grid-template-rows: 33.33% 33.33% 33.33%; */
-
-      /* 可以使用repeat函数简化重复值 */
-      grid-template-columns: repeat(3, 33.33%);
-      grid-template-rows: repeat(3, 33.33%);
-
-    }
-  </style>
-  
-  <div>foo</div>
-  <div class="container">
-    <div class="item">1</div>
-    <div class="item">2</div>
-    <div class="item">3</div>
-    <div class="item">4</div>
-    <div class="item">5</div>
-    <div class="item">6</div>
-    <div class="item">7</div>
-    <div class="item">8</div>
-    <div class="item">9</div>
-  </div>
-  <div>bar</div>
-```
-
-**网格间隔**
-- row-gap：行间隔
-- column-gap：列间隔
-- gap：上述两个的简写形式
-
-**项目排序顺序**
-- grid-auto-flow：默认值为row，先行后列。
-- grid-auto-flow还可以设置为<font color="#FF6347">row dense和column dense</font>，表示某些项目指定位置后，剩余项目如何放置。
-
-
-**justify-items、align-items**    
-- justify-items属性设置单元格内容的水平位置（左中右）
-- align-items属性设置单元格内容的垂直位置（上中下）
-
-这两个属性的写法完全相同，都可以取下面这些值。
-- start：对齐单元格的起始边缘
-- end：对齐单元格的结束边缘
-- center：单元格内部居中
-- stretch：拉伸，占满单元格的整个宽度（默认值）
-
-place-items属性是align-items属性和justify-items属性的合并简写形式。
-
-```html
-place-items: <align-items> <justify-items>;
-```
-
-**justify-content、align-content**
-- justify-content属性是整个内容区域在容器里面的水平位置（左中右）
-- align-content属性是整个内容区域的垂直位置（上中下）
-
-- start
-- end
-- center
-- stretch
-- space-around
-- space-between
-- space-evenly：<font color="#FF6347">项目与项目的间隔相等，项目与容器边框之间也是同样长度的间隔</font>。
-
-place-content属性是align-content属性和justify-content属性的合并简写形式。
-```html
-place-content: <align-content> <justify-content>
-```
-
-**grid-auto-columns、grid-auto-rows**     
-有时候，项目的指定位置，在现有网格的外部。比如网格只有3列，但某一个项目指定在第5行，这时，浏览器会生成多余的网格，以便放置项目。
-<font color="#FF6347">grid-auto-columns、grid-auto-rows属性就是用来设置浏览器自动生成网格的宽高的。如果不指定，浏览器会根据内容大小，决定新增网格的大小</font>。
-
-**grid-template、grid**    
-- grid-template属性是grid-template-columns、grid-template-rows和grid-template-areas这三个属性的合并简写形式
-- grid属性是grid-template-rows、grid-template-columns、grid-template-areas、 grid-auto-rows、grid-auto-columns、grid-auto-flow这六个属性的合并简写形式
 
 ### **双飞翼布局与圣杯布局**
 圣杯布局和双飞翼布局是前端工程师需要日常掌握的重要布局方式。两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。
@@ -5453,7 +5551,9 @@ SessionStorage的适用场景：
 
 
 2. JSONP    
-**JSONP**的原理就是利用`<script>`标签没有对跨域限制。实现跨域主要得益于`<script>`的两个特点：
+**JSONP**的原理就是利用`<script>`标签没有对跨域限制。首先在客户端定义一个`callback`函数，然后把`callback`的函数名传给服务器。服务器在接收到请求后发现有这个函数，就知道了客户端向要用该函数接收请求的数据，然后后端就将数据写入函数中返回给客户端。客户端执行回调函数拿到数据。
+
+实现跨域主要得益于`<script>`的两个特点：
 - src属性能够访问任何URL资源，并不会受到同源策略的限制
 - 如果访问的资源包含JS代码，其会在下载后自动执行
 
@@ -5466,6 +5566,10 @@ JSONP的缺点：
 
 4. nginx代理
 反向代理请求。
+
+5. document.domain
+<font color="	#FF6347">如果只想实现主域名下的不同子域名的跨域操作，可以设置document.domain来解决</font>。将`document.domain`设置为主域名，来实现子域名的跨域操作，这时候主域名下的`cookie`就可以被子域名访问。
+
 
 ### **正向代理与反向代理的区别**
 - 正向代理：客户端想获得一个服务器数据，但是因为种种原因无法直接获取。于是客户端设置了一个代理服务器，并且指定目标服务器，之后代理服务器会向服务器转交请求并在获得资源后返回给浏览器。这样的本质上起到了<font color="	#FF6347">对真实服务器隐瞒真实客户端的目的</font>。
