@@ -6,29 +6,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    .container {
-      position: relative;
-    }
-
-    .left {
-      position: absolute;
-      height: 100px;
-      width: 100px;
-      background-color: antiquewhite;
-    }
-
-    .right {
-      height: 100px;
-      background-color: orange;
-    }
-  </style>
 </head>
 
 <body>
+  <style>
+    .container {
+      display: grid;
+      grid-template-columns: 100px auto 100px;
+    }
+
+    .left {
+      background-color: orange;
+    }
+
+    .right {
+      background-color: coral;
+    }
+
+    .center {
+      background-color: palegoldenrod;
+    }
+  </style>
   <div class="container">
-    <div class="left"></div>
-    <div class="right"></div>
+    <div class="left">left</div>
+    <div class="center">center</div>
+    <div class="right">right</div>
   </div>
 </body>
 

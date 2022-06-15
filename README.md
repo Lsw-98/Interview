@@ -506,9 +506,9 @@ iphone为了能把PC端大屏幕的页面以较好的效果展示在手机屏幕
 2. visibility:hidden是视觉上消失了，可以理解为透明度为0的效果，<font color="	#FF6347">在文档流中占位，浏览器会解析该元素，不会响应绑定事件，子节点会继承</font>。  
 3. opacity:0将透明度设置为0，以此来实现元素的隐藏，<font color="#FF6347">在文档流中占位，会响应绑定的事件</font>。
 4. z-index:负值使其他元素覆盖该元素，实现隐藏。 
-5. 将height设为0。
+5. 将height设为0。<font color="#FF6347">脱离文档流，不会响应绑定的事件</font>。
 6. position: absolute。使用绝对定位将元素移到可视区外。
-7. transform: scale(0, 0)将元素缩放为0.<font color="#FF6347">在文档流中占位，不会响应绑定的事件</font>。
+7. transform: scale(0, 0)将元素缩放为0。<font color="#FF6347">在文档流中占位，不会响应绑定的事件</font>。
 
 ### display:none与visibility:hidden的区别
 两者都是隐藏元素的方式，都不会对事件做出响应，区别在于：
@@ -594,8 +594,9 @@ opacity和rgba都可以给元素设置透明度，但不同之处在于：
      margin、content(padding、border、content)
 
 ### 如何转化盒子模型
-    标准盒子模型：box-sizing: content-box  
-    IE盒子模型： box-sizing:border-box  
+标准盒子模型：box-sizing: content-box    
+IE盒子模型： box-sizing: border-box    
+box-sizing默认值为`content-box`，不可继承    
 
 ### 两者的区别
  - 标准盒子模型的宽度为border * 2 + padding * 2 + content(width)
@@ -950,15 +951,17 @@ px是页面布局的基础，px是屏幕能显示的最小区域，分为CSS像�
     - 物理像素只与设备的硬件密度有关，任何设备的物理像素都是固定的
 2. em和rem  
 em和rem都是相对长度单位。em是相对于父元素，rem相对于root。
-    - em：文本相对长度单位，**相对父元素字体大小的倍数**。相对于当前对象内文本的字体尺寸。如果当前行内文本的字体尺寸未被设置，则相对于浏览器默认字体大小（16px）进行设置。
-    - rem：**相对于根元素的字体大小的倍数**。使用rem可以实现响应式布局，当屏幕分辨率发生变化时，元素也随之变化。
+- em：文本相对长度单位，**相对父元素字体大小的倍数**。相对于当前对象内文本的字体尺寸。如果当前行内文本的字体尺寸未被设置，则相对于浏览器默认字体大小（16px）进行设置。为了简化`font-size`的换算，我们需要在`css`中的`body`选择器中声明`font-size` = `62.5%`，这就使em的值变为`16px * 62.5% = 10px`，这样`1em = 10px`
+- rem：**相对于html根元素的字体大小的倍数**。使用rem可以实现响应式布局，当屏幕分辨率发生变化时，元素也随之变化。
 3. %  
 当浏览器的宽高发生变化时，通过%可以实现响应式效果。<font color="	#FF6347">一般认为子元素的百分比相对于父元素</font>
 4. vw和vh  
 vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度，除了vw和vh之外，还有vmin和vmax两个相关的单位。vmin代表vw和vh之中的较小值，vmax代表较大值。使用vw和vh也可以实现响应式。
 
+vw根据窗口的宽度，分成100等份，`100vw`就表示满宽，`50vw`就表示一半宽。
+
 ### vw/vh和%的区别：
-- %大部分相对于祖先元素，也有相对于自身的元素：比如（border-radius、translate）
+- %大部分相对于父元素，也有相对于自身的元素：比如（border-radius、translate）
 - vw/vh：相对于视口的尺寸
 
 ## px、em、rem的区别及使用场景
@@ -1225,235 +1228,6 @@ place-content: <align-content> <justify-content>
 - grid-template属性是grid-template-columns、grid-template-rows和grid-template-areas这三个属性的合并简写形式
 - grid属性是grid-template-rows、grid-template-columns、grid-template-areas、 grid-auto-rows、grid-auto-columns、grid-auto-flow这六个属性的合并简写形式
 
-## BFC规范
-BFC(块级格式化上下文)就是页面上一个隔离的独立容器，里面的子元素不会影响到外面的元素
-
-### **BFC布局规则**
- - 内部盒子在垂直方向，一个接一个的放置
- - Box垂直方向的距离由margin决定，属于同一个BFC的两个相邻Box的margin会发生重叠
- - 计算BFC的高度时，浮动元素也参与计算
- - 每个Box的margin box的左边，与包含块border box的左边相接触（对于从左往右的格式化 ，否则相反）。即使存在浮动也是如此
- - BFC的区域不会与float box重叠
-
-### **如何创建BFC**
- - float的值不为none
- - position的值为absolute或者fixed
- - overflow的值为hidden、auto、scroll
- - display的值为inline-block、table-cell、flex、table-caption、flex
-
- ### **BFC解决的问题**
- - margin重叠
- - 高度塌陷
- - 两栏布局
-
- ### **margin重叠**
- margin重叠就是两个块级元素的上下外边距会合并为一个外边距，这个外边距取值为两个元素上下外边距值较大的那个，重叠只会出现在垂直方向。<font color="#FF6347">浮动元素和绝对定位元素这种脱离文档流的元素的外边距不会重叠</font>。
-
-
- ## 如何清除浮动
- 1. 使用BFC
- 2. 使用:after
-
- ### *:before 和 :after
- :before 和 :after 的主要作用是在元素内容前后加上指定内容
-
- 可以使用:after来清除浮动，例如：
- ```html
-   <style>
-    * {
-      padding: 0;
-      margin: 0;
-    }
-
-    ul {
-      border: 5px solid black;
-    }
-
-    ul:after {
-      content: '';
-      display: block;
-      /* 清除左右两边浮动 */
-      clear: both;   
-    }
-
-    ul li {
-      width: 200px;
-      height: 200px;
-      background-color: orange;
-      float: left;
-    }
-  </style>
-
-  <ul>
-   <li>1</li>
-   <li>2</li>
-   <li>3</li>
-  </ul>
- ``` 
-
-## position有哪些值，分别根据什么定位
-- position: static; - 默认值，没有定位，遵循正常的文档流对象
-- position: fixed;   - 固定定位，相对于窗口定位，不管浏览器怎么滚动
-- position: relative;   - 相对于自身原本的位置进行定位，不脱离文档流
-- position: absolute;   - 相对第一个有relative的父元素进行定位，脱离文档流
-
-### **absolute和fixed的区别**
-共同点：
-- 脱离了文档流，不再占据文档流空间
-- 会覆盖非定位的文档元素
-- 改变元素的呈现方式
-
-不同点：
-- absolute和fixed的根元素不同：absolute的根元素可以设置，而fixed的根元素是浏览器
-- fixed会固定在页面的具体位置，absolute会进行移动
-
-## reset.css
-reset是一个css文件，可以重置css样式
-
-## Normalize.css
-Normalize.css：可以增强跨浏览器渲染的一致性
-
-## 重绘与重排
-### **重排**
-<font color="	#FF6347">当DOM的变化引起了元素几何属性的变化时</font>，比如：改变元素的宽高、元素的位置等，导致浏览器不得不重新计算元素的几何属性，并重新构建渲染树，这个过程为重排
-
-### **重绘**
-完成重排后，将重新构建的渲染树渲染到页面上，这个过程称为重绘。  
-
-<font color="	#FF6347">重排负责元素的几何属性更新，重绘负责元素的样式更新。重排必然会带来重绘，但重绘不一定带来重排，例如改变背景颜色，不会引起重排，但会带来重绘。</font>
-
-## 定位与浮动
-### **浮动的工作原理**
-- 浮动的元素会脱离文档流，不占据空间（引起高度塌陷问题）
-- 浮动元素碰到包含它的边框或其他浮动元素的边框会停留
-
-当元素浮动后，不会影响块级元素的布局，只会影响内联元素布局。当包含框的高度小于浮动框的时候，此时就会出现**高度塌陷**。详细代码见"/css/定位与浮动/02_高度塌陷.html"。
-
-### *浮动引起的问题
-- 父元素的高度无法被撑开，影响与父元素同级的元素
-- 与浮动同级的非浮动元素会会紧随浮动元素之后
-
-### *清除浮动的方式
-- 给父元素设置height属性
-- 在最后一个浮动元素之后加一个空的div，给该div加上<font color="	#FF6347">clear: both</font>属性
-- 给包含浮动元素的父元素加上<font color="	#FF6347">overflow: hidden 或者 overflow: auto</font>属性
-- 给父元素添加伪元素::after
-```js
-.father::after{
-  content: "";
-  display: block;
-  clear: both;
-}
-```
-
-### *BFC（块级格式化上下文）
-BFC就是页面中一块渲染的区域，在这个区域中浮动元素也参与计算，区域内的元素如何布局不会影响到区域外的元素并且不会受到外部元素的影响。
-
-### *触发BFC的条件
-- overflow的值为: hidden、auto、scroll
-- 元素设置浮动
-- 元素设置绝对定位：position：absolute、fixed
-- display设置为inline-block、table-cell、table-caption、flex
-
-### *BFC的作用
-1. 解决margin重叠问题。
-2. 解决高度塌陷问题。
-3. 创建自适应两栏布局。
-
-### *margin重叠问题
-两个块级元素的上下边距可能会合并为一个外边距，其大小会取边距值大的那个。<font color="	#FF6347">浮动元素与绝对定位这种脱离文档流的元素外边距不会折叠，重叠只会出现在垂直方向上</font>。
-
-### 解决margin重叠的方法
-**兄弟元素之间**
-- 底部元素变为行内盒子：display：inline-block
-- 底部元素设置浮动
-- 底部元素的position的值为:absolute/fixed
-
-**父子元素之间**
-- 父元素加上overflow: hidden
-- 父元素添加透明边框
-- 子元素变为行内盒子：display：inline-block
-- 子元素加入浮动或定位
-
-### **浮动**
-<font color="#FF6347">在容器不设置高度且子元素浮动时，容器高度不能被内容撑开，使内容跑到容器外面，影响布局，这种现象就是浮动</font>。
-
-### **浮动的工作原理**
-- 浮动元素会脱离文档流，不会占据空间（引起高度塌陷问题）
-- 浮动元素碰到包含它的边框或其它浮动元素的边框时停留
-
-浮动元素可以左右移动，直到遇到另一个浮动元素的边框或遇到包含它的边框后才会停留，浮动元素脱离了文档流，当元素浮动后，不会影响块级元素的布局，只会影响内联元素的布局。当包含浮动元素的容器高度小于浮动框时，会引起高度塌陷问题。
-
-### **浮动元素引起的问题**
-1. 浮动元素的父元素高度无法被撑开，影响父元素的同级元素
-2. 高度塌陷
-3. 脱离文档流
-
-### **清除浮动的方式**
-- overflow: hidden
-- clear:left、clear:right、cleat:both
-- 
-
-### **float**
-<font color="#FF6347">浮动元素是脱离文档流的，但不脱离文字流</font>。
-
-**浮动元素的特点：**
-- 对于自身：
-    1. 浮动元素可以形成块；可以让行内元素拥有宽和高
-    2. 浮动元素尽量靠上
-    3. 尽量靠左（float：left）或右（float：right）。如果那一行不能满足浮动元素的宽度要求，则元素会往下掉。
-
-- 对于兄弟元素：
-    1. 不会影响其它块级元素的位置
-    2. 会影响其它块级元素的文本
-    3. <font color="#FF6347">上面紧贴非浮动元素、旁边紧贴浮动元素</font>
-
-- 对父元素影响：
-    1. <font color="#FF6347">从布局上“消失”</font>
-    2. <font color="#FF6347">高度塌陷</font>
-
-### CSS如何针对不同浏览器做适应
-
-
-### CSS哪些属性不被IE兼容
-
-
-### font-size在不同浏览器中兼容性问题
-<font color="#FF6347">CSS在浏览器表现的运用，例如font-size、盒模型</font>
-在css中使用font-size设定字体大小，不同浏览器的字体`height`是一样的，但是`width`不同，比如在火狐和谷歌中，`font-size: 20px`字体中的高度为20px，但是谷歌的字体宽度比火狐长。
-
-解决方法如下：
-1. 将浏览器的基准字号设置为`62.5%`，也就是`10px`，现在`1rem=10px`。然后在`body`上应用`font-size: 2rem`，那么现在`body`的字体大小就是`20px`。
-```css
-html{
-  font-size: 62.5%
-}
-
-body{
-  font-size: 2rem
-}
-```
-
-2. 在html中使用calc()函数
-
-场景：在大小为360px的设计稿中放一个宽度为100px的元素
-```css
-html{
-    font-size:calc((100vw / 360) * 100);
-}
-```
-
-- 100vw：是浏览器视口宽度
-- 360：ui设计图的宽度
-
-加入现在有一个`button`，宽度为180px，那么在任何尺寸的移动设备上，宽度都要占一半。所以`button`的`width`不能写死，要使用`rem`来动态设置`width`。默认情况下根元素的`font-size`大小是`16px`，我们要根据html设置的`font-size`的大小，利用`rem`动态设置元素的宽度。
-
-例如：
-```
-在1080px的界面上，按钮宽度为：180rem = (1080 / 360) * 180（这个180是button的宽度） = 540px
-在750px的界面上，按钮宽度为：180rem = (750 / 360) * 180 = 375px
-```
-
 ### **响应式布局**
 响应式布局就是一个网站同时能兼容多个终端。通过对不同宽度进行布局和样式的设置，从而适配不同设备的目的。
 
@@ -1486,10 +1260,11 @@ html{
 
 使用rem可以实现响应式布局。<font color="#FF6347">rem 指的是 html 元素的 font-size，html 元素的 font-size 默认是 16px，所以 1 rem = 16px；然后根据 rem 来计算各个元素的宽高</font>。
 
-### **双飞翼布局与圣杯布局**
+### 双飞翼布局与圣杯布局
 圣杯布局和双飞翼布局是前端工程师需要日常掌握的重要布局方式。两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。
 
-**特点：**      
+**特点：**
+
 1. 两侧宽度固定，中间宽度自适应（三栏布局）
 2. <font color="#FF6347">中间部分在DOM结构上有限，以便先行渲染</font>
 3. 允许三列中的任意一列成为最高列
@@ -1692,6 +1467,211 @@ body {
 **对比圣杯布局和双飞翼布局**
 - 圣杯布局结构上更加自然和直观，在平时的开发中更容易形成这样的布局结构；
 - 双飞翼布局由于不使用定位，所以更加简洁，允许页面的最小宽度小于圣杯布局。
+
+## 定位于浮动
+### 为什么要清除浮动？清除浮动的方式
+**浮动**：容器不设高度且子元素浮动时，容器高度不能被内容撑开。此时，内容会溢出到容器外面而影响布局，这种现象被称为浮动（溢出）。
+
+**浮动的工作原理**：
+- 浮动元素会脱离文档流，不占据空间（引起高度塌陷问题）
+- 浮动元素碰到包含它的边框或其它浮动元素的边框会停留
+
+<font color="#FF6347">浮动元素可以左右移动，直到遇到另一个浮动元素或者遇到它外边缘的包含框。浮动框不属于文档流中的普通流，当元素浮动之后，不会影响块级元素的布局，只会影响内联元素布局。此时文档流中的普通流就会表现得该浮动框不存在一样的布局模式。当包含框的高度小于浮动框的时候，此时就会出现“高度塌陷”</font>
+
+**浮动元素引起的问题**：
+- 父元素的高度无法被撑开，影响与父元素同级的元素
+- 与浮动元素同级的非浮动元素会跟随其后
+- 若浮动的元素不是第一个元素，则该元素之前的元素也要浮动，否则会影响页面的显示结构
+
+**清除浮动的方式**：
+- 给父元素定义height属性
+- 给最后一个浮动元素之后添加一个空的div，并添加`clear: both`样式
+- BFC
+- 使用`:after`伪元素
+
+### 使用clear清除浮动的原理
+clear属性：元素的边不能和前面的浮动元素相邻，对元素设置clear属性是为了避免浮动元素对该元素的影响，而不是清除掉浮动。考虑到float属性要么是left，要么是right，不可能同时存在。
+
+由于clear属性对“后面的”浮动元素不闻不问，因此，当clear:left有效的时候，clear:right必定无效，也就是此时clear:left等同于设置clear:both；同样地，clear:right如果有效也是等同于设置clear:both。由此可见，clear:left和clear:right这两个声明就没有任何使用的价值。
+
+一般使用`伪元素`的方式清除浮动：
+```css
+.clear::after{
+  display: block;
+  clear: both;
+  content: '';
+}
+```
+
+<font color="#FF6347">clear属性只有块级元素才有效，而::after等伪元素默认都是内敛元素，所以需要使用**display:block**</font>
+
+### BFC规范
+BFC(块级格式化上下文)就是页面上一个独立的容器，在容器中按照一定规则拜访元素，里面的元素不会影响到容器外面的元素。如果一个元素符合触发BFC的条件，那么BFC的元素布局不受外部影响。
+
+### 如何创建BFC
+- float的值不为none
+- position的值为absolute或者fixed
+- overflow的值为hidden、auto、scroll
+- display的值为inline-block、table-cell、flex、table-caption
+
+### BFC布局规则
+- BFC内部垂直方向上，自上而下排列，和文档流的排列方式一致
+- 元素垂直方向的距离由margin决定，属于同一个BFC的两个相邻元素的margin会发生重叠
+- 计算BFC的高度时，浮动元素也参与计算
+- 每个元素的左margin值与容器的左border相接触
+- BFC内浮动元素不会发生重叠
+
+### BFC解决的问题
+- margin重叠
+- 高度塌陷
+- 两栏布局
+- 文字环绕
+
+### margin重叠
+margin重叠就是两个块级元素的上下外边距会合并为一个外边距，这个外边距取值为两个元素上下外边距值较大的那个，重叠只会出现在`垂直方向`。<font color="#FF6347">浮动元素和绝对定位元素这种脱离文档流的元素的外边距不会重叠</font>。
+
+### 解决margin重叠问题
+- 兄弟之间重叠：
+    - 底部元素变为行内元素：`display: inline-block`
+    - 底部元素设置为浮动: `float: left`
+    - 底部元素的position的值为`absolute/fixed`
+- 父子之间重叠：
+    - 父元素加入：`overflow:hidden`
+    - 父元素添加透明边框：`border: 1px solid transparent`
+    - 子元素变为行内元素：`display: inline-block`
+    - 子元素加入浮动或定位
+
+ ### :before 和 :after
+ :before 和 :after 的主要作用是在元素内容前后加上指定内容
+
+ 可以使用:after来清除浮动，例如：
+ ```html
+   <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    ul {
+      border: 5px solid black;
+    }
+
+    ul:after {
+      content: '';
+      display: block;
+      /* 清除左右两边浮动 */
+      clear: both;   
+    }
+
+    ul li {
+      width: 200px;
+      height: 200px;
+      background-color: orange;
+      float: left;
+    }
+  </style>
+
+  <ul>
+   <li>1</li>
+   <li>2</li>
+   <li>3</li>
+  </ul>
+ ``` 
+
+### position有哪些值，分别根据什么定位
+- position: static; - 默认值，没有定位，遵循正常的文档流对象
+- position: fixed;   - 固定定位，相对于窗口定位，不管浏览器怎么滚动。<font color="#FF6347">会导致其他元素位置发生变化</font>
+- position: relative;   - 相对于自身原本的位置进行定位，不脱离文档流
+- position: absolute;   - 浏览器会递归查询该元素的所有父元素，如果找到了一个设置了`position: relative/absolute/fixed`的父元素，就以该元素为基准定位；如果没有找到，就以浏览器边界定位
+
+### absolute和fixed的区别
+共同点：
+- 脱离了文档流，不再占据文档流空间
+- 会覆盖非定位的文档元素
+- 改变元素的呈现方式，将元素的display设置为inline-block
+
+不同点：
+- absolute和fixed的根元素不同：absolute的根元素可以设置，而fixed的根元素是浏览器
+- fixed会固定在页面的具体位置，absolute会进行移动
+
+### reset.css
+reset是一个css文件，可以重置css样式
+
+### Normalize.css
+Normalize.css：可以增强跨浏览器渲染的一致性
+
+## 重绘与重排
+### 重排
+<font color="	#FF6347">当DOM的变化引起了元素几何属性的变化时</font>，比如：改变元素的宽高、元素的位置等，导致浏览器不得不重新计算元素的几何属性，并重新构建渲染树，这个过程为重排
+
+### 重绘
+完成重排后，将重新构建的渲染树渲染到页面上，这个过程称为重绘。  
+
+<font color="	#FF6347">重排负责元素的几何属性更新，重绘负责元素的样式更新。重排必然会带来重绘，但重绘不一定带来重排，例如改变背景颜色，不会引起重排，但会带来重绘。</font>
+
+### 什么情况会触发重绘重排
+1. 页面首次渲染时
+2. 页面元素大小改变时
+3. 字体，背景色改变时
+4. 进行DOM操作时
+5. 浏览器窗口大小发生变化时
+6. 元素位置发生变化时
+
+### 如何减少重绘和重排
+1. 避免频繁操作DOM。在操作DOM时，尽量在底层的DOM节点进行操作
+2. 不要使用table布局，因为一个小改动都可能会引起table进行重新布局
+3. 不要频繁操作元素样式
+4. 避免频繁操作DOM
+5. 使用absolute和fixed，使元素脱离文档流，这样他们的变化会不会影响其他元素
+6. 可以使用display: none，操作结束后再把它显示出来，因为在display: none的元素上进行操作不会引起重绘和重排
+7. 将DOM的多个读操作或写操作放在一起，而不是多个读写操作穿插着写。这得益于浏览器的渲染队列机制
+
+### CSS如何针对不同浏览器做适应
+1. 做浏览器CSS样式初始化，常见的做法是引入`reset.css`或`Normalize.css`。最好不要使用`*`来重置CSS样式，因为会影响效率。
+2. 添加浏览器私有属性，比如`-webkit-`、`-moz-`、`-ms-`
+
+### CSS哪些属性不被IE兼容
+1. inherit
+2. outline。在调试CSS时，我们经常会给元素加上border属性来更加精确的查看元素发生了什么样的变化。但如果是块级元素，添加边框会影响到布局，会让整个元素的宽度额外增加。<font color="	#FF6347">而outline可以在不影响文档流的情况下呈现该元素</font>
+3. :hover
+4. :focus
+5. display的inline-block
+
+### font-size在不同浏览器中兼容性问题
+<font color="#FF6347">CSS在浏览器表现的运用，例如font-size、盒模型</font>
+在css中使用font-size设定字体大小，不同浏览器的字体`height`是一样的，但是`width`不同，比如在火狐和谷歌中，`font-size: 20px`字体中的高度为20px，但是谷歌的字体宽度比火狐长。
+
+解决方法如下：
+1. 将浏览器的基准字号设置为`62.5%`，也就是`10px`，现在`1rem=10px`。然后在`body`上应用`font-size: 2rem`，那么现在`body`的字体大小就是`20px`。
+```css
+html{
+  font-size: 62.5%
+}
+
+body{
+  font-size: 2rem
+}
+```
+
+2. 在html中使用calc()函数
+
+场景：在大小为360px的设计稿中放一个宽度为100px的元素
+```css
+html{
+    font-size:calc((100vw / 360) * 100);
+}
+```
+
+- 100vw：是浏览器视口宽度
+- 360：ui设计图的宽度
+
+加入现在有一个`button`，宽度为180px，那么在任何尺寸的移动设备上，宽度都要占一半。所以`button`的`width`不能写死，要使用`rem`来动态设置`width`。默认情况下根元素的`font-size`大小是`16px`，我们要根据html设置的`font-size`的大小，利用`rem`动态设置元素的宽度。
+
+例如：
+```
+在1080px的界面上，按钮宽度为：180rem = (1080 / 360) * 180（这个180是button的宽度） = 540px
+在750px的界面上，按钮宽度为：180rem = (750 / 360) * 180 = 375px
+```
 
 # JS
 ## JS基础
