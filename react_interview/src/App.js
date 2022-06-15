@@ -1,39 +1,51 @@
 import React, { Component } from 'react'
 
-class Children extends React.Component {
-
-  shouldComponentUpdate(newProps, nextState) {
-    if (newProps.a === this.props.a) return false;
-    return true;
-  }
-
-  render() {
-    console.log('Children Update');
-    return (
-      <div>Children Component</div>
-    )
-  }
-}
-
 export default class App extends Component {
-  state = {
-    a: [1, 2, 3]
+  constructor(props) {
+    super(props)
+    this.state = {
+      tab: [
+        { tabName: "标签标题1", id: 1 },
+        { tabName: "标签标题2", id: 2 },
+        { tabName: "标签标题3", id: 3 },
+      ],
+      currentIndex: 1
+    }
   }
 
-  add = () => {
+  tabSwitch(id) {
     this.setState({
-      count: this.state.a[0] + 1
+      currentIndex: id
     })
   }
 
   render() {
-    const { count } = this.state.a[0];
+    const { tab, currentIndex } = this.state
     return (
-      <div>
-        <button onClick={this.add}>加一</button>
-        <Children />
-        <p>count: {count}</p>
-      </div>
+      <>
+        <div className='tab_box'>
+          <h3>tab切换</h3>
+          <ul>
+            {
+              tab.map((item) => {
+                return <li key={item.id} onClick={() => { this.tabSwitch(item.id) }}>{item.tabName}</li>
+              })
+            }
+          </ul>
+
+          <div>
+            {
+              currentIndex === 1 && <div>Content of Tab Pane 1</div>
+            }
+            {
+              currentIndex === 2 && <div>Content of Tab Pane 2</div>
+            }
+            {
+              currentIndex === 3 && <div>Content of Tab Pane 3</div>
+            }
+          </div>
+        </div>
+      </>
     )
   }
 }
