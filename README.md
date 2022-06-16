@@ -1754,13 +1754,103 @@ console.log(a.call(undefined));
 console.log(a.call(null));
 ```
 
-### **四种判断类型的区别**
+### 四种判断类型的区别
 1. typeof方法存在判断类型不准确的情况，例如数组、对象、null都会被判断为object
 2. instanceof只能判断引用数据类型，不能判断基本数据类型
 3. 如果改变了一个对象的原型，那么constructor方法就不能用来判断数据类型了
 4. Object.prototype.toString可以准确的比较数据类型
 
-### **<font color="#FF6347">数组的常用方法</font>**
+### null和undefined的区别
+null和undenfined都是基本数据类型。
+
+- undefined是未定义的，一般变量声明了但还没有定义的时候会返回undefined
+- null主要用于赋值给一些可能会返回对象的变量，作为初始化
+
+undefined在JS中并不是一个保留字，这意味着可以使用`undefined`来作为变量名，但这样做是十分危险的，因为<font color="#FF6347">会影响对undefined值的判断</font>。为了安全起见，可以使用`void 0`代替undefined。
+
+### 为什么0.1+0.2 ! == 0.3，如何让其相等
+```js
+console.log(0.1 + 0.2)   // 0.30000000000000004
+```
+
+计算机是通过二进制进行存储数据的，而0.1和0.2的二进制都是无限循环的数。在JS中，只有一种数字类型Number。它的实现<font color="#FF6347">遵循了IEEE 754标准</font>，使用64位固定长度来表示，也就是标准的double双精度浮点数。而在二进制中，小数部分最多保留52位，剩余的部分要舍去，遵循”0舍1入的原则“。
+
+简单来说，<font color="#FF6347">0.1和0.2的小数部分用二进制表示都是一个无限循环的数字，在计算机中最多保留了52位，所以将0.1与0.2相加不等于0.3</font>。
+
+解决方法：
+1. 采用四舍五入保留小数的函数
+```js
+// 四舍五入保留一位小数  
+console.log((0.1 + 0.2).toFixed(1))   // 0.3
+```
+
+2. 对精度进行判断
+设置一个误差范围，通常称为“机器精度”。对JavaScript来说，这个值通常为2 ** -52，在ES6中，提供了Number.EPSILON属性，而它的值就是2 ** -52，只要判断0.1+0.2-0.3是否小于Number.EPSILON，如果小于，就可以判断为0.1+0.2 ===0.3
+```js
+function numberepsilon(arg1,arg2){                   
+  return Math.abs(arg1 - arg2) < Number.EPSILON;        
+}        
+
+console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
+```
+
+### 如何获取安全的undefined值
+因为undefined不是一个js的字面量，所以可以用来当作变量，但这样会影响正常的undefined的判断。如果想获得安全的undefined的值，可以使用<font color="#FF6347">void</font>。<font color="#FF6347">void并不改变表达式的结果，只是让表达式不返回值，因此可以用**void 0**来获得undefined</font>。
+
+### typeof NaN的结果是什么
+NaN代表<font color="#FF6347">**不是一个数字**</font>，指在数字类型的运算中发生错误的情况。<font color="#FF6347">NaN与自身不相等，是唯一一个非自反值</font>。
+```js
+console.log(typeof NaN);   // number
+console.log(NaN !== NaN);   // true
+```
+
+### isNaN和Number.isNaN的区别
+<font color="#FF6347">isNaN本意是**通过Number方法把参数转换成数字类型**，如若转换成功，则返回false，反之返回true，它只判断参数是否会转换为数字</font>。
+
+而Number.isNaN用来严格判断传入的值是否等于NaN，<font color="#FF6347">它首先会判断传入的值是否为数字类型，如果不是，直接返回false</font>。
+
+```js
+const a = 2
+console.log(isNaN(a));    // false
+console.log(Number.isNaN(a));    // false
+
+const b = "b2"
+console.log(isNaN(b));   // true
+console.log(Number.isNaN(b));    // false
+```
+
+### ==的判断流程
+1. 首先判断两者的类型是否相同，不相同则进行类型转换
+2. 判断是否是null与undefined进行比较，是的话返回true  (null == undefined，而null !== undefined)
+3. 判断两者类型是否为string和number，如果是则将string转换为number
+```js
+1 == '1'
+      ↓
+1 ==  1
+```
+4. 判断两者是否有boolean，有的话就把boolean转换为number进行比较
+```js
+'1' == true
+        ↓
+'1' ==  1
+        ↓
+ 1  ==  1
+```
+5. 判断两者是否有一者是object且另一方为string、number或symbol，如果是就把object转为原始类型再进行判断
+```js
+'1' == { name: 'js' }
+        ↓
+'1' == '[object Object]'
+```
+
+![image](https://user-images.githubusercontent.com/70066311/163975853-4d06fe0a-c818-45aa-9d53-a5c695ed54dd.png)
+
+### **Object.is()与比较操作符"==="、"=="的区别**
+- "=="：如果两边类型不一致，会转换类型再做比较
+- "==="：如果两边类型不一致，直接返回false
+- Object.is()：与 "===" 判断相同，但<font color="#FF6347">-0与+0不再相等，两个NaN是相等的</font>。
+
+### <font color="#FF6347">数组的常用方法</font>
 **增**     
 - push，会对数组产生影响
 - unshift，会对数组产生影响
@@ -1792,7 +1882,7 @@ console.log(colors) // red,yellow,orange,green,blue
 console.log(removed) // []
 ```
 
-concat()会先创建一个数组的副本，然后将元素添加到副本的末尾，最后返回一个新构建的数组，不会影响原始数组。
+concat()会先创建一个数组的副本，然后将元素添加到副本的末尾，最后返回一个新构建的数组，不会影响原始数组
 
 ```js
 let colors = ["red", "green", "blue"];
@@ -1934,7 +2024,7 @@ obj.push("d");
 obj.push("f");
 
 console.log(obj);
-obj.pop;
+obj.pop();
 console.log(obj);
 ```
 
@@ -2014,91 +2104,6 @@ Object.defineProperty(obj, prop. desc)
 
 </html>
 ```
-
-### **null和undefined的区别**
-null是空对象，而undefined是未定义的。<font color="#FF6347">一般定义了一个变量而没赋值时，会返回undefined；而null主要赋值给那些可能返回对象的变量</font>。
-
-### **为什么0.1+0.2 ! == 0.3，如何让其相等**
-```js
-console.log(0.1 + 0.2)   // 0.30000000000000004
-```
-
-计算机是通过二进制进行存储数据的，而0.1和0.2的二进制都是无限循环的数。在JS中，只有一种数字类型Number。它的实现<font color="#FF6347">遵循了IEEE 754标准</font>，使用64位固定长度来表示，也就是标准的double双精度浮点数。而在二进制中，小数部分最多保留52位，剩余的部分要舍去，遵循”0舍1入的原则“。
-
-简单来说，<font color="#FF6347">0.1和0.2的小数部分用二进制表示都是一个无限循环的数字，在计算机中最多保留了52位，所以将0.1与0.2相加不等于0.3</font>。
-
-解决方法：
-1. 采用四舍五入保留小数的函数
-```js
-// 四舍五入保留一位小数  
-console.log((0.1 + 0.2).toFixed(1))   // 0.3
-```
-
-2. 对精度进行判断
-设置一个误差范围，通常称为“机器精度”。对JavaScript来说，这个值通常为2 ** -52，在ES6中，提供了Number.EPSILON属性，而它的值就是2 ** -52，只要判断0.1+0.2-0.3是否小于Number.EPSILON，如果小于，就可以判断为0.1+0.2 ===0.3
-```js
-function numberepsilon(arg1,arg2){                   
-  return Math.abs(arg1 - arg2) < Number.EPSILON;        
-}        
-
-console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
-```
-
-### **如何获取安全的undefined值**
-因为undefined不是一个js的字面量，所以可以用来当作变量，但这样会影响正常的undefined的判断。如果想获得安全的undefined的值，可以使用<font color="#FF6347">void</font>。<font color="#FF6347">void并不改变表达式的结果，只是让表达式不返回值，因此可以用**void 0**来获得undefined</font>。
-
-### **typeof NaN的结果是什么**
-NaN代表<font color="#FF6347">**不是一个数字**</font>，指在数字类型的运算中发生错误的情况。<font color="#FF6347">NaN与自身不相等，是唯一一个非自反值</font>。
-```js
-console.log(typeof NaN);   // number
-console.log(NaN !== NaN);   // true
-```
-
-### **isNaN和Number.isNaN的区别**
-<font color="#FF6347">isNaN本意是**通过Number方法把参数转换成数字类型**，如若转换成功，则返回false，反之返回true，它只判断参数是否会转换为数字</font>。
-
-而Number.isNaN用来严格判断传入的值是否等于NaN，<font color="#FF6347">它首先会判断传入的值是否为数字类型，如果不是，直接返回false</font>。
-
-```js
-const a = 2
-console.log(isNaN(a));    // false
-console.log(Number.isNaN(a));    // false
-
-const b = "b2"
-console.log(isNaN(b));   // true
-console.log(Number.isNaN(b));    // false
-```
-
-### **==的判断流程**
-1. 首先判断两者的类型是否相同，不相同则进行类型转换
-2. 判断是否是null与undefined进行比较，是的话返回true  (null == undefined，而null !== undefined)
-3. 判断两者类型是否为string和number，如果是则将string转换为number
-```js
-1 == '1'
-      ↓
-1 ==  1
-```
-4. 判断两者是否有boolean，有的话就把boolean转换为number进行比较
-```js
-'1' == true
-        ↓
-'1' ==  1
-        ↓
- 1  ==  1
-```
-5. 判断两者是否有一者是object且另一方为string、number或symbol，如果是就把object转为原始类型再进行判断
-```js
-'1' == { name: 'js' }
-        ↓
-'1' == '[object Object]'
-```
-
-![image](https://user-images.githubusercontent.com/70066311/163975853-4d06fe0a-c818-45aa-9d53-a5c695ed54dd.png)
-
-### **Object.is()与比较操作符"==="、"=="的区别**
-- "=="：如果两边类型不一致，会转换类型再做比较
-- "==="：如果两边类型不一致，直接返回false
-- Object.is()：与 "===" 判断相同，但<font color="#FF6347">-0与+0不再相等，两个NaN是相等的</font>。
 
 ### **JS中的设计模式**
 #### 工厂模式
@@ -2360,7 +2365,7 @@ console.log(obj2);
 
 <font color="#FF6347">扩展运算符会将数组或对象中每个值都拷贝到新的数组或对象中</font>。
 
-### **如何判断一个对象是空对象**
+### 如何判断一个对象是空对象
 1. 使用JSON.stringify
 ```js
 const obj = {}
@@ -2373,9 +2378,7 @@ const obj = {}
 console.log(Object.keys(obj).length === 0);
 ```
 
-
-
-### **new操作符实现原理**
+### new操作符实现原理
 new的执行过程：
 1. 首先创建一个空对象
 2. 设置原型，将对象的原型设置为prototype对象
@@ -2405,7 +2408,7 @@ function objectFactory() {
 objectFactory(构造函数, 初始化参数)
 ```
 
-### **map和object的区别**
+### map和object的区别
 <font color="#FF6347">Map 对象存有键值对，其中的键可以是任何数据类型；Map对象记得键的原始插入顺序；Map对象具有表示映射大小的属性</font>。
 
 **Map的API：**      
@@ -2468,7 +2471,7 @@ fruits.get(apples);    // 返回 500
 | 迭代  | Map可以被直接迭代 | Object需要获取键后才可以迭代 |
 | 性能  | 在频繁增删键值时表现更好 | 在频繁添加和删除键值对的场景下未作出优化。 |
 
-### **Map和weakMap的区别**
+### Map和weakMap的区别
 Map本质上就是键值对的集合，但是普通的Object中的键值对中的键只能是字符串。而ES6提供的Map数据结构类似于对象，但是它的键不限制范围，可以是任意类型，是一种更加完善的Hash结构。<font color="#FF6347">如果Map的键是一个原始数据类型，只要两个键严格相同，就视为是同一个键</font>。
 
 实际上Map是一个数组，他的每个数据也都是一个数组：
@@ -2494,7 +2497,7 @@ WeakMap的API：
 - Map 数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
 - WeakMap 结构与 Map 结构类似，也是用于生成键值对的集合。但是 WeakMap 只接受对象作为键名（ null 除外），不接受其他类型的值作为键名。而且 WeakMap 的键名所指向的对象，不计入垃圾回收机制。
 
-### **WeakMap详解**
+### WeakMap详解
 先来看一个例子：
 ```js
 let obj = { name: 'toto' }
@@ -2760,7 +2763,9 @@ Function.prototype.myCall = function (context) {
 要是<font color="#FF6347">在堆内存中也开辟一个新的内存专门为b存放值</font>，就像基本类型那样，岂不就达到深拷贝的效果了。
 
 ## 原型与原型链
-### **prototype（原型）**
+在JS中是使用构造函数来新建一个对象的，每个构造函数的内部都有一个prototype属性，它的属性值是一个对象，这个对象包含了该构造方法所有的实例可以共用的属性和方法。当使用构造函数新建了一个对象后，在这个对象的内部将包含一个指针，这个指针指向构造函数的prototype属性对应的值。
+
+### prototype（原型）
 在JS中，每个函数都有一个prototype属性，这个属性指向函数的原型对象。
 ```js
 function Person(age) {
@@ -2777,7 +2782,7 @@ console.log(person2.name)  //kavin
 <font color="#FF6347">每个JS对象创建时，就会与之关联另一个对象，这个对象就是我们说的原型，每个对象都会从原型中继承属性</font>。
 ![image](https://user-images.githubusercontent.com/70066311/161051022-d32de349-62ec-49b8-babd-0bfb3b951aca.png)
 
-### **\_\_proto\_\_**
+### \_\_proto\_\_
 <font color="#FF6347">该属性指向对象的原型</font>。
 
 ``` js
@@ -2789,8 +2794,7 @@ console.log(person.__proto__ === Person.prototype); // true
 上面代码实例化了一个对象`person`，而这个对象的__proto__属性就指向它的原型。
 ![image](https://user-images.githubusercontent.com/70066311/161052367-8f33ff21-829f-405d-a2c5-378b9f276c5a.png)
 
-
-### **constructor**
+### constructor
 <font color="#FF6347">每个原型都有一个constructor属性，指向关联的构造函数</font>。
 
 ```js
@@ -2849,8 +2853,6 @@ teacher.hanOwnProperty('name')
 2. 然后创建一个空的子类构造函数，将子类的原型绑定在父类的实例上，再将子类原型的父类也绑定在父类的实例上，然后通过prototype属性定义子类的属性和方法；
 3. 然后创建一个空的孙类构造函数，将孙类的原型绑定在子类的实例上，再将孙类原型的子类也绑定在子类的实例上，然后通过prototype属性定义孙类的属性和方法；
 4. 这样，实例化孙类后，孙类可以调用自己的属性和方法，以及子类与父类的属性和方法，从而实现多继承。
-
-
 
 ## 函数柯里化
 函数柯里化是是把<font color="#FF6347">接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术</font>。
@@ -5732,7 +5734,7 @@ EventLoop的执行顺序如下：
 
 ![image](https://user-images.githubusercontent.com/70066311/168248924-b90e2dd9-f8d4-41ef-81a8-71bc10b4ada1.png)
 
-### **浏览器垃圾回收机制**
+### 浏览器垃圾回收机制
 #### V8的垃圾回收机制是怎样的
 V8采用了分布式垃圾回收机制，将内存分为新生代和老生代两个部分。
 
@@ -6238,8 +6240,6 @@ undefined // bar()的返回值，如果函数没有返回值，默认为：undef
 789
 [typeError]：bar is not a function
 ```
-
-
 
 ## 扩展运算符（...）
 <font color="	#FF6347">扩展运算符对对象实例的拷贝属于浅拷贝</font>
