@@ -7793,11 +7793,6 @@ import { Outlet } from 'react-router-dom'
 ### 为什么useState使用数组而不是对象
 如果使用数组，那么调用者在解构useState中的值时可以自由对这些值命名；而使用对象就必须用对象中的命名。
 
-### Hooks的使用限制
-- <font color="	#FF6347">不在循环、条件或嵌套函数中使用Hooks</font>。
-- <font color="	#FF6347">只能在函数式组件中调用Hooks</font>。
-React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中使用Hooks，可能会造成取值错位等错误发生。
-
 ### 常用的Hooks
 - useState：状态钩子，为函数式组件提供内部状态
 - useContext：共享钩子，用于组件间共享状态，可以解决通过逐层传递props共享状态的麻烦。  
@@ -7813,7 +7808,6 @@ React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中
   <Child1 />
   <Child2 />
 </TestContext.Provider>
-</div >
 ```
 3. <font color="	#FF6347">在子组件中使用useContext()获取值</font>
 ```js

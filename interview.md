@@ -251,25 +251,115 @@ Component和PureComponent几乎完全相同，差别是PureComponent已经实现
 函数式组件真正的将数据和页面渲染绑定到了一起，实现了输入一组数据，输出一个UI，更加方便复用与拆分。但函数式组件是一种无状态组件，他不可以定义state，没有生命周期函数。而Hooks使得函数式组件有了这些能力。
 
 ##### 常用的Hooks
-1. useState：状态钩子，为函数式组件提供内部状态。参数是state的默认值，返回一个数组，第一个参数是当前的state，第二个参数是更新state的方法。
+1. useState：状态钩子。为函数式组件提供内部状态。参数是state的默认值，返回一个数组，第一个参数是当前的state，第二个参数是更新state的方法。
 
 函数式组件和类组件关于state的区别：
 - state的声明方式：函数式通过`useState`获取；类式通过`constructor`构造函数中设置
 - state的读取方式：函数组件中直接使用状态变量；类组件通过`this.state`调用状态变量
 - state的更新方式：使用setState更新；类组件使用`this.setState`更新
 
-2. useEffect：副作用钩子，<font color="#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
+2. useEffect：副作用钩子。<font color="#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
 
 useEffect的return函数的执行时机：组件卸载时。
 
-3. useCallback：记忆组件，当组件重新渲染的时候，会导致方法会被重新创建。使用useCallback会固定函数的引用，只要依赖项没有改变，则始终会返回之前的函数的地址。
+3. useCallback：记忆组件。当组件重新渲染的时候，会导致方法会被重新创建。使用useCallback会固定函数的引用，只要依赖项没有改变，则始终会返回之前的函数的地址。
 例如：在父组件中创建了一个名为handleClick的事件处理函数并把这个handleClick传给子组件，当父组件重新渲染时，会重新创建名为handleClick函数的实例，并传给子组件，这时，新旧的handleClick函数的地址发生变化，子组件会认为props发生了改变，就会重新渲染子组件，造成了不必要的渲染。
 
 - 在使用了useCallback后，只有依赖项改变后，才会使函数重新声明一次。
 - 如果传入空数组，那么第一次创建后就被缓存，后期不管如何变化都只能拿到缓存的函数引用。
 - 如果不传数组，那么每次组件渲染完后都会获得最新的函数引用
 
-4. useMemo：记忆组件，
+4. useMemo：记忆组件。与useCallback功能类似，useMemo是缓存函数的运算结果，通常对于计算复杂的情况适用。
+
+5. useRef：保存引用值，操作当前DOM。useRef有两种用法：
+- 保持变量的持久化，当组件重新渲染时不会重新初始化变量，而会保留之前的值。例如：使用useEffect和useRef实现componentDidUpdate
+- 获取当前的DOM实例。
+```js
+function CustomForm() {
+  const eleRef = useRef(null)
+  const handleSubmit = (e) => {
+    console.log(eleRef.current.value)
+    e.preventDefault();
+  }
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        NAME: <input type="text" ref={eleRef} />
+      </label>
+      <input type="submit" value="Submit" />
+    </form>
+  )
+}
+```
+
+6. useConext：共享钩子。用于组件间共享状态，可以解决通过逐层传递props共享状态的麻烦。  
+使用方法：   
+1. <font color="	#FF6347">使用React.createContext()创建一个context对象</font>；
+```js
+  const TestContext = React.createContext();
+```
+2. <font color="	#FF6347">使用TestContext.Provider包裹需要共享数据的子组件</font>；
+```js
+// TestContext.Provider包裹子组件数据放在value属性中
+<TestContext.Provider value={value}>
+  <Child1 />
+  <Child2 />
+</TestContext.Provider>
+```
+3. <font color="	#FF6347">在子组件中使用useContext()获取值</font>
+```js
+// 子组件通过useContext(TestContext)获取值
+const value = useContext(TestContext);
+```
+
+##### 为什么useState使用数组而不是对象
+使用数组可以在解构useState时自由对state命名；而使用对象就必须要使用对象中的名称。
+
+##### Hooks的注意事项
+1. 不在循环、条件或嵌套函数中使用hooks
+2. 必须在React函数的顶层使用hooks
+3. 善用useMemo、useCallback，不要滥用useContext
+4. 对于useState，修改state必须使用setState方法，不能直接修改state值
+
+##### useEffect和useLayoutEffect的区别
+1. useEffect是异步执行的，可用于处理消息订阅、发送请求等；useLayoutEffect是同步执行的，用于处理DOM操作，调整样式，避免页面闪烁等。因此要避免在useLayoutEffect中进行大量耗时的计算，可能会阻塞线程的执行。
+2. useEffect的执行时机是浏览器渲染完成之后；useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前。
+
+```js
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import logo from './logo.svg';
+import './App.css';
+function App() {
+  const [state, setState] = useState("hello world")
+  
+  useEffect(() => {
+    let i = 0;
+    while (i <= 100000000) {
+      i++;
+    };
+    setState("world hello");
+  }, []);
+
+  useLayoutEffect(() => {
+    let i = 0;
+    while (i <= 100000000) {
+      i++;
+    };
+    setState("world hello");
+  }, []);
+  
+  return (
+    <>
+      <div>{state}</div>
+    </>
+  );
+}
+export default App;
+```
+
+useLayoutEffect可以解决屏幕闪烁的问题。如果使用useEffect，会在浏览器渲染之后再去执行，会导致`hello world`先被渲染到屏幕上，在变成`world hello`，就会出现屏幕闪烁的问题。而useLayoutEffect是在页面渲染之前执行的，会等待useLayoutEffect执行完再去渲染页面，这样就避免了闪烁。
+
+所以最好把DOM操作放在useLayoutEffect中。
 
 ### 26. 反问：如果进行CSS兼容不同浏览器？
 
