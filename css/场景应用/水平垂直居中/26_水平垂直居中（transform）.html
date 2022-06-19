@@ -33,8 +33,15 @@
 
 <body>
   <div class="father">
-    <div class="child"></div>
+    <div class="child" onclick="click"></div>
   </div>
+
+  <script>
+    let c = document.querySelector(".child")
+    c.addEventListener("click", () => {
+      console.log(111);
+    })
+  </script>
 </body>
 
 </html>

@@ -7303,7 +7303,7 @@ componentWillUpdate()不管更没更新，都会执行回调函数，而我们�
 ### Component和PureComponent的区别
 Component和PureComponent几乎完全相同，但<font color="	#FF6347">PureComponent通过props和state的浅比较来实现shouldComponentUpdate()，在PureComponent中如果包含深层次的数据结构，那么会因为深层的数据不一致而导致更新错误，导致界面不更新</font>。
 
-PureComponent可以通过props和state的浅比较来实现shouldComponentUpdate()，而Component。
+PureComponent已经实现了通过props和state的浅比较来实现shouldComponentUpdate()，不需要再去实现shouldComponentUpdate()，而Component需要再实现shouldComponentUpdate()。
 
 #### PureComponent缺点
 可能会因深层的数据不一致而产生错误的否定判断，从而shouldComponentUpdate结果返回false，界面得不到更新。
@@ -7821,7 +7821,7 @@ React Hooks是基于数组实现的，如果在循环、条件或嵌套函数中
 const value = useContext(TestContext);
 ```
 
-- useEffect：副作用钩子，<font color="	#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="	#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
+- useEffect：副作用钩子，<font color="#FF6347">数据获取、消息订阅、操作DOM等都属于副作用</font>。useEffect接收两个参数，第一个参数是一个回调函数，第二个参数是一个数组，可以传入state和props。只有状态数组中的状态值发生变化时才会执行回调函数中的代码。若数组为空，则useEffect只执行一次。<font color="	#FF6347">有时我们想在DOM更新后执行一些额外的代码，比如更新日志、发送请求等，就可以使用useEffect</font>。我们可以在函数式组件中实现像类组件生命周期的某个阶段(componentDidMount、componentDidUpdate、componentWillUnmount)可以完成的事。<font color="#FF6347">若传入空数组，则useEffect相当于componentDidMount；在组件销毁之前，模拟componentWillUnmount</font>
 
 - useEffect的return函数的执行时机：
     1. 组件卸载时
@@ -7829,7 +7829,7 @@ const value = useContext(TestContext);
 
 - useRef：获得组件的实例，多用于\<input>、\<form>等带有输入的DOM标签。
 
-**什么是闭包陷阱**：在hooks里面的函数，如果是useEffect(()=>(),[])这种写法，即只组件`挂载阶段`执行，那么在这里面的函数，拿到的值始终都只是初始化时候的值，就算你在其他地方修改了值之后，也是获取不到最新值的。
+**什么是闭包陷阱**：在hooks里面的函数，如果是useEffect(()=>(),[])这种写法，即只有组件`挂载阶段`执行，那么在这里面的函数，拿到的值始终都只是初始化时候的值，就算你在其他地方修改了值之后，也是获取不到最新值的。
 
 React Hooks在渲染时维护了一个链表，来记录useState和useEffect等Hooks的位置和值。
 
@@ -8503,7 +8503,6 @@ Cookie+Session存在的问题
 #### Token登录
 
 Token 是服务端生成的一串字符串，以作为客户端请求的一个令牌。当第一次登录后，服务器会生成一个 Token 并返回给客户端，客户端后续访问时，只需带上这个 Token 即可完成身份认证。
-
 
 **token的实现流程：**      
 用户首次登录时：
