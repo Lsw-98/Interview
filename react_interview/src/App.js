@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react'
-
-export default function App() {
-  const [obj, setObj] = useState({ c: 0, d: { a: 1 } })
-
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import logo from './logo.svg';
+import './App.css';
+function App() {
+  const [state, setState] = useState("hello world")
+  
   useEffect(() => {
-    console.log(obj);
-  })
+    let i = 0;
+    while (i <= 100000000) {
+      i++;
+    };
+    setState("world hello");
+  }, []);
 
-
-  const handleClick = () => {
-  }
-
+  useLayoutEffect(() => {
+    let i = 0;
+    while (i <= 100000000) {
+      i++;
+    };
+    setState("world hello");
+  }, []);
+  
   return (
-    <div onClick={handleClick}>{obj.d.a}</div>
-  )
+    <>
+      <div>{state}</div>
+    </>
+  );
 }
+export default App;
