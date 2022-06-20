@@ -7,26 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    div {
-      width: 200px;
-      height: 200px;
-      background-color: orange;
+    .father {
+      position: absolute;
+      width: 201px;
+      height: 201px;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
     }
   </style>
 </head>
 
 <body>
-  <div></div>
-  <script>
-    const div = document.querySelector("div")
-    div.addEventListener("click", () => {
-      if (div.style.visibility === "visible") {
-        div.style.visibility = "hidden"
-      } else {
-        div.style.visibility = "visible"
-      }
-    })
-  </script>
+  <div class="father">
+    <input type="text">
+  </div>
+
 </body>
 
 </html>

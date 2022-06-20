@@ -1,33 +1,244 @@
 # 石墨文档
 ## 一面
 ### 1. 屏幕适配（媒体查询（媒体查询的语法），%布局（使用%的优缺点））
+#### 媒体查询
+**语法**：
+```css
+@media mediatype and|not|only (media feature){
+  css-code
+}
+```
+
+- 用@media开头
+- mediatype媒体类型
+- 关键字：and、not、only
+- media feature媒体特性
+
+**mediatype**      
+媒体类型主要分为：all（用于所有设备）、print（打印设备）、screen（电脑屏幕、平板、手机等）
+
+**媒体特性**
+- width：定义输出设备中页面可见区域的宽度
+- min-width：定义输出设备中页面最小可见区域宽度
+- max-width：定义输出设备中页面最大可见区域宽度
+
+#### rem
+ rem：**相对于html根元素的字体大小的倍数**。使用rem可以实现响应式布局，当屏幕分辨率发生变化时，元素也随之变化。
+
+#### vh/vw 
+vw表示相对于视图窗口的宽度，vh表示相对于视图窗口的高度，除了vw和vh之外，还有vmin和vmax两个相关的单位。vmin代表vw和vh之中的较小值，vmax代表较大值。使用vw和vh也可以实现响应式。
+
+vw根据窗口的宽度，分成100等份，`100vw`就表示满宽，`50vw`就表示一半宽。
+
 ### 2. 水平居中垂直布局（使用transform: translate()带来的问题）
+使用transform: translate可能会导致像素模糊的问题，如果宽高是奇数，那么使用transform: translate(-50%, -50%)得到的计算结果中会包含小数，导致渲染的内容模糊。
+
+应该尽量使用偶数的像素单位；或直接使用flex实现水平垂直居中。
+
 ### 3. 场景题：将一个url中的参数写入到对象中（注意边界值判断）
 ### 4. typescript中的语法（返回值如何限制参数类型）
+```js
+function demo(a: String, b: Boolean): (String | Function) {
+  return a
+}
+```
 ### 5. 登录模块中，token和localstorage分别是做什么的？
+token用于用户身份认证；localstorage用户存储token。
+#### 拓展问题：
+##### token
+token是服务器生成的一串字符串，以作为客户端请求的一个令牌。当第一次登录后，服务器会生成一个token并返回给客户端，客户端在之后的请求会写带上这个token进行身份认证。
+
+##### token的实现流程
+用户首次登录时：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/54d6b9b14eba476fae3b1d7ed5ff5fc9.png)
+
+1. 用户输入用户名和密码，点击登录，浏览器发起post请求
+2. 服务器首先验证账号和密码无误，然后创建token
+3. 服务器将token返回给客户端，由客户端自由保存
+
+后续页面访问时：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7ffb8dbb2d2245ae9c7f2223d2c919f8.png)
+
+1. 用户再次访问页面时，带上第一次登录时获取的token
+2. 服务器验证token，有效则身份验证成功
+
+##### token的优势
+- 存放在客户端，对服务器的压力小，即使是服务器集群，也不需要增加维护成本。
+- token可以存放在前端任何地方，可以不用保存在cookie中，提升了安全性
+- token在跨域后不会存在信息丢失的问题
+- token不会遭受csrf攻击
+
+##### token的缺点
+- token在下发后很难再被服务器收回
+- token会被暴力穷举法破解，因此token的有效期不易设置太长，并且定期更新服务器的哈希签名密钥
+- token也会遭受劫持
+- token需要进行签名，性能稍差
+
+##### token的生成方式
+最常见的token生成方式JWT（JSON Web Token），JWT的本质是一个字符串，他将用户的信息保存到一个JSON字符串中，然后编码得到一个Token，并且这个Token带有签名信息，在接受后可以校验是否被篡改。
+
+##### JWT结构
+JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组成。
+
+- Header中存储着一些描述信息
+- Payload中存放着需要传递的信息，一般会把`用户信息数据`和`token的有效期`放在payload中
+- Signature：签名部分，确保数据不被篡改
+
+##### JWT的认证流程：
+1. 浏览器通过表单将用户名和密码提交到服务器，这个过程一般是一个POST请求，应该使用HTTPS传输，避免敏感信息被劫持
+2. 服务器核对用户名和密码正确后将包含用户信息的数据作为Payload，将其与JWT的Header进行拼接后签名，形成一个JWT Token，这个Token就相当于一个aaa.bbb.ccc的字符串
+3. 服务器将JWT Token字符串作为登录成功的结果返回给前端。前端可以将返回的结果保存在浏览器中，退出登录时删除保存的JWT Token即可
+4. 前端在每次请求时将JWT Token放入HTTP请求头中的Authorization属性中(解决XSS和CSRF问题)
+5. 后端检查前端传过来的JWT Token，验证其有效性，比如检查签名是否正确、是否过期、token的接收方是否是自己等等
+6. 验证通过后，后端解析出JWT Token中包含的用户信息，进行其他逻辑操作(一般是根据用户信息得到权限等)，返回请求结果
+
+##### 如何增加JWT的安全性
+- 将Token放在请求头中，避免网络劫持
+- 使用HTTPS传输
+- JWT可以使用暴力穷举法破解，所以应该定期更换服务器的哈希签名密钥
+
+##### token过期
+有两种情况会出现401状态码：
+- 未登录的用户做一些需要登录后才有权限操作的事情，服务器会返回401，并重定向到登录页
+- 登录的用户token过期了
+
+在用户首次登录后，服务器会返回一个token，在后续请求时通过请求头带上token。token的有效期由后端决定，token一旦过期就会被网关拦截。
+
+##### refresh_token和token
+当用户登录成功后，返回的token有两个值：
+
+![image](https://user-images.githubusercontent.com/70066311/171977549-e150f433-8ce8-418f-b696-edbcb615febd.png)
+
+- token：在访问一些接口时，需要传入token。就是每次请求携带的token。
+- refresh_token：当token过期后，可以使用它去访问一些特殊的接口（由后端决定），并返回一个新的token，替换之前的token。
+
+服务端不需要刷新 Token 的过期时间，一旦 Token 过期，就反馈给前端，前端使用 Refresh Token 申请一个全新 Token 继续使用。这种方案中，服务端只需要在客户端请求更新 Token 的时候对 Refresh Token 的有效性进行一次检查，大大减少了更新有效期的操作，也就避免了频繁读写。当然 Refresh Token 也是有有效期的，但是这个有效期就可以长一点了，比如，以天为单位的时间。refresh token，也是加密字符串，并且和token是相关联的。相比获取各种资源的token，refresh token的作用仅仅是获取新的token，因此其作用和安全性要求都大为降低，所以其过期时间也可以设置得长一些。
+
+##### 响应拦截器中处理过期的token
+![image](https://user-images.githubusercontent.com/70066311/171977583-1f43c22d-76e3-490c-b992-dd428c2f3734.png)
+
+在响应拦截器中：
+- 对于某次请求A，如果是401（2）
+    - 有refresh_token，用refresh_token去请求返回新的token（3）
+        - 新token请求成功（4）
+            - 更新本地token（5）
+            - 再发一次请求A（6）
+        - 新token请求失败
+            - 携带请求地址，跳转到登录页
+    - 没有refresh_token，说明没有登陆
+        - 携带请求地址跳转到登录页
+
+
 ### 6. token是存放在localstorage中的吗？
+是
+
 ### 7. 在用户A注销之后登录了用户B，有没有可能导致用户B读取到用户A的信息？
+在用户A注销时会清除用户A的相关信息，所以用户B无法读取到用户A的相关信息。
+```js
+<Menu.Item key={2} danger onClick={() => {
+  // 清楚本地token
+  localStorage.removeItem("token")
+  // 更改url，跳转到登录页
+  props.history.replace("/login")
+}}>退出登录</Menu.Item>
+```
+
 ### 8. 没有权限的用户访问出现403页面，服务器是200还是403？
+当没有权限的用户通过地址栏输入url的方式访问更高权限用户才能访问的页面时，会返回403。
+
+在用户发起访问请求后，浏览器将请求地址提交到服务器，服务器根据请求地址判断用户是否有相应的权限。判断方法是：获取用户所有的权限，对比该请求地址是否在用户的权限中。如果没有权限则会返回403状态码。前端axios的响应拦截器拦截到状态码为403，然后将页面重定向到无权限页面。
+
 ### 9. 先获取前端代码再报403还是直接报了403？
+
 ### 10. 具体说说路由懒加载
+路由懒加载的方式有很多：
+1. 使用React.lazy实现懒加载
+    - 通过React.lazy动态import需要懒加载的组件
+    - 使用Suspense来包裹懒加载的组件，可以设置fallback实现加载中的效果
+```js
+import React, { lazy, Suspense } from 'react';
+import { HashRouter, Redirect, Route, Switch } from 'react-router-dom'
+
+const Login = lazy(() => import('../views/login/Login'));
+const NewsSandBox = lazy(() => import('../views/newsSandBox/NewsSandBox'));
+const Detail = lazy(() => import('../views/visitor/Detail'));
+const Visitor = lazy(() => import('../views/visitor/Visitor'));
+
+export default function indexRouter() {
+  return (
+    <HashRouter>
+      <Switch>
+        <Suspense fallback={<div>loading</div>}>
+          <Route path="/login" component={Login}></Route>
+          <Route path="/visitor" component={Visitor}></Route>
+          <Route path="/detail/:id" component={Detail}></Route>
+          {/* <Route path="/" component={NewsSandBox}></Route> */}
+          <Route path="/" render={() =>
+            localStorage.getItem("token") ?
+              <NewsSandBox></NewsSandBox> :
+              <Redirect to="/login"></Redirect>
+          }></Route>
+        </Suspense>
+      </Switch>
+    </HashRouter>
+  );
+}
+```
+
+2. webpack中使用lazyload-loader
+```js
+// webpack 配置中
+module: {
+  rules: [
+    {
+      test: /.(js|jsx)$/,,
+    use: [
+      'babel-loader',
+      'lazyload-loader'
+    ]
+ },
+```
+
+业务代码中，使用lazy!前缀代表需要懒加载的Router。
+
+```js
+
+import Shop from 'lazy!./src/view/Shop';
+// Router 正常使用
+<Route path="/shop" component = { Shop } />
+```
+
 ### 11. 页面跳转出现白屏如何解决？
+1. 先确定浏览器是否可以访问其他网站，如果不可以，说明是客户端网络自身的问题，然后检查客户端网络配置
+2. 抓包确认DNS是否解析出IP地址，如果没有解析出IP地址，说明是域名写错了
+3. 查看服务端返回的响应码：
+  - 404：检查输入的URL是否正确
+  - 500：服务器内部出错，导致浏览器一直等待请求的资源返回，造成阻塞，无法渲染页面
+  - 200：如果返回200就表示问题出在前端，可能是前端代码有问题，导致页面无法渲染
+4. 如果访问速度很慢，很久才能显示出来，那么有可能是客户端的网口流量太大，导致TCP丢包；或者是加载JS文件造成网络拥塞、CSS文件还未加载完导致JS又对样式操作，不得不等待CSS加载完成。
+
 #### 拓展问题：
 ##### 为什么会出现白屏？
-    1. 等待HTML文件返回
-    2. JS未加载完
-    3. 浏览器兼容性问题
-    4. css加载慢，因为渲染树是由DOM树和CSSOM树合成的，如果css未加载完成，就会阻塞渲染树的合成
+1. 等待HTML文件返回
+2. JS未加载完
+3. 浏览器兼容性问题（比如IE6以下的浏览器）
+4. css加载慢，因为渲染树是由DOM树和CSSOM树合成的，如果css未加载完成，就会阻塞渲染树的合成
+5. URL无效或含有中文字符
 ##### 如何减少白屏时间
-    1. 减少http请求次数和请求大小
-    2. 使用缓存
-    3. 使用link引入css而不是@import
-    4. 引入js加上defer或async属性，或将js引入放在文档底部
-    5. 优化用户体检，使用loading进度条
-    6. 使用懒加载
+1. 减少http请求次数和请求大小
+2. 使用缓存、预加载等策略
+3. 使用link引入css而不是@import
+4. 引入js加上defer或async属性，或将js引入放在文档底部
+5. 优化用户体检，使用loading进度条
+6. 使用懒加载
+7. 使用语义化标签，HTML层级不要太深
 
 ### 12. webpack优化（打包、CSS加载、懒加载）
+
 ### 13. 使用图片懒加载最终会把图片处理成什么样的？
+
 ### 14. webpack使用图片懒加载后图片的名字为什么会变成哈希值？
+
 ### 15. 断点续传整个的流程
 ### 16. 文件上传为什么使用web worker？使用promise不行吗？
 ### 17. 文件上传暂停如何实现的？
@@ -360,6 +571,11 @@ export default App;
 useLayoutEffect可以解决屏幕闪烁的问题。如果使用useEffect，会在浏览器渲染之后再去执行，会导致`hello world`先被渲染到屏幕上，在变成`world hello`，就会出现屏幕闪烁的问题。而useLayoutEffect是在页面渲染之前执行的，会等待useLayoutEffect执行完再去渲染页面，这样就避免了闪烁。
 
 所以最好把DOM操作放在useLayoutEffect中。
+
+##### React.memo、useMemo和useCallback的区别
+三者都是性能优化的手段。React.memo类似于类组件中的shouldComponentUpdate；useMemo和useCallback会判断props和state是否变化，从而避免每次父组件render时去创建子组件函数的实例，提升性能。
+
+区别在于React.memo是判断一个组件是否需要被重新渲染；useCallback用于缓存函数实例，避免子组件渲染后创建与之前一样的函数实例；而useMemo用于缓存函数的计算结果，避免子组件渲染后再执行一次函数运算，针对的是一段代码逻辑是否重新执行。
 
 ### 26. 反问：如果进行CSS兼容不同浏览器？
 
