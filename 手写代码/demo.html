@@ -6,23 +6,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    .father {
-      position: absolute;
-      width: 201px;
-      height: 201px;
-      transform: translate(-50%, -50%);
-      top: 50%;
-      left: 50%;
-    }
-  </style>
 </head>
 
 <body>
-  <div class="father">
-    <input type="text">
-  </div>
+  <input id="i" type="text" oninput="handleinput()">
+  <p id="p"></p>
 
+  <script>
+    let i = document.querySelector("#i")
+    let p = document.querySelector("#p")
+    let data = {}
+
+    Object.defineProperties(data, "val", {
+      get: function () {
+        return val
+      },
+      set: function (newVal) {
+        val = newVal
+        input.value = val
+        p.innerHTML = val
+      }
+    })
+
+    function handleinput() {
+      data.val = input.value
+    }
+  </script>
 </body>
 
 </html>

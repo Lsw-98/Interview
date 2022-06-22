@@ -1761,10 +1761,12 @@ console.log(a.call(null));
 4. Object.prototype.toString可以准确的比较数据类型
 
 ### null和undefined的区别
-null和undenfined都是基本数据类型。
+null和undefined都是基本数据类型，区别在于
 
-- undefined是未定义的，一般变量声明了但还没有定义的时候会返回undefined
-- null主要用于赋值给一些可能会返回对象的变量，作为初始化
+- null：是一个空对象，一般赋值给那些可能返回数据的变量，作为初始化；undefined：未定义的变量，一般变量声明了但没有定义会返回undefined
+- 数据类型不同：null的数据类型是Object；undefined的数据类型是undefined
+- 相等性判断时不同：== 比较时返回true，因为规范中提到， **要比较相等性之前，不能将 null 和 undefined 转换成其他任何值**，并且规定null 和 undefined 是相等的；===比较时返回false，因为数据类型不同
+- 转化成数字的值不同：null转换为0；undefined转化为NaN
 
 undefined在JS中并不是一个保留字，这意味着可以使用`undefined`来作为变量名，但这样做是十分危险的，因为<font color="#FF6347">会影响对undefined值的判断</font>。为了安全起见，可以使用`void 0`代替undefined。
 
@@ -1805,7 +1807,7 @@ console.log(NaN !== NaN);   // true
 ```
 
 ### isNaN和Number.isNaN的区别
-<font color="#FF6347">isNaN本意是**通过Number方法把参数转换成数字类型**，如若转换成功，则返回false，反之返回true，它只判断参数是否会转换为数字</font>。
+<font color="#FF6347">isNaN本意是通过Number方法把参数转换成数字类型，如若转换成功，则返回false，反之返回true，它只判断参数是否会转换为数字</font>。
 
 而Number.isNaN用来严格判断传入的值是否等于NaN，<font color="#FF6347">它首先会判断传入的值是否为数字类型，如果不是，直接返回false</font>。
 
@@ -5559,7 +5561,7 @@ SessionStorage的适用场景：
 ## 跨域
 ### 1. 同源策略
 同源策略限制了从一个源加载的文档或脚本与另一个源的资源的交互。<font color="	#FF6347">同源即协议、端口号、域名必须一致</font>。  
-下表给出了与 URL http://store.company.com/dir/page.html 的源进行对比的示例:
+下表给出了与 URL `http://store.company.com/dir/page.html` 的源进行对比的示例:
 |  URL   | 是否跨域  | 原因 | 
 |  ----  | ----  | ---- |
 | http://store.company.com/dir/page.html  | 同源 | 完全相同 |
@@ -8712,7 +8714,7 @@ class Demo extends React.Component {
 ```
 解决方法：
   - 使用bind进行调用
-  - 是用箭头函数调用
+  - 使用箭头函数调用
 
 2. useEffect等hooks
 在useEffect回调函数中使用了setState()方法，然后数组中绑定了该state，会导致进入无限循环
@@ -8744,7 +8746,7 @@ class Demo extends React.Component {
           </div>
         )
       }
-    }
+}
 ```
 5. 在`render`使用setState
 6. 在`getDerivedStatefromprops`使用setState
@@ -8841,3 +8843,13 @@ export default class NestedRoutingComponent extends React.Component {
 3. 在chrome F12中的源码按ctrl P搜索报错的文件，打断点调试
 4. 如果是请求的话查看请求的状态码
 5. 使用`componentDidCatch()`打印错误信息
+
+|  对象   | 返回值  |
+|  ----  | ----  |
+| Array  | 返回数组本身 |
+| Boolean  | 布尔值 |
+| Date  | 存储的时间是从 1970 年 1 月 1 日午夜开始计的毫秒数 UTC |
+| Function  | 函数本身 |
+| Number | 数字值 |
+| Object  | 对象本身 |
+| String  | 对象本身 |
