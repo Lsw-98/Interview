@@ -1,29 +1,25 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
-function App() {
-  const [state, setState] = useState("hello world")
-  
-  useEffect(() => {
-    let i = 0;
-    while (i <= 100000000) {
-      i++;
-    };
-    setState("world hello");
-  }, []);
+import React, { Component } from 'react'
 
-  useLayoutEffect(() => {
-    let i = 0;
-    while (i <= 100000000) {
-      i++;
-    };
-    setState("world hello");
-  }, []);
-  
-  return (
-    <>
-      <div>{state}</div>
-    </>
-  );
+export default class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      isToggleOn: true
+    }
+    this.toggleBtnClick = this.toggleBtnClick.bind(this, this.state.isToggleOn)
+  }
+  render() {
+    // console.log(this);
+    return (
+      <button onClick={this.toggleBtnClick}>
+        {this.state.isToggleOn ? 'Button On' : 'Button Off'}
+      </button>
+    );
+  }
+  toggleBtnClick(isToggleOn, e) {
+    console.log('Now state is' + isToggleOn + ' before to convert.');
+    this.setState({
+      isToggleOn: !isToggleOn
+    })
+  }
 }
-export default App;
