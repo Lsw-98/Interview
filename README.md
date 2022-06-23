@@ -290,7 +290,6 @@ function reverseULFragment(ul) {
 
 **createElement和createDocumentFragment方法比较**
 - createElement创建的元素可以进行重复操作；createDocumentFragment创建的元素是一次性的，添加后就不能再继续操作了
-- createElement创建的元素直接添加到DOM树上；createDocumentFragment创建的元素存在于内存中，只能使用js进行操作。
 - 节点类型必须为Node类型，不能为文本
 - 都可以使用appendChild添加子元素
 - 若添加的子元素是文档中存在的元素，通过appendChild在为其添加子元素时，会从文档中删除之前存在的元素。
@@ -849,7 +848,7 @@ z-index属性在下列情况会失效：
 
 ### nth-child和:nth-of-type的区别
 - nth-child：找出包含对应元素父元素内所有的子元素然后再去找到对应位置的元素后再去匹配选择器
-- nth-of-type：找出包含对应元素父元素内的子元素,然后根据样式选择器找到的元素的tag,把父元素内子元素所有对应tag种类分别取出排列后,分别比对对应的位置然后匹配选择器
+- nth-of-type：找出包含对应元素父元素内的子元素，然后根据样式选择器找到的元素的tag，把父元素内子元素所有对应tag种类分别取出排列后，分别比对对应的位置然后匹配选择器
 
 ```html
 <!DOCTYPE html>
@@ -5578,7 +5577,7 @@ SessionStorage的适用场景：
 
 ### 2. 如何解决跨域问题
 1. CORS跨域资源共享机制
-跨域资源共享机制（CORS）使用额外的HTTP头来告诉浏览器，让运行在一个Origin上的web应用被允许访问来自不同源服务器上的指定资源。当一个资源从与该资源本身所在的服务器不同的域、协议或端口请求一个资源时，资源会发起一个跨域HTTP请求。
+跨域资源共享机制（CORS）是一种基于HTTP头的机制，该机制通过允许服务器标示除了它自己之外的其它`origin（域名、协议、端口号）`，使得浏览器允许这些`origin`访问加载自己的资源。
 
 浏览器将CORS分为简单请求和非简单请求：     
 1.  简单请求：浏览器会直接发出CORS请求，它会在请求的头信息中加上一个Origin字段，该字段说明本次请求来自哪个源，服务器会根据这个Origin字段来判断是否同意本次请求，如果Origin请求的域在许可范围内，服务器会返回响应和Access-Control-Allow-Origin等信息头；如果不在许可范围内，服务器就返回一个正常的HTTP回应，浏览器发现没有Access-Control-Allow-Origin等头部信息，就知道请求出错了。
