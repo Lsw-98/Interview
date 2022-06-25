@@ -2056,11 +2056,11 @@ const args = Array.prototype.concat.apply([], arguments);
 ```
 
 ### JS原生实现双向绑定
-JS实现双向绑定使用：Object.defineProperty()方法。
+JS实现双向绑定使用：`Object.defineProperty`方法。
 
 Object.defineProperty()用于在一个对象上定义一个新属性，或者修改一个已经存在的属性。
 
-Object.defineProperty(obj, prop. desc)
+Object.defineProperty(obj, prop, desc)
 - obj：需要定义属性的对象
 - prop：需要定义的属性名
 - desc：具体的改变方法
@@ -4933,12 +4933,21 @@ FIN：释放一个连接
 
 当客户端发出最后的ACK确认报文后，并不能确定服务器端是否收到，所以客户端会设置一个2MSL（MSL：一段报文在传输过程中的最大生命周期，2MSL即服务器端发出报文以及客户端发出确认报文的总时长）的计时器。在客户端发出最后一个确认报文段后，服务器端在1MSL内没有收到客户端发来的确认报文，就再次向客户端发送报文。<font color="	#FF6347">如果客户端在2MSL内，再次收到了来自服务器端的FIN报文，说明服务器端由于各种原因没有接收到客户端发出的ACK确认报文。客户端再次向服务器端发出ACK确认报文，计时器重置，重新开始2MSL的计时；客户端在2MSL内没有再次收到来自服务器端的FIN报文，说明服务器端正常接收了ACK确认报文，客户端可以进入CLOSED阶段，完成“四次挥手”</font>。
 
-### **TIME-WAIT 状态过多会产生什么后果？
+### TIME-WAIT和CLOSE_WAIT的区别
+- TIME-WAIT是主动关闭连接的一方：需要等待2MSL，主要是 防止最后一个ACK丢失
+- CLOSE_WAIT是被动关闭连接的一方
+
+### CLOSE_WAIT状态过多会产生什么后果？
+产生原因：被动关闭连接的一方忙于读或写，没有关闭连接
+- 占用系统内存
+- 服务不可用：服务器开启的连接个数是有限的，当连接达到上限时，服务器无法再创建新的请求，导致服务不可用
+
+### TIME-WAIT 状态过多会产生什么后果？
 从服务器来讲，短时间内关闭了大量的Client连接，就会造成服务器上出现大量的TIME_WAIT连接，严重消耗着服务器的资源，此时部分客户端就会显示连接不上。
 
 从客户端来讲，客户端TIME_WAIT过多，就会导致端口资源被占用，因为端口就65536个，被占满就会导致无法创建新的连接。
 
-### **TIME_WAIT 是服务器端的状态?还是客户端的状态?**
+### TIME_WAIT 是服务器端的状态?还是客户端的状态?
 TIME_WAIT 是主动断开连接的一方会进入的状态，一般情况下，都是客户端所处的状态;服务器端一般设置不主动关闭连接。
 
 TIME_WAIT 需要等待 2MSL，在大量短连接的情况下，TIME_WAIT会太多，这也会消耗很多系统资源。对于服务器来说，在 HTTP 协议里指定 KeepAlive（浏览器重用一个 TCP 连接来处理多个 HTTP 请求），由浏览器来主动断开连接，可以一定程度上减少服务器的这个问题。
@@ -6669,10 +6678,11 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 - <font color="#FF6347">尽量不要用数组中的index作为key</font>。因为在进行删除操作时会发生误删的现象。
 - <font color="#FF6347">不要再render的时候使用随机数或其它操作给元素加上不稳定的key，因为这样造成的性能开销比不加key更多</font>
 
-### **Vue的diff和react的diff的区别**
+### Vue的diff和react的diff的区别
 相同点：
-- 都不进行跨层级比较
+- 都不进行跨层级比较，只做同级比较
 - 对数组或对象中深层次的变化无法检测
+- 时间复杂度都为O(n)
 
 不同点：
 - Vue进行diff时，调用patch打补丁函数，一边比较一边给真实的DOM打补丁；而React是比较完后一次性更新DOM
@@ -6680,7 +6690,71 @@ key是React用于追踪哪些列表中元素被修改、被添加、被移除的
 - Vue的列表对比，采用在两端设置双指针；而React采用从左到右依次对比
 - 当一个集合把最后一个节点移动到最前面时，React将前面的节点依次向后移动；而Vue会将最后一个插入到最前面。
 
-### **React-Fiber**
+### 传统的diff算法为什么是O(n^3)
+首先需要进行两棵树的节点比较：树1上的节点1要遍历树2上的所有的节点，树1上的节点2也要遍历树2的所有节点，所以时间复杂度为O(n^2)。在对比过程中发现旧节点在新的树中未找到，那么就需要把旧节点删除，删除一棵树的一个节点(找到一个合适的节点放到被删除的位置)的时间复杂度为O(n)，同理添加新节点的复杂度也是O(n)，合起来diff两个树的复杂度就是O(n^3)
+
+### Vue如何优化到了O(n)
+Vue中的diff整体策略是：深度优化，同层比较。进行时间复杂度O(n)的while循环，循环条件为遍历旧节点数组&&遍历新节点数组，谁先遍历完循环就结束。
+
+1. 比较只在同层级中进行，不会跨层级比较。
+![image](https://user-images.githubusercontent.com/70066311/175453488-64c004b9-5eee-423e-859a-2e8ed59488d8.png)
+
+2. 在比较过程中，循环从两边向中间收拢
+![image](https://user-images.githubusercontent.com/70066311/175453629-0e7772f4-7e41-46ad-a438-d63e685f00d6.png)
+
+下面举个`vue`通过`diff`算法更新的例子：
+
+新旧`VNode`节点如下图所示：
+![image](https://user-images.githubusercontent.com/70066311/175453810-7db86d0f-813c-409c-be5d-4eaffd25d43b.png)
+
+第一次循环后，发现旧节点D与新节点D相同，直接复用旧节点D作为diff后的第一个真实节点，同时旧节点endIndex移动到C，新节点的 startIndex 移动到了 C。
+![image](https://user-images.githubusercontent.com/70066311/175453877-e57e65f9-4c80-4afd-8ee2-b4f62401bcea.png)
+
+第二次循环后，同样是旧节点的末尾和新节点的开头(都是 C)相同，同理，diff 后创建了 C 的真实节点插入到第一次创建的 B 节点后面。同时旧节点的 endIndex 移动到了 B，新节点的 startIndex 移动到了 E。
+![image](https://user-images.githubusercontent.com/70066311/175453997-504bf78e-fd8e-4039-ae0d-63f935a19fdf.png)
+
+第三次循环中，发现E没有找到，这时候只能直接创建新的真实节点 E，插入到第二次创建的 C 节点之后。同时新节点的 startIndex 移动到了 A。旧节点的 startIndex 和 endIndex 都保持不动。
+![image](https://user-images.githubusercontent.com/70066311/175454071-d1602741-c982-48f3-a8f4-c13f321ace10.png)
+
+第四次循环中，发现了新旧节点的开头(都是 A)相同，于是 diff 后创建了 A 的真实节点，插入到前一次创建的 E 节点后面。同时旧节点的 startIndex 移动到了 B，新节点的startIndex 移动到了 B。
+![image](https://user-images.githubusercontent.com/70066311/175454139-fb661b50-225f-42c8-abba-b0ce9792b8e9.png)
+
+第五次循环中，情形同第四次循环一样，因此 diff 后创建了 B 真实节点 插入到前一次创建的 A 节点后面。同时旧节点的 startIndex移动到了 C，新节点的 startIndex 移动到了 F。
+![image](https://user-images.githubusercontent.com/70066311/175454344-e077c1f5-24c9-4250-8619-c2cb80e4330d.png)
+
+新节点的 startIndex 已经大于 endIndex 了，需要创建 newStartIdx 和 newEndIdx 之间的所有节点，也就是节点F，直接创建 F 节点对应的真实节点放到 B 节点后面
+![image](https://user-images.githubusercontent.com/70066311/175454373-6d37acd6-3092-4965-be99-12a51eff111c.png)
+
+通过查看源码，可以知道while循环中主要处理了以下五种情景：
+- 当新老 `VNode` 节点的 `start` 相同时，直接 `patchVnode` ，同时新老 `VNode` 节点的开始索引都加 1
+- 当新老 `VNode` 节点的 `end`相同时，同样直接 `patchVnode` ，同时新老 `VNode` 节点的结束索引都减 1
+- 当老 `VNode` 节点的 `start` 和新 `VNode` 节点的 `end` 相同时，这时候在 `patchVnode` 后，还需要将当前真实 `dom` 节点移动到 `oldEndVnode` 的后面，同时老 `VNode` 节点开始索引加 1，新 `VNode` 节点的结束索引减 1l
+- 当老 `VNode` 节点的 `end` 和新 `VNode` 节点的 `start` 相同时，这时候在 `patchVnode` 后，还需要将当前真实 `dom` 节点移动到 `oldStartVnode` 的前面，同时老 `VNode` 节点结束索引减 1，新 `VNode` 节点的开始索引加 1
+- 如果都不满足以上四种情形，那说明没有相同的节点可以复用，则会分为以下两种情况：
+    - 从旧的 `VNode` 为 `key` 值，对应 `index` 序列为 `value` 值的哈希表中找到与 `newStartVnode` 一致 `key` 的旧的 `VNode` 节点，再进行`patchVnode`，同时将这个真实 `dom`移动到 `oldStartVnode` 对应的真实 `dom` 的前面
+    - 调用 `createElm` 创建一个新的 `dom` 节点放到当前 `newStartIdx` 的位置
+
+### React如何优化到了O(n)
+为了优化diff算法，react中对普通的diff算法进行优化，通过三大策略奖时间复杂度将为O(n)
+
+**Tree diff**：tree diff是diff算法的基础策略，它的重点在于同层比较。处于对diff算法的优化，react的tree diff对DOM节点跨层级移动的操作忽略不计，只对同层级的DOM节点进行比较（即同一个父节点下所有的子节点）。对比时，一旦发现节点不存在，就直接删除掉该节点及节点之下的所有子节点，这样对DOM树进行依次遍历，完成整个树的对比。
+
+![image](https://user-images.githubusercontent.com/70066311/175495876-bc7ef0dc-f4a4-424b-b6f4-6fb5136c1445.png)
+
+如果出现了跨层级移动的操作，那么久忽略它，只进行节点的创建和删除操作。React建议不要进行DOM节点的跨层级操作。
+
+**component diff**：component diff是组件间的对比，在遇到组件之间的比较时，有三种策略：
+1. 对比时，遇到同一类型的组件，遵循tree diff，进行层级比较
+2. 对比时，一旦遇到不同类型的组件，直接将这个组件判断为`dirty component`（脏组件），并替换该组件和之下所有子节点
+3. 对比时，在同一类型的两个组件中，如果你知道这个组件的VDOM没有任何变化，就可以手动使用 shouldComponentUpdate() 来判断组件是否需要进行diff，进一步的提升了diff效率和性能
+
+优化点：
+- 避免使用结构相同但类型不同的组件，因为虽然组件的结构不需要改动，但是由于类型不同的原因，diff会直接销毁该组件并重建。
+- 对于同一类型并且没有变化的组件，合理使用 shouldComponentUpdate() 进行优化
+
+**element diff**:
+
+### React-Fiber
 在进行虚拟DOM向真实DOM更新时，React会占据浏览器资源，导致用户触发的事件无法得到响应，给用户一种卡顿的感觉。<font color="#FF6347">React-Fiber可以暂停页面的渲染，让浏览器先执行更高级的任务，等浏览器空闲后再恢复渲染。可以提高浏览器的用户响应速度，并兼顾任务执行效率；延时对DOM的操作，避免一次性操作大量DOM节点</font>
 
 ### Fiber的双缓冲技术
@@ -8099,11 +8173,11 @@ const takeLatest = (pattern, saga, ...args) => fork(function*() {
 })
 ```
 
-### **Redux状态管理器和变量挂载到window中有什么区别**
+### Redux状态管理器和变量挂载到window中有什么区别
 二者都是存储数据以供后期使用。
 - Redux状态更改可以回溯，数据多了的时候可以清晰地知道改动在哪里发生，完整的提供了一套状态管理模式；而window不可以。
 
-### **Redux和VueX的区别和共同思想**
+### Redux和VueX的区别和共同思想
 1. 区别：
     - VueX改进了Redux中的Action和Reducer函数，以mutations变化函数取代Reducer，无需switch，只需要在对应的mutations中改变state的值即可
     - 由于Vue自动重新渲染的特性，无需subscribe重新渲染函数，只要生成新的state即可
@@ -8113,7 +8187,7 @@ const takeLatest = (pattern, saga, ...args) => fork(function*() {
 
 2. 共同思想：Redux和VueX都是以MVVM思想进行设计，将数据从视图层抽离出来，实现变化可预测、单一数据源。
 
-### **Redux中的connect有什么作用**
+### Redux中的connect有什么作用
 <font color="	#FF6347">connect负责连接Redux和React</font>
 
 1. 获取State：connect通过context获取Provider中store，通过store.getState()获取整个store tree上所有state。
@@ -8124,7 +8198,7 @@ const takeLatest = (pattern, saga, ...args) => fork(function*() {
 ![image](https://user-images.githubusercontent.com/70066311/168463150-ea397238-5119-49dc-ae80-3aa86b4d148d.png)
 
 
-### **为什么要在`root`根组件上使用`react-redux`的`Provider`组件包裹**
+### 为什么要在`root`根组件上使用`react-redux`的`Provider`组件包裹
 #### `Provider`到底做了什么
 1. Provider创建subscription，context保存上下文
 首先看Provider的源码
@@ -8170,15 +8244,15 @@ function Provider({ store, context, children }) {
 - 创建一个contextValue，里面包含一个创建出来的父级`Subscription`和`redux`提供的`store`
 - 通过react上下文`context`和`contextValue`传递给子孙组件
 
-### **react-redux是怎么和redux契合，做到state改变更新视图的呢**
+### react-redux是怎么和redux契合，做到state改变更新视图的呢
 
-### **`provider`用什么方式存放当前的redux的store，又是怎么传递给每一个需要管理`state`的组件的？**
+### `provider`用什么方式存放当前的redux的store，又是怎么传递给每一个需要管理`state`的组件的？
 
-### **`connect`是怎么连接业务组件，然后传递组件更新函数的**
+### `connect`是怎么连接业务组件，然后传递组件更新函数的
 
-### **`connect`怎么通过第一个参数，来订阅与之对应的`state`的**
+### `connect`怎么通过第一个参数，来订阅与之对应的`state`的
 
-### **`connect`怎么样将props和redux的state合并的**
+### `connect`怎么样将props和redux的state合并的
 
 ## React事件机制
 React基于浏览器机制实现了一套事件机制，包括：`事件注册`、`事件合成`、`事件冒泡`、`事件派发`等。
@@ -8207,25 +8281,25 @@ React未将事件处理函数与对应的DOM节点直接关联，而是在顶层
 
 <font color="	#FF6347">当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。这样做简化了事件处理和回收机制，效率也提升很大</font>。
 
-### **合成事件**
+### 合成事件
 React中的onClick、onChange等事件是**合成事件**，并不是浏览器的原生事件。<font color="	#FF6347">这些事件并没有绑定到对应的真实DOM上，而是通过**事件代理**的方式，将所有事件绑定到了document上</font>。当事件发生并冒泡到document时，React将事件内容封装并交由真正的处理函数运行，这样做不仅可以<font color="	#FF6347">减少内存消耗</font>，还可以<font color="	#FF6347">在组件挂载销毁时统一订阅和移除事件</font>。  
 可以使用**event.preventDefault**阻止事件冒泡。
 
 ![事件机制](https://user-images.githubusercontent.com/70066311/157618463-b5fc6510-f7f9-498f-9722-cf7458d6972c.jpg)
 
-### **实现合成事件的目的**
+### 实现合成事件的目的
  - 合成事件是一个跨浏览器的原生事件包装器，赋予了跨浏览器开发的能力，解决了浏览器之间的兼容问题。
  - 对于原生浏览器事件来说，浏览器会给监听器创建一个事件对象，如果你有很多的事件监听，那么就需要分配很多的事件对象，造成高额的内存分配问题，但<font color="	#FF6347">对于合成事件来说，有一个事件池专门来管理它们的创建和销毁，当事件需要被使用时，就会从池子中复用对象，事件回调结束后，就会销毁事件对象上的属性，从而便于下次复用事件对象</font>。
 
-### **React的事件和普通的HTML事件有什么不同？**
+### React的事件和普通的HTML事件有什么不同？
 1. 事件的命名方式不同，原生事件为全小写，react事件为小驼峰
 2. 事件函数处理语法不同，原生事件为字符串，react事件为函数
 3. <font color="	#FF6347">react事件不能采用return false的方式来阻止浏览器的默认行为，而必须明确调用preventDefault()来阻止默认行为</font>
 
-### **react事件执行顺序**
+### react事件执行顺序
 事件的执行顺序为<font color="#FF6347">原生事件先执行，合成事件再执行</font>。合成事件会冒泡到document上，所以**尽量避免原生事件和合成事件混用**。<font color="	#FF6347">如果原生事件阻止冒泡，那么就会导致合成事件不执行</font>。
 
-### **事件绑定的方式**
+### 事件绑定的方式
 - 在render中使用bind()绑定
 - 在render中使用箭头函数
 - 在类组件的构造函数中使用bind()绑定
@@ -8506,6 +8580,57 @@ class TodoItem extends React.Component{
 | 使用场景 | 需要使用状态或需要使用状态操作组件时时 | 组件不需要管理state，纯展示 |
 | 总结 | 类组件可以维护自身的状态变量，让开发者在组件的不同阶段对组件进行更多的控制  | 视图与数据解耦分离、专注于render |
 
+### React和Vue在设计上有什么异同：
+#### 同
+- 都使用了虚拟DOM
+- 都有自己的diff算法
+- 都是比较轻量级的前端开发工具
+- 都实现了单向数据流
+- 都采用组件化的开发思想
+
+#### 异
+- Templating vs JSX
+React的思想是`all in js`，通过js来生成html；而Vue是把html、css、js组合到一起，使用`模板引擎`来处理。Vue的`模板引擎`支持指令、过滤器等模板功能，简化了渲染流程；React中只能用js来操作DOM，页面渲染、条件判断等都需要js来控制，更加复杂。
+
+- 单向绑定与双向绑定
+单向绑定指的是：View层与Model层之间的映射关系，Model的更新会触发View的更新，而View的更新不会触发Model的更新，它们的作用是单向的。如下图所示。一个父组件下有两个子组件1和子组件2，父组件可以向子组件传递数据。假如子组件都获取到了父组件的name，在子组件1中对name重新修改之后，子组件2和父组件中的值并不会发生改变，这就是单向绑定。子组件不能直接改变父组件的状态。但反过来，如果是父组件中的name修改了，当然两个子组件中的name也就改变了。
+
+![image](https://user-images.githubusercontent.com/70066311/175448458-4eeac4c1-ef3e-4b84-bdf0-0a2726f08547.png)
+
+**单向绑定的优缺点：**
+- 优点：所有状态变化都可以被记录、跟踪，状态变化通过手动调用出发，源头易追溯
+- 缺点：有很多的样板代码，代码量会上升
+
+双向绑定是Model的更新会触发View的更新，View的更新也会触发Model的更新，它们的作用是相互的。
+
+React采用单向绑定：
+![image](https://user-images.githubusercontent.com/70066311/175441717-15a32830-5d59-4e5d-a0ab-5deb32a4b749.png)
+
+用户访问View，用户与页面交互引起数据的变化，React通过setState对State进行更新。React无法直接通过View修改State，必须通过setState进行操作，这样更加清晰可控。
+
+而Vue支持单向绑定和双向绑定
+单向绑定是通过`v-bind`和插值表达式`{{data}}`。在vue中，父组件使用props将值传递给子组件后，子组件并不能直接修改从父组件传递过来的值，而是通过$emit去通知父组件进行修改。所以vue是属于单项数据流的。
+
+双向绑定是通过表单`v-model`，用户对view层的更改会直接同步到`model`层。所存在的双向绑定`v-model`只不过是`v-bind:value` 和 `v-on:input`的语法糖。
+```js
+<input  v-model="userName" />
+<input v-bind:value="userName" v-on:input="userName = $event.target.value" />
+```
+
+**双向绑定的优缺点：**
+- 优点：Vue在操作表单时使用v-model，可以减少onChange事件的处理，减少代码量
+- 缺点：无法很好的跟踪双向绑定的数据变化
+
+- 框架本质不同
+Vue是MVVM模式的一种；而React只针对View层
+
+- 状态管理
+state对象在react应用中是不可变的，需要使用setState()方法更新状态；在Vue中，state对象并不是必须的，数据由data属性在Vue对象中进行管理。
+
+- 性能优化
+在react中，当父组件重新渲染时，也会触发子组件重新渲染，为了避免不必要的子组件重新渲染，你需要使用React.memo、PureComponent或实现 shouldComponentUpdate。
+
+在vue中通过双向绑定的形式为每一个`data`属性建立一个依赖，以后只要修改`data`的任何一个属性，就会触发视图的重新渲染，而且是精确的修改对应的vdom。这就不需要开发人员对整个性能进行优化，允许他们更专注于构建应用程序本身。而vue这么做也有个缺点就是在大型应用中可能会有很多data，这样会造成对应的依赖较多，导致卡顿，所以大型应用中一般使用react。
 
 # 场景题
 ## 如何实现登录
