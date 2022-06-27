@@ -1,35 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
   <style>
-    .a:nth-of-type(4) {
-      background: #ff0000;
+    .content {
+      display: flex;
+      flex-direction: row;
+      height: 1000px;
+      width: 3000px;
     }
 
-    .a:nth-child(4) {
-      background: green;
+    .first {
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+      align-self: center;
+    }
+
+    .second {
+      width: 100px;
+      height: 100px;
+      background-color: aqua;
+    }
+
+    .third {
+      width: 100px;
+      height: 100px;
+      background-color: gray;
     }
   </style>
 </head>
 
 <body>
-
-  <h1>这是标题</h1>
-  <div class="a">div1</div>
-  <p>p1特别</p>
-  <label class="a">label1</label>
-  <div>div2特别</div>
-  <div>div2特别的</div>
-  <div class="a">div3</div>
-  <p class="a">p2</p>
-  <label class="a">label2</label>
-  <div class="a">div4</div>
-  <p class="a">p3</p>
-  <label>label3特别</label>
-  <div class="a">div5</div>
-  <p class="a">p4</p>
-  <label class="a">label4</label>
+  <div class="content">
+    <div class="first"></div>
+    <div class="second"></div>
+    <div class="third"></div>
+  </div>
 </body>
 
 </html>

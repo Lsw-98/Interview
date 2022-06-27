@@ -3230,7 +3230,9 @@ race()方法和all()方法一样，区别是race()会返回最先执行完的pro
 
 ```js
 Promise.race(promise1, timeOutPromise(5000)).then(res=>{})
-```    
+```
+
+**all和race都传入空数组**:Promise.all 会立即返回 resolved 状态，因而会立马输出，而 Promise.race 则一直处于 pending 状态，不会走到 then ，所以永远不会输出
 
 **finally()**
 finally()方法用于指定不管Promise对象最后状态如何，都会执行的操作。
@@ -4570,6 +4572,7 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 
 3. 4XX（客户端错误状态码）
 - 400 Bed Request：客户端请求的报文有错。
+- 401 Unauthorized：权限认证失败
 - 403 Forbidden：服务器禁止访问该资源。
 - 404 Not Found：请求的资源未在服务器上找到。
 
@@ -4602,7 +4605,7 @@ HTTP是服务器用于传输数据到本地浏览器的协议，它的传输是�
 - 收录减少
 - 权重下降
 
-### **kepp-alive**
+### **keep-alive**
 keep-alive就是使用长连接。
 优点：
 - 较少的CPU和内存使用
@@ -5382,7 +5385,7 @@ Cache-Control的优先级比Expires高。
 2. Memory Cache。内存缓存<font color="	#FF6347">效率最快，但内存缓存虽然读取效率高，但是持续性很短，会随着进程的释放而释放</font>。一旦我们关闭了Tab页面，内存中的缓存就被释放掉了。
 3. Service Worker。<font color="	#FF6347">Service Worker就是服务器与浏览器之间的中间人角色。它会拦截当前网站所有的请求，进行判断，可以让我们自由控制缓存哪些文件，并且缓存是持久的，如果需要向服务器发起请求就转发给服务器，如果可以直接使用缓存就返回缓存而不转发给服务器，从而提高浏览体验</font>。
 
-## 浏览器渲染原理
+## 浏览器渲染原理 
 ### 浏览器的渲染过程
 1. 文档解析：首先解析收到的文档，根据文档构建一颗DOM树，DOM树是由DOM元素及属性节点组成的
 2. CSS文件解析：然后对CSS进行解析，生成CSSOM规则树
@@ -5460,7 +5463,7 @@ Session是服务器和客户端一次会话的过程。<font color="	#FF6347">Se
 1. <font color="#FF6347">NAME=[VALUE]</font>
 Cookie的值，NAME是唯一标识Cookie的名称，不区分大小写；VALUE是存储在Cookie里的字符串值，该值必须通过URL编码
 2. <font color="#FF6347">Domain=[域名]</font>
-Cookie有效的域，发送到这个与所有的请求都会包含对应的Cookie
+Cookie有效的域，发送到这个域所有的请求都会包含对应的Cookie
 3. <font color="#FF6347">Path=[PATH]</font>
 4. <font color="#FF6347">Expires=[DATE]</font>
 Cookie的有效期。浏览器结束后会删除所有Cookie
@@ -6752,7 +6755,11 @@ Vue中的diff整体策略是：深度优化，同层比较。进行时间复杂�
 - 避免使用结构相同但类型不同的组件，因为虽然组件的结构不需要改动，但是由于类型不同的原因，diff会直接销毁该组件并重建。
 - 对于同一类型并且没有变化的组件，合理使用 shouldComponentUpdate() 进行优化
 
-**element diff**:
+**element diff策略：**element diff是针对同一层级的element节点的，在双方同一层级的节点对比时，有三种情况：
+
+1. 面对全新的节点时，执行**插入操作**
+2. 面对多余的节点时，执行**删除操作**
+3. 面对换位的节点时，执行**移动操作**
 
 ### React-Fiber
 在进行虚拟DOM向真实DOM更新时，React会占据浏览器资源，导致用户触发的事件无法得到响应，给用户一种卡顿的感觉。<font color="#FF6347">React-Fiber可以暂停页面的渲染，让浏览器先执行更高级的任务，等浏览器空闲后再恢复渲染。可以提高浏览器的用户响应速度，并兼顾任务执行效率；延时对DOM的操作，避免一次性操作大量DOM节点</font>
