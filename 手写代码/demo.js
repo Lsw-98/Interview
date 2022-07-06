@@ -34,3 +34,10 @@
 // for in 遍历为什么没有遍历
 // 变量怎么判断有没有被定义（window.hasOwnProperty）
 // 使用babel将es6转为es5，块级作用域怎么实现的
+
+
+{
+  x = 1
+  let x = 2
+}
+console.log(x);

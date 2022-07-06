@@ -7,23 +7,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    p:nth-child(n + 2):nth-child(-n + 4) {
-      color: red;
+    .container {
+      position: relative;
+    }
+
+    .left {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+      left: 0;
+    }
+
+    .mid {
+      height: 100px;
+      left: 100px;
+      right: 200px;
+      background-color: aqua;
+      position: absolute;
+    }
+
+    .right {
+      height: 100px;
+      position: absolute;
+      width: 200px;
+      background-color: gray;
+      right: 0;
     }
   </style>
 </head>
 
 <body>
-  <p>1</p>
-  <p>2</p>
-  <p>3</p>
-  <p>4</p>
-  <p>5</p>
-  <p>6</p>
-  <p>7</p>
-  <p>8</p>
-  <p>9</p>
+  <div class="container">
+    <div class="left"></div>
+    <div class="mid"></div>
+    <div class="right"></div>
+  </div>
 </body>
-
 
 </html>

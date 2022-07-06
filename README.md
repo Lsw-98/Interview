@@ -618,6 +618,8 @@ box-sizing默认值为`content-box`，不可继承
 - transform：让一个元素在一个坐标系统中缩放
 - 线性渐变：linear-gradient
 - CSS动画：animation
+- rgba
+- 字体：text-shadow
 
 ### transform
 transform可以实现元素的位移、旋转、倾斜、缩放等功能。
@@ -1066,9 +1068,9 @@ display：
 
 position：
 - static：<font color="#FF6347">没有定位，存在于正常的文档流中</font>
-- relative：<font color="#FF6347">相对元素本来的位置进行偏移，不会改变布局的计算</font>
+- relative：<font color="#FF6347">相对元素本来的位置进行偏移，其偏移后，原来的位置仍然占据空间</font>
 - absolute：<font color="#FF6347">脱离文档流，相对于第一个不是static的父元素进行定位</font>
-- fixed：<font color="#FF6347">固定定位，相对于浏览器窗口进行定位</font>
+- fixed：<font color="#FF6347">脱离文档流，固定定位，相对于浏览器窗口进行定位</font>
 
 static不可以设置z-index。    
 
@@ -1620,10 +1622,9 @@ Normalize.css：可以增强跨浏览器渲染的一致性
 1. 避免频繁操作DOM。在操作DOM时，尽量在底层的DOM节点进行操作
 2. 不要使用table布局，因为一个小改动都可能会引起table进行重新布局
 3. 不要频繁操作元素样式
-4. 避免频繁操作DOM
-5. 使用absolute和fixed，使元素脱离文档流，这样他们的变化会不会影响其他元素
-6. 可以使用display: none，操作结束后再把它显示出来，因为在display: none的元素上进行操作不会引起重绘和重排
-7. 将DOM的多个读操作或写操作放在一起，而不是多个读写操作穿插着写。这得益于浏览器的渲染队列机制
+4. 使用absolute和fixed，使元素脱离文档流，这样他们的变化会不会影响其他元素
+5. 可以使用display: none，操作结束后再把它显示出来，因为在display: none的元素上进行操作不会引起重绘和重排
+6. 将DOM的多个读操作或写操作放在一起，而不是多个读写操作穿插着写。这得益于浏览器的渲染队列机制
 
 ### CSS如何针对不同浏览器做适应
 1. 做浏览器CSS样式初始化，常见的做法是引入`reset.css`或`Normalize.css`。最好不要使用`*`来重置CSS样式，因为会影响效率。
@@ -1714,7 +1715,7 @@ console.log(typeof null);            // object
 2. instacneof
 instacneof可以正确判断对象的类型，<font color="#FF6347">其内部运行机制是判断实例的原型链中是否能找到该类型的原型</font>。
 
-也就是<font color="#FF6347">右边变量的prototype在左边变量的原型链上即可。因此instanceof会依次遍历左边变量的原型链，知道找到右边变量的prototype属性为止</font>。
+也就是<font color="#FF6347">右边变量的prototype在左边变量的原型链上即可。因此instanceof会依次遍历左边变量的原型链，直到找到右边变量的prototype属性为止</font>。
 
 instacneof只能判断引用数据类型，不能判断原始数据类型。
 ```js
@@ -2054,6 +2055,8 @@ const args = Array.prototype.splice.call(arguments, 0);
 ```js
 const args = Array.prototype.concat.apply([], arguments);
 ```
+
+### 将集合转换为数组的方式
 
 ### JS原生实现双向绑定
 JS实现双向绑定使用：`Object.defineProperty`方法。
@@ -3967,6 +3970,7 @@ obj1.a = null
 obj2.a = null
 ```
 
+
 ### **减少垃圾回收**
 虽然浏览器可以进行自动垃圾回收，但当代码比较复杂时，垃圾回收的代价比较大，所以应该尽量减少垃圾回收。
 - 对数组进行优化：在清空一个数组时，将其赋值为`[]`
@@ -4270,7 +4274,7 @@ Content-Type: text/html; charset=utf-8
 Accept: */*
 ```
 上面代码中，客户端声明自己可以接受任何格式的数据。
- 
+
 
 ##  <font color="#FF6347">HTTP 1.0 和 HTTP 1.1之间的区别</font>
 - 连接方面：HTTP 1.0使用非持久连接；HTTP 1.1使用持久连接。持久连接可使多个HTTP请求复用同一个TCP连接，以此来避免使用非持久连接时每次需要建立连接的时延。
@@ -5142,9 +5146,9 @@ CSRF的本质是<font color="	#FF6347">**在同源请求中cookie会携带发送
 ### **攻击类型**
 常见的CSRF攻击有三种：
 - GET类型。比如在网站中的一个img标签里构建一个请求，当用户打开这个网站的时候就会自动发起请求。
-```
+
 ![](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/ff0cdbee.example/withdraw?amount=10000&for=hacker)
-```
+
 当受害者访问这个含有img的页面后，浏览器会自动向`http://bank.example/withdraw?account=xiaoming&amount=10000&for=hacker`发送一次HTTP请求，`bank.example`就会收到包含受害者登录信息的一次跨域请求。
 - POST类型。比如构建一个表单，然后隐藏它，当用户进入页面时，自动提交这个表单。
 ```html
@@ -5811,9 +5815,9 @@ EventLoop的执行顺序如下：
 V8采用了分布式垃圾回收机制，将内存分为新生代和老生代两个部分。
 
 **新生代算法**      
-<font color="#FF6347">新生代中的对象一般存活时间较短，使用Scavenge GC算法。Csavenge GC算法具体实现中，主要采用了一种复制式的方法，即`Cheneny算法`</font>。
+<font color="#FF6347">新生代中的对象一般存活时间较短，使用Scavenge GC算法。Scavenge GC算法具体实现中，主要采用了一种复制式的方法，即`Cheneny算法`</font>。
 
-在新生代空间中，`Cheney算法`将内存空间分为两部分，别分为From空间和To空间。在这两个空间中，必定有一个空间是使用的，另一个空间是空闲的。新分配的对象会被放入From空间中，当From空间被占满时，新生代GC就会启动了。算法会检查From空间中存活的对象并复制到To空间中，如果有失活的对象就会销毁。当复制完成后From空间和To空间互换，GC结束。
+在新生代空间中，`Cheney算法`将内存空间分为两部分，分别为From空间和To空间。在这两个空间中，必定有一个空间是使用的，另一个空间是空闲的。新分配的对象会被放入From空间中，当From空间被占满时，新生代GC就会启动了。算法会检查From空间中存活的对象并复制到To空间中，如果有失活的对象就会销毁。当复制完成后From空间和To空间互换，GC结束。
 
 ![image](https://user-images.githubusercontent.com/70066311/169829860-83e7361a-c783-4014-b715-46d8a342c97f.png)
 
@@ -5821,11 +5825,10 @@ V8采用了分布式垃圾回收机制，将内存分为新生代和老生代两
 1. 当一个对象经过2次复制后依然存活，它将会被认为是生命周期较长的对象，随后会被移动到老生代中，采用老生代的垃圾回收策略进行管理。
 2. 如果复制一个对象到空闲区时，空闲区空间占用超过了25%，那么这个对象会被直接晋升到老生代空间中。设置25%的原因是<font color="#FF6347">当完成Scanvenge回收后，空闲区将翻转成使用区，继续进行对象内存的分配，若占比过大，将影响后续的内存分配</font>。
 
-
 **老生代算法**     
 <font color="#FF6347">老生代中的对象一般存活时间较长且占用空间大，因为老生代中的对象通常比较大，如果再用新生代赋值的方法就会非常耗时，从而导致回收执行效率不高</font>。老生代使用了两个算法，分别是标记清除算法和标记压缩算法。
 
-- 标记清除算法和浏览器回收机制的标记清除算法相同。
+- 标记清除算法和JS回收机制的标记清除算法相同。
 - 并行回收。      
     **全停顿**：JS是单线程的，当进行垃圾回收时就会阻塞当前的JS脚本的执行，需等待垃圾回收完毕后再回复脚本执行，这种行为就是**全停顿**。如果某次GC时间过长，那么对用户来说就会造成页面卡顿的情况，所以有了并行回收。
 
