@@ -35,9 +35,40 @@
 // 变量怎么判断有没有被定义（window.hasOwnProperty）
 // 使用babel将es6转为es5，块级作用域怎么实现的
 
+// function Foo() {
+//   getName = function () {
+//     console.log('1');
+//   };
+//   return this;
+// }
 
-{
-  x = 1
-  let x = 2
-}
-console.log(x);
+// Foo.getName = function () {
+//   console.log('2');
+// };
+
+// Foo.prototype.getName = function () {
+//   console.log('3');
+// };
+
+// var getName = function () {
+//   console.log('4');
+// };
+
+
+// function getName() {
+//   console.log(5);
+// }
+
+// Foo.getName();  // 2
+// // Foo().getName();
+// getName();  // 4
+// new Foo.getName();  // 2
+// new Foo().getName();  // 1
+// new new Foo().getName();  //  3
+
+const m = new Map()
+m.set("hello", "Hello Map")
+m.set("1", "1")
+m.set("a", "a")
+
+console.log(m);

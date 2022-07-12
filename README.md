@@ -3351,8 +3351,6 @@ AJAX的原理就是通过XHR对象来向服务器发起异步请求，从服务�
 
 ![image](https://user-images.githubusercontent.com/70066311/170992029-bdde0af0-20a0-4de2-b694-976fc9020b76.png)
 
-
-
 **创建AJAX**     
 ```js
 // 1. 创建 XMLHttpRequest 实例
@@ -5597,14 +5595,14 @@ SessionStorage的适用场景：
 
 ### 2. 如何解决跨域问题
 1. CORS跨域资源共享机制
-跨域资源共享机制（CORS）是一种基于HTTP头的机制，该机制通过允许服务器标示除了它自己之外的其它`origin（域名、协议、端口号）`，使得浏览器允许这些`origin`访问加载自己的资源。
+跨域资源共享机制（CORS）是一种基于HTTP头的机制，该机制通过允许服务器标示除了它自己之外的其它`Origin（域名、协议、端口号）`，使得浏览器允许这些`Origin`访问加载自己的资源。
 
 浏览器将CORS分为简单请求和非简单请求：     
-1.  简单请求：浏览器会直接发出CORS请求，它会在请求的头信息中加上一个Origin字段，该字段说明本次请求来自哪个源，服务器会根据这个Origin字段来判断是否同意本次请求，如果Origin请求的域在许可范围内，服务器会返回响应和Access-Control-Allow-Origin等信息头；如果不在许可范围内，服务器就返回一个正常的HTTP回应，浏览器发现没有Access-Control-Allow-Origin等头部信息，就知道请求出错了。
+1.  简单请求：浏览器会直接发出CORS请求，它会在请求的头信息中加上一个Origin字段，该字段说明本次请求来自哪个源，服务器会根据这个Origin字段来判断是否同意本次请求，如果Origin请求的域在许可范围内，服务器会返回响应和`Access-Control-Allow-Origin`等信息头；如果不在许可范围内，服务器就返回一个正常的HTTP回应，浏览器发现没有Access-Control-Allow-Origin等头部信息，就知道请求出错了。
 
 2. 
 - 非简单请求：非简单请求是对服务器有特殊要求的请求，比如使用DELETE或PUT等请求，非简单请求会在正式请求之前先进行一次查询请求，称为预检请求。
-- 在预检请求中，浏览器会询问服务器当前所在的网页是否允许访问，以及可以使用哪些HTTP请求方式和头信息字段。预检请求使用的是OPTIONS，表示这个请求时来询问的，他的头信息中的关键字段是Origin，表示请求来自哪个源；还有Access-Control-Request-Method，表示HTTP请求所使用的方法；Access-Control-Request-Headers，表示额外发送的头信息字段。服务器在收到浏览器的预检请求之后，会根据头信息的三个字段来进行判断，如果返回的头信息在中有Access-Control-Allow-Origin这个字段就是允许跨域请求，如果没有，就是不同意这个预检请求，就会报错。
+- 在预检请求中，浏览器会询问服务器当前所在的网页是否允许访问，以及可以使用哪些HTTP请求方式和头信息字段。预检请求使用的是OPTIONS，表示这个请求时来询问的，他的头信息中的关键字段是Origin，表示请求来自哪个源；还有Access-Control-Request-Method，表示HTTP请求所使用的方法；`Access-Control-Request-Headers`，表示额外发送的头信息字段。服务器在收到浏览器的预检请求之后，会根据头信息的三个字段来进行判断，如果返回的头信息在中有Access-Control-Allow-Origin这个字段就是允许跨域请求，如果没有，就是不同意这个预检请求，就会报错。
 - 通过了预检请求，在以后每次的CORS请求都会自带一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
 
 
@@ -8750,7 +8748,6 @@ JWT由Header（JWT头）、Payload（有效载荷）和Signature（签名）组�
 当用户登录成功后，返回的token有两个值：
 
 ![image](https://user-images.githubusercontent.com/70066311/171977549-e150f433-8ce8-418f-b696-edbcb615febd.png)
-
 
 - token：在访问一些接口时，需要传入token
 - refresh_token：当token的有效期过了之后，可以使用它去请求一个特殊接口（由后端决定），并返回一个新的token回来，以替换过期的token。

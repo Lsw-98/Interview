@@ -32,8 +32,8 @@ function deepcopy(obj) {
 
 obj2 = deepcopy(obj1)
 
-// obj2.a = 111
-// obj2.c.d = 444
+obj2.a = 111
+obj2.c.d = 444
 
 console.log(obj1);
 console.log(obj2);
