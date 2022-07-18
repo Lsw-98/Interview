@@ -66,9 +66,3 @@
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
 
-const m = new Map()
-m.set("hello", "Hello Map")
-m.set("1", "1")
-m.set("a", "a")
-
-console.log(m);

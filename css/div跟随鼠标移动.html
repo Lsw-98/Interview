@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .father {
+      width: 500px;
+      height: 500px;
+      background-color: gray;
+      position: relative;
+    }
+
+    .child {
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="child"></div>
+  </div>
+  <script>
+    const father = document.querySelector(".father")
+    const child = document.querySelector(".child")
+    let isClick = false
+    let x = 0
+    let y = 0
+    let offsetLeft = 0
+    let offsetTop = 0
+    child.addEventListener("mousedown", (e) => {
+      isClick = true
+      x = e.clientX  // 记录鼠标最开始点击的位置
+      y = e.clientY
+      offsetLeft = child.offsetLeft  // 记录child元素最开始距离左边的距离
+      offsetTop = child.offsetTop
+    })
+
+    child.addEventListener("mouseup", () => {
+      isClick = false
+    })
+
+    child.addEventListener("mousemove", (e) => {
+      let resX = e.clientX
+      let resY = e.clientY
+
+      if (isClick) {
+        child.style.left = resX - (x - offsetLeft) + "px"
+        child.style.top = resY - (y - offsetTop) + "px"
+      }
+    })
+  </script>
+</body>
+
+</html>
