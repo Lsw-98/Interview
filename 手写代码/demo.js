@@ -65,4 +65,3 @@
 // new Foo.getName();  // 2
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
-
