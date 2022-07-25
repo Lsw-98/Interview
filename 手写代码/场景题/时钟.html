@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    .clock {
+      width: 30rem;
+      height: 30rem;
+      border: 20px solid white;
+      border-radius: 50%;
+      margin: 50px auto;
+      position: relative;
+      padding: 2rem;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 3px #efefef,
+        inset 0 0 10px black,
+        0 0 10px rgba(0, 0, 0, 0.2)
+    }
+
+    .click-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform: translateY(-3px);
+    }
+
+    .click-face::after {
+      width: 1em;
+      height: 1em;
+      left: 50%;
+      top: 50%;
+      position: absolute;
+      display: block;
+      content: "";
+      background-color: #a8c5d1;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1),
+        0 0 10px rgba(0, 0, 0, 0.2);
+      transform: translate(-50%, -50%);
+    }
+
+    .hand {
+      width: 50%;
+      height: 6px;
+      background: black;
+      position: absolute;
+      top: 50%;
+      transform-origin: 100%;
+      transform: rotate(90deg);
+      box-shadow: 0 0 0 0.1px #fff,
+        0 0 0 1px rgb(0 0 0 / 10%),
+        0 0 8px rgb(0 0 0 / 50%),
+        2px 4px 1px rgb(0 0 0 / 50%);
+    }
+
+    .second-hand {
+      height: 3px;
+      background-color: #ff0e0e;
+      border-bottom-left-radius: 100%;
+      border-top-left-radius: 100%;
+    }
+
+    .min-hand {
+      background-color: white;
+      width: 45%;
+      left: 5%;
+    }
+
+    .hour-hand {
+      background-color: white;
+      border-radius: 5px;
+      width: 40%;
+      height: 12px;
+      left: 10%;
+    }
+
+    @keyframes circle {
+      to {
+        transform: rotate(1.25turn);
+      }
+    }
+
+    .second-hand {
+      animation: circle 60s steps(60, end) infinite;
+    }
+
+    .min-hand {
+      animation: circle 3600s linear infinite;
+    }
+
+    .hour-hand {
+      animation: circle 43200s linear infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="clock">
+    <!-- 时钟面板 -->
+    <div class="click-face">
+      <div class="hand hour-hand"></div>
+      <div class="hand min-hand"></div>
+      <div class="hand second-hand"></div>
+    </div>
+  </div>
+
+  <script>
+    const secondHand = document.querySelector(".second-hand")
+    const minHand = document.querySelector(".min-hand")
+    const hourHand = document.querySelector(".hour-hand")
+
+    function init() {
+      const now = new Date()
+      const seconds = now.getSeconds()
+      const mins = now.getMinutes() * 60 + seconds
+      const hours = now.getHours() * 3600 + mins
+
+      secondHand.style.animationDelay = `-${seconds}s`;
+      minHand.style.animationDelay = `-${mins}s`;
+      hourHand.style.animationDelay = `-${hours}s`;
+
+    }
+
+    init()
+  </script>
+</body>
+
+</html>

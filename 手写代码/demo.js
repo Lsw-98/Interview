@@ -65,3 +65,32 @@
 // new Foo.getName();  // 2
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
+
+const obj1 = {
+  a: 1,
+  b: 2,
+  c: {
+    d: 4,
+    e: 5,
+  }
+}
+
+function copy(obj) {
+  const res = Array.isArray ? [] : {}
+  if (obj && typeof obj === "object") {
+    for (const key in obj) {
+      if (obj[key] && typeof obj[key] === "object") {
+        res[key] = copy(obj[key])
+      } else {
+        res[key] = obj[key]
+      }
+    }
+  }
+  return res
+}
+
+const obj2 = copy(obj1)
+obj2.a = 111
+obj2.c.d = 444
+console.log(obj1);   // { a: 1, b: 2, c: { d: 400, e: 5 } }
+console.log(obj2);   // { a: 100, b: 2, c: { d: 400, e: 5 } }

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      text-decoration: none;
+      list-style: none;
+    }
+
+    #father {
+      width: 800px;
+      height: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #imgslist {
+      width: 4000px;
+      height: 400px;
+    }
+
+    #imgslist img {
+      width: 800px;
+      height: 400px;
+    }
+
+    #imgslist li {
+      float: left;
+    }
+
+    .move {
+      width: 40px;
+      height: 40px;
+      background-color: #999;
+      line-height: 40px;
+      text-align: center;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      cursor: pointer;
+    }
+
+    #prev {
+      left: 0px;
+    }
+
+    #next {
+      right: 0px;
+    }
+
+    #iconlist {
+      position: absolute;
+      bottom: 5px;
+      left: 45%;
+    }
+
+    #iconlist li {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #999;
+      float: left;
+      margin-left: 2px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="father">
+    <ul id="imgslist">
+      <li><img src="img/1.jpg" alt=""></li>
+      <li><img src="img/2.jpg" alt=""></li>
+      <li><img src="img/3.jpg" alt=""></li>
+      <li><img src="img/4.jpg" alt=""></li>
+      <li><img src="img/1.jpg" alt=""></li>
+    </ul>
+    <ul id="iconlist">
+      <li value="0"></li>
+      <li value="1"></li>
+      <li value="2"></li>
+      <li value="3"></li>
+    </ul>
+    <div class="move" id="prev">&lt;</div>
+    <div class="move" id="next">&gt;</div>
+  </div>
+
+  <script>
+    let left = 0;
+    let timer;
+    // 当前小圆点的序号
+    let m = 0;
+    const icons = document.querySelector("#iconlist").querySelectorAll("li")
+    const prev = document.querySelector("#prev");
+    const next = document.querySelector("#next");
+    const iconlist = document.querySelector("#iconlist");
+    const imglist = document.querySelector("#imgslist");
+
+    function run() {
+      if (left <= -3200) {
+        left = 0;
+      }
+      // 确定当前小圆点
+      m = Math.floor(-left / 800)
+      imgslist.style.marginLeft = left + "px";
+      let n = left % 800 === 0 ? 1200 : 10;
+      left -= 10;
+      timer = setTimeout(run, n);
+      iconChange(m)
+    }
+    run()
+
+    function imgChange(n) {
+      const lt = - (n * 800);
+      imgslist.style.marginLeft = lt + "px";
+      left = lt;
+    }
+
+    prev.onclick = function () {
+      let prevgo = Math.floor(-left / 800) - 1;
+      if (prevgo === -1) {
+        prevgo = 3;
+      }
+      imgChange(prevgo)
+    }
+
+    next.onclick = function () {
+      let nextgo = Math.floor(-left / 800) + 1;
+      if (nextgo === 4) {
+        nextgo = 0;
+      }
+      imgChange(nextgo)
+    }
+
+    function iconChange(index) {
+      for (let i = 0; i < icons.length; i++) {
+        icons[i].style.backgroundColor = ""
+      }
+      if (index < icons.length) {
+        icons[index].style.backgroundColor = "red"
+      }
+    }
+
+    iconlist.onclick = function () {
+      // 获取点击的序号
+      const tg = event.target.value;
+      const ico = tg;
+      imgChange(ico)
+      iconChange(ico)
+    }
+
+    imgslist.onmouseover = function () {
+      clearTimeout(timer)
+    }
+    imgslist.onmouseout = function () {
+      run()
+    }
+  </script>
+</body>
+
+</html>

@@ -3750,7 +3750,7 @@ source.cancel('Operation canceled by the user.');
   console.log(person5.friends); // ["p1", "p2", "p3","jerry","lucy"]
 ```
 
-因为Object.create实现的是浅拷贝，所以对于引用类型，存在修改数据混乱的问题。
+因为Object.create实现的是浅拷贝，所以对于引用类型，存在修改数据混乱的问题
 
 3. 原型链继承
 原型链继承涉及构造函数、原型和实例。
