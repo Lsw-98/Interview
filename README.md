@@ -5663,8 +5663,10 @@ btn.onclick = fun;
 ```html
 <input type="button" id="btn" onclick="fun1()">
 
-var btn = document.getElementById('.btn');
-btn.onclick = fun2;
+<script>
+  var btn = document.getElementById('.btn');
+  btn.onclick = fun2;
+</script>
 ```
 
 - IE事件模型：该事件模型共有两个过程：事件处理阶段和事件冒泡阶段。事件处理阶段会首先执行目标元素绑定的监听事件。然后是事件冒泡阶段，冒泡指的是事件从目标元素冒泡到document，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。
