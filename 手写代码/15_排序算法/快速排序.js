@@ -1,17 +1,16 @@
 function quickSort(arr) {
   if (arr.length <= 1) return arr
-
   const left = []
   const right = []
-  const pIndex = Math.floor(arr.length / 2)
-  const p = arr.splice(pIndex, 1)[0]
+  const midIndex = Math.floor(arr.length / 2)
+  const mid = arr.splice(midIndex, 1)[0]
 
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i] < p) left.push(arr[i])
+    if (arr[i] < mid) left.push(arr[i])
     else right.push(arr[i])
   }
 
-  return quickSort(left).concat([p], quickSort(right))
+  return quickSort(left).concat([mid], quickSort(right))
 }
 
 

@@ -1,21 +1,21 @@
 function flatten(arr, deep = 1) {
-  return arr.reduce((acc, val) => {
-    if (Array.isArray(val) && deep > 1) {
-      return acc.concat(flatten(val, deep--))
+  return arr.reduce((pre, cur) => {
+    if (Array.isArray(cur) && deep > 1) {
+      return pre.concat(flatten(cur, deep--))
     } else {
-      return acc.concat(val)
+      return pre.concat(cur)
     }
   }, [])
 }
 
 function flattenDeep(arr) {
-  return arr.reduce((acc, val) => {
-    if (Array.isArray(val)) {
-      return acc.concat(flattenDeep(val))
+  return arr.reduce((pre, cur) => {
+    if (Array.isArray(cur)) {
+      return pre.concat(flattenDeep(cur))
     } else {
-      return acc.concat(val)
+      return pre.concat(cur)
     }
   }, [])
 }
 
-console.log(flattenDeep([[[1, 2], 3], 4, 5, [6, 7]]));
+console.log(flatten([[[1, 2], 3], 4, 5, [6, 7]]));
