@@ -1,13 +1,13 @@
-Promise.resolve = function (res) {
+Promise.resolve = function (data) {
   return new Promise((resolve, reject) => {
-    if (res instanceof Promise) {
-      res.then(data => {
-        resolve(data)
+    if (data instanceof Promise) {
+      data.then(res => {
+        resolve(res)
       }).catch(err => {
         reject(err)
       })
     } else {
-      resolve(res)
+      resolve(data)
     }
   })
 }

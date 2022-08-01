@@ -9,6 +9,7 @@ function curry(fn, args) {
 
     // 拼接得到现有的所有参数
     for (let i = 0; i < arguments.length; i++) {
+      console.log(arguments[i]);
       subArgs.push(arguments[i]);
     }
 
@@ -25,11 +26,13 @@ function curry(fn, args) {
 
 
 var abc = function (a, b, c) {
-  return [a, b, c];
+  return [a, b, c].reduce((pre, cur) => {
+    return pre += cur
+  });
 };
 
 
 var curried = curry(abc);
 console.log(curried(1)(2)(3));
-console.log(curried(1, 2)(3));
-console.log(curried(1, 2, 3)); 
+// console.log(curried(1, 2)(3));
+// console.log(curried(1, 2, 3)); 

@@ -3472,7 +3472,7 @@ axios.patch('apiURL', {
 **axios拦截器执行顺序问题** 
 
 - 请求拦截：axios的请求拦截器会先执行最后指定的回调函数，再依次向前执行
-- 响应拦截：axios的响应拦截器会先执行最先执行的回调函数，再依次向前执行
+- 响应拦截：axios的响应拦截器会先执行最先执行的回调函数，再依次向后执行
 例如：
 
 ```js
@@ -3524,7 +3524,7 @@ console.log("成功了");
 
 **为什么请求拦截2会在请求拦截1之前执行呢？**
 
-在`axios`源码中将发送请求分为了<font color="#FF6347">请求拦截器、发送请求、响应拦截器、相应回调</font>，通过Promise的链式调用将这些部分结合起来了，这样就得到了发送请求拿到数据的全部过程。
+在`axios`源码中将发送请求分为了<font color="#FF6347">请求拦截器、发送请求、响应拦截器、响应回调</font>，通过Promise的链式调用将这些部分结合起来了，这样就得到了发送请求拿到数据的全部过程。
 
 下面分析源码：
 1. 代码开始构建了一个`config配置对象`，用于第一次执行Promise返回一个成功的Promise
@@ -8028,8 +8028,7 @@ return (
 - useMemo：与useEffect类似，区别在于<font color="	#FF6347">传入useMemo的函数会在页面渲染的时候执行，而useEffect是在页面渲染后才执行</font>。只有在数组中存储的变量发生变化时，useMemo()才会执行回调函数，可以减少局部页面渲染，提升性能。
 
 ### useMemo和useCallback的区别
-useCallback和useMemo都是优化性能的手段，类似于类组件中的<font color="	#FF6347">shouldComponentUpdate</font>，useCallback和useMemo都会判断props和state是否变化，从而避免每次父组件render时都去渲染子组件。     
-区别在于<font color="	#FF6347">useCallback返回一个函数，当这个函数被当作组件使用时，可以避免每次更新都重新渲染该组件；useMemo返回一个值，避免每次渲染都要对值进行不必要的计算</font>。
+useCallback和useMemo都是优化性能的手段，区别在于<font color="	#FF6347">useCallback返回一个函数，当这个函数被当作组件使用时，可以避免每次更新都重新渲染该组件；useMemo返回一个值，避免每次渲染都要对值进行不必要的计算</font>。
 
 ### Memo、useMemo和useCallback的区别
 三者都是进行性能优化的：
@@ -8037,7 +8036,7 @@ Memo针对的是一个组件是否重新渲染；而useMemo针对的是一段代
 而useCallback主要用来缓存函数，如果state发生变化，那么整个组件都会被重新渲染，即使一些函数没有必要被渲染，可以使用useCallback来讲这些函数缓存，以此来减少性能损耗。
 
 ### useEffect和useLayoutEffect的区别
-<font color="	#FF6347">useEffect是异步执行的，useLayoutEffect是同步执行的；useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前，和componentDidMount等价</font>。若在useEffect的回调函数中需要对DOM进行样式修改，可以使用useLayoutEffect，避免页面闪烁。<font color="	#FF6347">useLayoutEffect总是比useEffect先执行</font>。
+<font color="	#FF6347">useEffect是异步执行的，useLayoutEffect是同步执行的；useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是浏览器把内容真正渲染到界面之前</font>。若在useEffect的回调函数中需要对DOM进行样式修改，可以使用useLayoutEffect，避免页面闪烁。<font color="	#FF6347">useLayoutEffect总是比useEffect先执行</font>。
 
 ### React.PureComponent、useMemo和React.memo的区别
 React.PureComponent会浅比较prop和state，若比较前后prop和state没有变化，则可以减少渲染次数，提升效率。但<font color="	#FF6347">React.PureComponent只会作浅层比较，对于有复杂结构的prop和state可能会比较出错。所以React.PureComponent只适用于prop和state比较简单的情况</font>。

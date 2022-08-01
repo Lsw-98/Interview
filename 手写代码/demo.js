@@ -66,3 +66,72 @@
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
 
+class Lazy {
+  constructor(name) {
+    this.quque = []
+    this.quque.push(() => {
+      setTimeout(() => {
+        console.log(name);
+        this.next()
+      });
+    })
+    setTimeout(() => {
+      this.next()
+    });
+  }
+
+  next() {
+    setTimeout(() => {
+      if (this.quque.length === 0) return
+      const task = this.quque.shift()
+      task()
+    })
+  }
+
+  eat(value) {
+    this.quque.push(() => {
+      console.log(value);
+      this.next()
+    })
+    return this
+  }
+
+  sleep(delay) {
+    this.quque.push(() => {
+      setTimeout(() => {
+        this.next()
+      }, delay * 1000);
+    })
+    return this
+  }
+
+  sleepFirst(delay) {
+    this.quque.unshift(() => {
+      setTimeout(() => {
+        this.next()
+      }, delay * 1000);
+    })
+    return this
+  }
+}
+
+function LazyMan(name) {
+  return new Lazy(name)
+}
+
+// LazyMan('name').eat('apple').sleep(1).eat('orange')
+// LazyMan("Hank")
+// LazyMan("Hank").sleep(10).eat("dinner")
+// LazyMan("Hank").eat("dinner").eat("supper")
+// LazyMan("Hank").sleepFirst(5).eat("supper")
+
+function f(a) {
+  a.x = 1;
+  console.log(a.x);  // 1
+  a = { x: 3 };
+  console.log(a.x);  // 3
+}
+
+var a = { x: 0 };
+f(a);
+console.log(a.x); // 3

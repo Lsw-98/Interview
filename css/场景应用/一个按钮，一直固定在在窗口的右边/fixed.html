@@ -13,30 +13,28 @@
     }
 
     .father {
+      width: 900px;
+      height: 2000px;
       position: relative;
-    }
-
-    .left {
-      height: 100px;
-      width: 100px;
       background-color: gray;
     }
 
-    .right {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 100px;
+    .child {
+      width: 50px;
+      height: 50px;
       background-color: orange;
+      position: fixed;
+      right: 200px;
+      top: 100px;
     }
   </style>
 </head>
 
 <body>
   <div class="father">
-    <div class="left"></div>
-    <div class="right"></div>
+    <div class="child">
+
+    </div>
   </div>
 </body>
 
