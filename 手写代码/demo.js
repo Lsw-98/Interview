@@ -125,15 +125,13 @@ function LazyMan(name) {
 // LazyMan("Hank").eat("dinner").eat("supper")
 // LazyMan("Hank").sleepFirst(5).eat("supper")
 
-async function main() {
-  for (let i = 1; i < 6; i++) {
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve()
-      }, 1000);
-    })
-    console.log(i);
-  }
+var obj = {
+  '2': 3,
+  '3': 4,
+  'length': 1,
+  'splice': Array.prototype.splice,
+  'push': Array.prototype.push
 }
-
-main()
+obj.push(1)
+obj.push(2)
+console.log(obj)
