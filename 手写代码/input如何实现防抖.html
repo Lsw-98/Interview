@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text">
+  <script>
+    function debounce() {
+      let timer = null
+      return function (value) {
+        if (timer) {
+          clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
+          console.log(value);
+        }, 1000);
+      }
+    }
+
+    const i = document.querySelector("input")
+    let dbFun = debounce()
+    i.addEventListener("keyup", function (e) {
+      dbFun(e.target.value)
+    })
+  </script>
+</body>
+
+</html>

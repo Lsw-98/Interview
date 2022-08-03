@@ -55,32 +55,3 @@ LazyMan("Hank")
 LazyMan("Hank").sleep(10).eat("dinner")
 LazyMan("Hank").eat("dinner").eat("supper")
 LazyMan("Hank").sleepFirst(5).eat("supper")
-
-// class Lazy {
-//   constructor(value) {
-//     console.log(value);
-//   }
-
-//   eat(value) {
-//     console.log(value);
-//     return this
-//   }
-
-//   sleep(delay) {
-//     let date = new Date();
-//     while (true) {
-//       let newDate = new Date()
-//       if (newDate.getTime() - date.getTime() >= delay) {
-//         break;
-//       }
-//     }
-//     return this
-//   }
-// }
-
-// function lazyMan(name) {
-//   return new Lazy(name)
-// }
-
-
-// lazyMan('name').eat('apple').sleep(1000).eat('orange')

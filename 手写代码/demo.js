@@ -66,72 +66,49 @@
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
 
-class Lazy {
-  constructor(name) {
-    this.quque = []
-    this.quque.push(() => {
-      setTimeout(() => {
-        console.log(name);
-        this.next()
-      });
-    })
-    setTimeout(() => {
-      this.next()
-    });
+
+class PubSub {
+  constructor() {
+    this.handles = {}
   }
 
-  next() {
-    setTimeout(() => {
-      if (this.quque.length === 0) return
-      const task = this.quque.shift()
-      task()
-    })
-  }
+  on(eventType, handle) {
+    if (!this.handles.hasOwnProperty(eventType)) {
+      this.handles[eventType] = []
+    }
 
-  eat(value) {
-    this.quque.push(() => {
-      console.log(value);
-      this.next()
-    })
+    if (typeof handle === "function") {
+      this.handles[eventType].push(handle)
+    } else {
+      console.log("缺少回调函数");
+    }
     return this
   }
 
-  sleep(delay) {
-    this.quque.push(() => {
-      setTimeout(() => {
-        this.next()
-      }, delay * 1000);
-    })
+  off(eventType, handle) {
+    if (!this.handles.hasOwnProperty(eventType)) {
+      console.log(`"${eventType}"事件未注册`);
+    } else if (typeof handle !== "function") {
+      console.log("缺少回调函数");
+    } else {
+      this.handles[eventType].forEach((item, key, arr) => {
+        if (item === handle) {
+          arr.splice(key, 1)
+        }
+      })
+    }
     return this
   }
 
-  sleepFirst(delay) {
-    this.quque.unshift(() => {
-      setTimeout(() => {
-        this.next()
-      }, delay * 1000);
-    })
+  emit(eventType, ...args) {
+    if (this.handles.hasOwnProperty(eventType)) {
+      this.handles[eventType].forEach((item) => {
+        item.apply(null, args)
+      })
+    } else {
+      console.log(`"${eventType}"事件未注册`);
+    }
     return this
   }
 }
 
-function LazyMan(name) {
-  return new Lazy(name)
-}
-
-// LazyMan('name').eat('apple').sleep(1).eat('orange')
-// LazyMan("Hank")
-// LazyMan("Hank").sleep(10).eat("dinner")
-// LazyMan("Hank").eat("dinner").eat("supper")
-// LazyMan("Hank").sleepFirst(5).eat("supper")
-
-var obj = {
-  '2': 3,
-  '3': 4,
-  'length': 1,
-  'splice': Array.prototype.splice,
-  'push': Array.prototype.push
-}
-obj.push(1)
-obj.push(2)
-console.log(obj)
