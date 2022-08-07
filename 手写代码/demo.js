@@ -67,48 +67,26 @@
 // new new Foo().getName();  //  3
 
 
-class PubSub {
-  constructor() {
-    this.handles = {}
-  }
-
-  on(eventType, handle) {
-    if (!this.handles.hasOwnProperty(eventType)) {
-      this.handles[eventType] = []
+function demo(arr) {
+  let res = Infinity
+  for (let i = 0; i < arr.length; i++) {
+    let temp = 0
+    for (let j = 0; j < arr.length; j++) {
+      if (temp > res) continue
+      if (j === i) continue
+      if (arr[j] === 0) {
+        temp += 1
+        continue
+      }
+      if (j < i && arr[j] > 0) {
+        temp += 1
+      } else if (j > i && arr[j] < 0) {
+        temp += 1
+      }
     }
-
-    if (typeof handle === "function") {
-      this.handles[eventType].push(handle)
-    } else {
-      console.log("缺少回调函数");
-    }
-    return this
+    if (res > temp) res = temp
   }
-
-  off(eventType, handle) {
-    if (!this.handles.hasOwnProperty(eventType)) {
-      console.log(`"${eventType}"事件未注册`);
-    } else if (typeof handle !== "function") {
-      console.log("缺少回调函数");
-    } else {
-      this.handles[eventType].forEach((item, key, arr) => {
-        if (item === handle) {
-          arr.splice(key, 1)
-        }
-      })
-    }
-    return this
-  }
-
-  emit(eventType, ...args) {
-    if (this.handles.hasOwnProperty(eventType)) {
-      this.handles[eventType].forEach((item) => {
-        item.apply(null, args)
-      })
-    } else {
-      console.log(`"${eventType}"事件未注册`);
-    }
-    return this
-  }
+  return res
 }
 
+console.log(demo([0, -1, 1, 1, -1]));

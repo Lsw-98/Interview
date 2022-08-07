@@ -8989,8 +8989,3 @@ export default class NestedRoutingComponent extends React.Component {
 | Number | 数字值 |
 | Object  | 对象本身 |
 | String  | 对象本身 |
-
-作者：码出宇宙
-链接：https://www.nowcoder.com/discuss/988958?type=2&channel=-1&source_id=discuss_terminal_discuss_hot_nctrack
-来源：牛客网
-

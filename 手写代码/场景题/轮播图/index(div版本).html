@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      text-decoration: none;
+      list-style: none;
+    }
+
+    .container {
+      width: 800px;
+      height: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #imgsList {
+      width: 4000px;
+      height: 400px;
+      cursor: pointer;
+    }
+
+    #imgsList div {
+      float: left;
+      width: 800px;
+      height: 400px;
+    }
+
+    #imgsList div:nth-child(1) {
+      background-color: orange;
+    }
+
+    #imgsList div:nth-child(2) {
+      background-color: gray;
+    }
+
+    #imgsList div:nth-child(3) {
+      background-color: aquamarine;
+    }
+
+    #imgsList div:nth-child(4) {
+      background-color: blueviolet;
+    }
+
+    #imgsList div:nth-child(5) {
+      background-color: orange;
+    }
+
+    .move {
+      width: 30px;
+      height: 40px;
+      position: absolute;
+      background-color: #666;
+      color: #fff;
+      top: 45%;
+      line-height: 40px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #prev {
+      left: 0;
+    }
+
+    #next {
+      right: 0
+    }
+
+    #iconsList {
+      bottom: 5px;
+      left: 40%;
+      position: absolute;
+    }
+
+    #iconsList li {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #666;
+      cursor: pointer;
+      float: left;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="imgsList">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <div class="move" id="prev">&lt;</div>
+    <div class="move" id="next">&gt;</div>
+
+    <ul id="iconsList">
+      <li value="0"></li>
+      <li value="1"></li>
+      <li value="2"></li>
+      <li value="3"></li>
+    </ul>
+  </div>
+
+  <script>
+    let left = 0;
+    let timer;
+    let n;
+    const prev = document.querySelector("#prev")
+    const next = document.querySelector("#next")
+    const imgsLen = document.querySelector("#imgsList").querySelectorAll("li").length - 1
+    const iconsList = document.querySelector("#iconsList")
+    const iconsLen = document.querySelector("#iconsList").querySelectorAll("li")
+
+    function run() {
+      if (left <= -3200) {
+        left = 0
+      }
+      const index = Math.floor(-left / 800)
+      iconChange(index)
+      n = (left % 800 === 0) ? n = 1200 : n = 10
+      imgsList.style.marginLeft = left + "px"
+      timer = setTimeout(run, n);
+      left -= 10
+    }
+
+    run()
+
+    imgsList.addEventListener("mouseover", () => {
+      clearTimeout(timer)
+    })
+
+    imgsList.addEventListener("mouseout", () => {
+      run()
+    })
+
+    function imgChange(index) {
+      const newLeft = -(index * 800)
+      imgsList.style.marginLeft = newLeft + "px"
+      left = newLeft
+    }
+
+    prev.addEventListener("click", () => {
+      let imgIndex = Math.floor(-left / 800) - 1;
+      if (imgIndex === -1) {
+        imgIndex = imgsLen - 1
+      }
+      imgChange(imgIndex)
+      iconChange(imgIndex)
+    })
+
+    next.addEventListener("click", () => {
+      let imgIndex = Math.floor(-left / 800) + 1;
+      if (imgIndex === imgsLen) {
+        imgIndex = 0
+      }
+      imgChange(imgIndex)
+      iconChange(imgIndex)
+    })
+
+    function iconChange(index) {
+      for (let i = 0; i < iconsLen.length; i++) {
+        if (index === i) iconsLen[i].style.backgroundColor = "red"
+        else iconsLen[i].style.backgroundColor = ""
+      }
+    }
+
+    iconsList.addEventListener("click", () => {
+      const tg = event.target.value
+      imgChange(tg)
+      iconChange(tg)
+    })
+  </script>
+</body>
+
+</html>
