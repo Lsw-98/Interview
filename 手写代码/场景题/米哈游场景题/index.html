@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      width: 1000px;
+      height: 700px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .bg {
+      border: 4px solid black;
+      width: 300px;
+      height: 300px;
+      margin: 10px;
+    }
+
+    .first-face {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dot {
+      width: 40px;
+      height: 40px;
+      background-color: black;
+      border-radius: 50%;
+      margin: 20px;
+    }
+
+    .second-face {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .second-face .dot:nth-of-type(2) {
+      align-self: flex-end;
+    }
+
+    .three-face {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .three-face .dot:nth-of-type(2) {
+      justify-content: center;
+      align-self: center;
+    }
+
+    .three-face .dot:nth-of-type(3) {
+      align-self: flex-end;
+    }
+
+    .four-face,
+    .six-face {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .four-face .column,
+    .six-face .column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .five-face {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .five-face .column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .five-face .column:nth-child(2) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btns {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      margin: 10px;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="bg first-face">
+      <span class="dot"></span>
+    </div>
+    <div class="bg second-face">
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+    <div class="bg three-face">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+    <div class="bg four-face">
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+    <div class="bg five-face">
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <div class="column">
+        <span class="dot"></span>
+      </div>
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+    <div class="bg six-face">
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <div class="column">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btns">
+    <button class="btn" id="start">开始</button>
+    <button class="btn" id="stop">暂停</button>
+  </div>
+
+  <script>
+    const start = document.querySelector("#start");
+    const stop = document.querySelector("#stop");
+    // 获取全部面
+    const faces = document.querySelectorAll(".bg");
+    const arr = new Array(faces.length).fill(0).map((item, index) => { return index })
+    let t;
+    let timer;
+    // 将防抖的结果赋值
+    start.onclick = function handleclick() {
+      if (t) {
+        clearInterval(t)
+      }
+      if (timer) {
+        clearTimeout(timer)
+      }
+      debounce()
+      t = setInterval(() => {
+        changeFace()
+      }, 500);
+    }
+
+    stop.addEventListener("click", () => {
+      clearInterval(t)
+    })
+
+    function getIndex() {
+      let index = Math.floor(Math.random() * (faces.length - 1))
+      const temp = arr[arr.length - 1]
+      arr[arr.length - 1] = arr[index]
+      arr[index] = temp
+      return arr[index]
+    }
+
+    function changeFace() {
+      let index = getIndex()
+      console.log(index);
+      // 把边框变色
+      for (let i = 0; i < faces.length; i++) {
+        if (i === index) {
+          faces[i].style.border = "4px solid skyblue"
+        }
+        else faces[i].style.border = "4px solid black"
+      }
+    }
+
+    // 防抖
+    function debounce() {
+      timer = setTimeout(() => {
+        clearInterval(t)
+      }, 5000);
+    }
+  </script>
+</body>
+
+</html>

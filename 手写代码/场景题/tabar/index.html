@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      list-style: none;
+    }
+
+    .tab {
+      width: 978px;
+      margin: 100px auto;
+    }
+
+    .tab-list {
+      height: 39px;
+      border: 1px solid #666;
+      background-color: #f1f1f1;
+      display: flex;
+    }
+
+    .tab-item {
+      height: 39px;
+      line-height: 39px;
+      text-align: center;
+      cursor: pointer;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tab-list .current {
+      background-color: #c81623;
+      color: #fff;
+    }
+
+    .item {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="tab">
+    <div class="tab-list">
+      <li class="tab-item current">模块1</li>
+      <li class="tab-item">模块2</li>
+      <li class="tab-item">模块3</li>
+      <li class="tab-item">模块4</li>
+      <li class="tab-item">模块5</li>
+    </div>
+    <div class="tab-con">
+      <div class="item" style="display: block;">
+        模块1内容
+      </div>
+      <div class="item">
+        模块2内容
+      </div>
+      <div class="item">
+        模块3内容
+      </div>
+      <div class="item">
+        模块4内容
+      </div>
+      <div class="item">
+        模块5内容
+      </div>
+    </div>
+  </div>
+  <script>
+    // 首先获取元素
+    var lis = document.querySelector('.tab-list').querySelectorAll('li')
+    var items = document.querySelectorAll('.item')
+    // 元素获取完成之后利用for循环为每个li标签绑定事件
+    for (var i = 0; i < lis.length; i++) {
+      // 为每个li标签添加自定义属性index
+      lis[i].setAttribute('index', i)
+      lis[i].onclick = function () {
+        // 所有标签的类均设置为空
+        for (var i = 0; i < lis.length; i++) {
+          lis[i].className = 'tab-item'
+        }
+        // 将自己标签的类设置成红背景，白字体
+        this.className = 'tab-item current'
+        // 获取当前li的index属性。
+        var index = this.getAttribute('index')
+        for (var i = 0; i < lis.length; i++) {
+          // 将所有li标签对应的内容均设置为不可见
+          items[i].style.display = 'none'
+        }
+        // 将当前li标签对应的内容设置为可见
+        items[index].style.display = 'block';
+      }
+    }
+  </script>
+</body>
+
+</html>

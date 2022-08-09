@@ -66,27 +66,19 @@
 // new Foo().getName();  // 1
 // new new Foo().getName();  //  3
 
+const t = setInterval(() => {
+  console.log(1);
+}, 500);
 
-function demo(arr) {
-  let res = Infinity
-  for (let i = 0; i < arr.length; i++) {
-    let temp = 0
-    for (let j = 0; j < arr.length; j++) {
-      if (temp > res) continue
-      if (j === i) continue
-      if (arr[j] === 0) {
-        temp += 1
-        continue
-      }
-      if (j < i && arr[j] > 0) {
-        temp += 1
-      } else if (j > i && arr[j] < 0) {
-        temp += 1
-      }
+function db() {
+  let timer = null;
+  return function () {
+    if (timer) {
+      clearTimeout(timer)
     }
-    if (res > temp) res = temp
+    timer = setTimeout(() => {
+      clearInterval(t)
+    }, 5000);
   }
-  return res
 }
 
-console.log(demo([0, -1, 1, 1, -1]));
