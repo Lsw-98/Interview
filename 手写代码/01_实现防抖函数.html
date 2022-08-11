@@ -19,9 +19,6 @@
   <div></div>
   <script>
 
-    const t = setInterval(() => {
-      console.log(1);
-    }, 500);
     function debounce(fn, delay) {
       let timer = null   // 借助闭包
       return function (...args) {
@@ -30,7 +27,6 @@
         }
         timer = setTimeout(() => {
           fn.apply(this, args)
-          clearInterval(t)
         }, delay);
       }
     }

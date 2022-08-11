@@ -9,8 +9,6 @@ function flatten(arr, deep = 1) {
   }, [])
 }
 
-// console.log(flatten([1, 2, [3, 4, 5, [6, [7, 8, 9]]]]));
-
 // 扩展运算符
 function demo(arr) {
   while (arr.some(item => Array.isArray(item))) {
@@ -19,4 +17,4 @@ function demo(arr) {
   return arr
 }
 
-console.log(demo([1, 2, [3, 4, 5, [6, [7, 8, 9]]]]));
+console.log(flatten([1, 2, [3, 4, 5, [6, [7, 8, 9]]]]));

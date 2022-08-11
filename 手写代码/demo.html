@@ -6,100 +6,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    * {
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      list-style: none;
-    }
-
-    #container {
-      width: 1000px;
-      margin: 100px auto;
-    }
-
-    #tabbar {
-      height: 40px;
-      border: 1px solid #666;
-      background-color: #f1f1f1;
-      display: flex;
-    }
-
-    #tabbar-item {
-      flex: 1;
-      justify-content: center;
-      align-items: center;
-      height: 40px;
-      line-height: 40px;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .current {
-      background-color: #c81623;
-    }
-
-    .item {
-      display: none;
-    }
-  </style>
 </head>
 
 <body>
-  <div id="container">
-    <div id="tabbar">
-      <li id="tabbar-item" class="current" value="0" onclick="click"> 模块1 </li>
-      <li id="tabbar-item" class="" value="1"> 模块2 </li>
-      <li id="tabbar-item" class="" value="2"> 模块3 </li>
-      <li id="tabbar-item" class="" value="3"> 模块4 </li>
-      <li id="tabbar-item" class="" value="4"> 模块5 </li>
-    </div>
-
-    <div id="tab-content">
-      <div class="item" style="display: block;">
-        模块1内容
-      </div>
-      <div class="item">
-        模块2内容
-      </div>
-      <div class="item">
-        模块3内容
-      </div>
-      <div class="item">
-        模块4内容
-      </div>
-      <div class="item">
-        模块5内容
-      </div>
-    </div>
-  </div>
-
+  <input class="i" type="text" onInput="handleClick()">
+  <p class="p"></p>
   <script>
-    const lis = document.querySelector("#tabbar").querySelectorAll("li")
-    const contents = document.querySelector("#tab-content").querySelectorAll(".item")
-    const tabbar = document.querySelector("#tabbar")
-    function demo(index) {
-      for (let i = 0; i < lis.length; i++) {
-        if (i === index) {
-          lis[i].className = "current"
-          contents[i].style.display = "block"
-        }
-        else {
-          lis[i].className = ""
-          contents[i].style.display = "none"
-        }
+    const p = document.querySelector(".p")
+    const i = document.querySelector(".i")
+    const data = {}
+
+    Object.defineProperty(data, "val", {
+      get: function () {
+        return val
+      },
+
+      set: function (newVal) {
+        val = newVal
+        p.innerHTML = val
+        i.value = val
       }
-    }
-
-
-
-    tabbar.addEventListener("click", () => {
-      const tg = event.target.value;
-      demo(tg)
     })
+
+    function handleClick() {
+      data.val = i.value
+    }
   </script>
 </body>
 

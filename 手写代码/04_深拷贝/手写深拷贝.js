@@ -10,8 +10,6 @@ let obj1 = {
   e: [1, 2, 3]
 }
 
-let obj = [1, 2, 3, [4, 5, 6]]
-
 function deepcopy(obj) {
   let res = Array.isArray(obj) ? [] : {}
   if (obj && typeof obj === "object") {
@@ -30,7 +28,7 @@ function deepcopy(obj) {
   return res
 }
 
-obj2 = deepcopy(obj1)
+const obj2 = deepcopy(obj1)
 
 obj2.a = 111
 obj2.c.d = 444
