@@ -598,8 +598,8 @@ IE盒子模型： box-sizing: border-box
 box-sizing默认值为`content-box`，不可继承    
 
 ### 两者的区别
- - 标准盒子模型的宽度为border * 2 + padding * 2 + content(width)
- - IE盒子模型为border * 2 + padding * 2 > width ? border + padding : width
+ - 标准盒子模型元素的宽度为border * 2 + padding * 2 + content(width)
+ - IE盒子模型元素的宽度为border * 2 + padding * 2 > width ? border + padding : width
 
 ### li 与 li 之间有看不见的空白间隔是什么原因引起的？如何解决？
 浏览器会把`inline`元素间的空白字符（空格、换行、Tab等）渲染成一个空格。在`ul`中，通常是一个`li`占据一行，这导致`li`换行后会产生换行字符，它变成了一个空格，占用了一个字符的宽度。

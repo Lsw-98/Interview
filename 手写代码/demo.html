@@ -6,32 +6,33 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    #border-box {
+      box-sizing: border-box;
+    }
+
+    #content-box {
+      box-sizing: content-box;
+    }
+
+    .box {
+      width: 100px;
+      height: 100px;
+      margin: 20px;
+      padding: 20px;
+      border: 20px solid red;
+      background-color: blue;
+    }
+  </style>
 </head>
 
 <body>
-  <input class="i" type="text" onInput="handleClick()">
-  <p class="p"></p>
-  <script>
-    const p = document.querySelector(".p")
-    const i = document.querySelector(".i")
-    const data = {}
 
-    Object.defineProperty(data, "val", {
-      get: function () {
-        return val
-      },
 
-      set: function (newVal) {
-        val = newVal
-        p.innerHTML = val
-        i.value = val
-      }
-    })
-
-    function handleClick() {
-      data.val = i.value
-    }
-  </script>
+  <!-- 18 10 -->
+  <div id="border-box" class="box"></div>
+  <!-- 10 10 -->
+  <div id="content-box" class="box"></div>
 </body>
 
 </html>
