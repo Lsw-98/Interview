@@ -3760,10 +3760,10 @@ function Parent() {
   this.play = [1, 2, 3]
 }
 function Child() {
-  this.type = 'child2';
+  this.type = 'child2'; 
 }
 Child.prototype = new Parent()
-console.log(new Child())
+console.log(new Child())   
 ```
 <font color="#FF6347">创建子类实例时，不能向父构造函数传递参数，导致继承的父类属性没有值。如果包含引用类型，会被所有的实例对象共享，容易造成修改混乱</font>
 
