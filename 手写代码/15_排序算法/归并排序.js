@@ -29,5 +29,5 @@ function merge(left, right) {
   return result;
 }
 
-// 时间复杂度 O(nlogn)
+// 归并排序 时间复杂度 O(nlogn)  是一种稳定的排序算法
 console.log(mergeSort([1, 5, 9, 7, 3, 2, 6, 4, 8]));

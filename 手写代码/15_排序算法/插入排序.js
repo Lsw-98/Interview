@@ -12,5 +12,5 @@ function insertionSort(arr) {
 }
 
 
-// 时间复杂度 最坏情况O(n^2) 最好情况O(n)
+// 插入排序 时间复杂度 最坏情况O(n^2) 最好情况O(n)  稳定的
 console.log(insertionSort([1, 5, 9, 7, 3, 2, 6, 4, 8]));

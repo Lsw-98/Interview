@@ -13,6 +13,6 @@ function selectionSort(arr) {
   return arr
 }
 
-// 时间复杂度 最好最坏都是 O(n^2)
+// 选择排序：时间复杂度 最坏是 O(n^2) 最好是：O(nlogn)
 
 console.log(selectionSort([1, 5, 9, 7, 3, 2, 6, 4, 8]));

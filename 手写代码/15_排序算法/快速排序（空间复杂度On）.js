@@ -14,6 +14,6 @@ function quickSort(arr) {
 }
 
 
-// 时间复杂度 最坏是 O(n^2)  最好是O(nlongn)
+// 时间复杂度 最坏是 O(n^2)  最好是O(nlongn)  不稳定
 
 console.log(quickSort([1, 5, 9, 7, 3, 2, 6, 4, 8]));

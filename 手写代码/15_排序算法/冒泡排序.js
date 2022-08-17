@@ -11,6 +11,6 @@ function bubbleSort(arr) {
   return arr
 }
 
-// 时间复杂度 最坏O(n^2) 最好O(n)
+// 冒泡排序：时间复杂度 最坏O(n^2) 最好O(n)
 
 console.log(bubbleSort([1, 5, 9, 7, 3, 2, 6, 4, 8]))
