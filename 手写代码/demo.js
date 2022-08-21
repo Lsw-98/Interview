@@ -1,9 +1,11 @@
-function demo(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    for (let j = 0; j < i; j++) {
+var a = 0
+function f(n) {
+  a += 1
+  console.log(a)
+  if (n == 0) return 0
+  if (n == 1) return 1
 
-    }
-  }
+  return f(n - 1) + f(n - 2)
 }
 
-console.log(demo([1, 5, 9, 7, 3, 2, 6, 4, 8]));
+f(5)
