@@ -10,21 +10,22 @@
   <style>
     .container {
       display: grid;
-      grid-template-columns: 100px 1fr 100px;
+      grid-template-columns: 1fr, 2fr, 3fr;
     }
 
-    .left {
+    .item {
       height: 100px;
+    }
+
+    .first {
       background-color: orange;
     }
 
-    .right {
-      height: 100px;
+    .second {
       background-color: gray;
     }
 
-    .center {
-      height: 100px;
+    .third {
       background-color: skyblue;
     }
   </style>
@@ -32,9 +33,9 @@
 
 <body>
   <div class="container">
-    <div class="item left"></div>
-    <div class="item center"></div>
-    <div class="item right"></div>
+    <div class="item first"></div>
+    <div class="item second"></div>
+    <div class="item third"></div>
   </div>
 </body>
 

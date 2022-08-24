@@ -13,6 +13,7 @@ class MyLazyMan {
       this.next();
     })
   }
+
   next() {
     setTimeout(() => {
       if (this.queue.length === 0) return;
@@ -20,6 +21,7 @@ class MyLazyMan {
       task();
     })
   }
+
   eat(something) {
     this.queue.push(() => {
       console.log(`Eat ${something}`);
@@ -27,6 +29,7 @@ class MyLazyMan {
     });
     return this;
   }
+
   sleep(second) {
     this.queue.push(() => {
       setTimeout(() => {
@@ -36,6 +39,7 @@ class MyLazyMan {
     });
     return this;
   }
+
   sleepFirst(second) {
     this.queue.unshift(() => {
       setTimeout(() => {
@@ -51,7 +55,7 @@ function LazyMan(name) {
   return new MyLazyMan(name);
 }
 
-LazyMan("Hank")
-LazyMan("Hank").sleep(10).eat("dinner")
-LazyMan("Hank").eat("dinner").eat("supper")
+// LazyMan("Hank")
+// LazyMan("Hank").sleep(10).eat("dinner")
+// LazyMan("Hank").eat("dinner").eat("supper")
 LazyMan("Hank").sleepFirst(5).eat("supper")
