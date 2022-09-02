@@ -6,15 +6,39 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    div {
+      width: 100px;
+      height: 100px;
+    }
+
+    div:hover {
+      animation: 1s rainbow infinite;
+    }
+
+    @keyframes rainbow {
+      0% {
+        background-color: #c00;
+      }
+
+      50% {
+        background-color: orange;
+      }
+
+      100% {
+        background-color: yellowgreen;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <div style="background-color: #f00;color: #fff;line-height: 30px;height: 200px;text-indent: 2em;padding: 5px 10px;">
-    welcome
+  <div id="box">
   </div>
-  <div style="background-color: #f00;color: #fff;line-height: 30px;height: 200px;padding: 5px 10px;">
-    welcome
-  </div>
+
+  <script>
+
+  </script>
 </body>
 
 </html>

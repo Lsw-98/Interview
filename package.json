@@ -1,5 +1,24 @@
 {
   "dependencies": {
     "immutable": "^4.1.0"
-  }
+  },
+  "name": "interview",
+  "description": "注:  \r     &emsp;&emsp;整个库的文档都是自己整理，自己手码的，有错误的地方，请指出，谢谢!!!。如果你喜欢的话，麻烦点一个star吧，谢谢!!!  \r     &emsp;&emsp;下面进行正题。",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lsw-98/Learn-CSS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lsw-98/Learn-CSS/issues"
+  },
+  "homepage": "https://github.com/Lsw-98/Learn-CSS#readme"
 }
