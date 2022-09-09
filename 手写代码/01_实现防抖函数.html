@@ -18,7 +18,7 @@
 <body>
   <div></div>
   <script>
-
+    const div = document.querySelector("div")
     function debounce(fn, delay) {
       let timer = null   // 借助闭包
       return function (...args) {
@@ -35,7 +35,7 @@
       let scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
       console.log('滚动条位置：' + scrollTop);
     }
-    window.onscroll = debounce(showTop, 5000)
+    window.onscroll = debounce(showTop, 500)
   </script>
 </body>
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Tabs from "./View/Tabs"
 
 export default class App extends Component {
   constructor(props) {
@@ -11,9 +12,12 @@ export default class App extends Component {
   render() {
     // console.log(this);
     return (
-      <button onClick={this.toggleBtnClick}>
-        {this.state.isToggleOn ? 'Button On' : 'Button Off'}
-      </button>
+      <>
+        <Tabs></Tabs>
+        <button onClick={this.toggleBtnClick}>
+          {this.state.isToggleOn ? 'Button On' : 'Button Off'}
+        </button>
+      </>
     );
   }
   toggleBtnClick(isToggleOn, e) {
