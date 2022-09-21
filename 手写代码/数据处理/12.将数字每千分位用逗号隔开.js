@@ -36,5 +36,5 @@ function format(num) {
 }
 
 
-console.log(format(123456789.33))  // '12,323.33');
-console.log(format(123456789))  // '12,323');
+console.log(format())  // '12,323.33');
+console.log(format(12345678))  // '12,323');
